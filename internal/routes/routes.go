@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
@@ -13,9 +14,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// AK TODO should be in a separate aggreagate
 type API struct {
-	TikTok *tiktok.TikTokClient
-	Bot    *bot.Bot
+	TikTok       *tiktok.TikTokClient
+	Bot          *bot.Bot
+	RoflersStore *roflers.RoflersStore
 	// AK TODO add base concerns like liviness probe
 }
 
@@ -29,8 +32,10 @@ func (api API) AddRoutes(router *mux.Router) {
 
 // Handles callback from Telegram. Extracts url from message, converts video and uploads it back.
 func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {
-	api.replaceLinkWithMessage(req)
-	// AK TODO add error handling
+	wasHandeled, _ := api.replaceLinkWithMessage(req)
+	if wasHandeled {
+		api.captureReaction(req)
+	}
 }
 
 // Downloads video from url and returns it as mp4 file compitable with telegram.
@@ -66,17 +71,17 @@ func (api API) download(resp http.ResponseWriter, req *http.Request) {
 	_, _ = resp.Write(content)
 }
 
-func (api API) replaceLinkWithMessage(req *http.Request) error {
-	log.Info("Telegram callback was called")
-
+func (api API) replaceLinkWithMessage(req *http.Request) (bool, error) {
+	wasHandeled := false
 	tvp, err := api.Bot.TryExtractTikTokUrlData(req)
 
 	if tvp == nil {
-		return nil
+		return wasHandeled, nil
 	}
 
+	wasHandeled = true
 	if err != nil {
-		return err
+		return wasHandeled, err
 	}
 
 	log.Info("Url was found in a callback message: ", tvp.Url)
@@ -84,13 +89,13 @@ func (api API) replaceLinkWithMessage(req *http.Request) error {
 	item, err := api.TikTok.GetItemByUrl(tvp.Url)
 
 	if err != nil {
-		return err
+		return wasHandeled, err
 	}
 
 	bc, err := api.TikTok.DownloadVideoFromItem(item)
 
 	if err != nil {
-		return err
+		return wasHandeled, err
 	}
 
 	tvp.VideoData.Payload = bc
@@ -102,35 +107,64 @@ func (api API) replaceLinkWithMessage(req *http.Request) error {
 	err = api.Bot.PostTiktokVideoFromUrl(tvp)
 
 	if err != nil {
-		return err
+		return true, err
 	}
 
 	err = api.Bot.DeletePost(tvp.ChatId, tvp.OriginalMessageId)
 
 	if err != nil {
-		return err
+		return wasHandeled, err
 	}
 
-	store := roflers.New()
+	rofler, found, err := api.RoflersStore.GetByUserName(tvp.Sender)
 
-	roflerU, found, err := store.GetByUserName(tvp.Sender)
+	if err != nil {
+		return wasHandeled, err
+	}
+
+	newPost := roflers.Post{
+		TiktokId: tvp.VideoData.Id,
+		Url:    :  tvp.Url,
+		PostedOn :time.Now(),
+	}
+
+	rofler.AddPost(newPost)
+
+	if !found {
+		rofler.UserName = tvp.Sender
+	}
+
+	err = api.RoflersStore.Upsert(rofler)
+
+	if err != nil {
+		return wasHandeled, err
+	}
+
+	return wasHandeled, nil
+}
+
+func (api API) captureReaction(req *http.Request) error {
+	tiktokid, sender, err := api.Bot.TryExtractTikTokReaction(req)
 
 	if err != nil {
 		return err
 	}
 
-	newPost := roflers.Post{
-		TiktokId:      tvp.VideoData.Id,
-		Url:           tvp.Url,
-		ChatLikeCount: tvp.VideoData.LikesCount,
+	if tiktokid == "" {
+		return nil
 	}
 
-	if !found {
-		roflerU.UserName = tvp.Sender
-		roflerU.AddPost(newPost)
+	log.Infof("Reaction was found for %s sent by %s", tiktokid, sender)
+
+	rofler, _, err := api.RoflersStore.GetByUserName(sender)
+
+	if err != nil {
+		return err
 	}
 
-	err = store.Upsert(roflerU)
+	rofler.IncrementLike(tiktokid)
+
+	err = api.RoflersStore.Upsert(rofler)
 
 	if err != nil {
 		return err

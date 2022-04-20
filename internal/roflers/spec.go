@@ -1,5 +1,8 @@
 package roflers
 
+import (
+	"time"
+)
 type Rofler struct {
 	UserName string `firestore:"user_name"`
 	Posts    []Post `firestore:"posts"`
@@ -11,10 +14,19 @@ type Post struct {
 	Url           string   `firestore:"url"`
 	ChatLikeCount int      `firestore:"chat_like_count"`
 	KeyWords      []string `firestore:"key_words"`
+	PostedOn      time.Time `firestore:"posted_on"`
 }
 
 func (r *Rofler) AddPost(p Post) {
 	r.Posts = append(r.Posts, p)
+}
+
+func (r *Rofler) IncrementLike(tiktokid string) {
+	for _, p := range r.Posts {
+		if p.TiktokId == tiktokid {
+			p.ChatLikeCount++
+		}
+	}
 }
 
 type RoflerStore interface {

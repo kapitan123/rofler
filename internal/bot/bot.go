@@ -18,17 +18,16 @@ type Bot struct {
 	api *tgbotapi.BotAPI
 }
 
-func New() (*Bot, error) {
+func New() *Bot {
 	bot, err := tgbotapi.NewBotAPI(config.TelegramToken)
 	if err != nil {
-		log.Error("Error creating Telegram bot API: ", err)
-		return nil, err
+		log.Panic("Error creating Telegram bot API: ", err)
 	}
 
 	log.Info("Authorized on account %s", bot.Self.UserName)
 	bot.Debug = true
 
-	return &Bot{api: bot}, nil
+	return &Bot{api: bot}
 }
 
 // Post TikTok back to the Telegram channel.
@@ -74,6 +73,23 @@ func (b *Bot) TryExtractTikTokUrlData(req *http.Request) (*TikTokVideoPost, erro
 	}
 
 	return nil, nil
+}
+
+func (b *Bot) TryExtractTikTokReaction(req *http.Request) (string, string, error) {
+	update, err := b.api.HandleUpdate(req)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	if !b.api.IsMessageToMe(*update.Message) {
+		return "", "", nil
+	}
+
+	sender := update.Message.ReplyToMessage.From.UserName
+	tiktokId := update.Message.ReplyToMessage.Video.FileName
+
+	return sender, tiktokId, nil
 }
 
 func (b *Bot) DeletePost(chatId int64, messageId int) error {

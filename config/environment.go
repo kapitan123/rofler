@@ -19,20 +19,15 @@ var GcloudCreds = os.Getenv(gcloudAppCredsEnv)
 
 func init() {
 	if TelegramToken == "" {
-		TelegramToken = "5144696466:AAGPHvo9LGjyqZAUG265hFrpOfn0yjccJ6w"
-		//log.Error("Telegram bot token is not set. Please set it in the environment variable ", telegramTokenEnv)
+		log.Panic("Telegram bot token is not set. Please set it in the environment variable ", telegramTokenEnv)
 	}
 
 	if ProjectId == "" {
 		ProjectId = "neat-cycling-346311"
-		// AK TODO panic on all env variables with no defaults
-		//log.Panic("Firestore projectid is not set. Please set it in the environment variable ", projectIdEnv)
+		log.Panic("Firestore projectid is not set. Please set it in the environment variable ", projectIdEnv)
 	}
 
 	if GcloudCreds == "" {
 		log.Info("gcloud creds not set. ADC default will be used. Variable ", gcloudAppCredsEnv)
-		GcloudCreds = "C:\\pet_proj\\neat-cycling-346311-82a839e49d3d.json"
-		// AK TODO panic on all env variables with no defaults
-		//log.Panic("Firestore projectid is not set. Please set it in the environment variable ", projectIdEnv)
 	}
 }

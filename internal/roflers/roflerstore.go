@@ -44,13 +44,17 @@ func (rs *RoflersStore) GetAll() ([]Rofler, error) {
 	return roflers, nil
 }
 
+// Tries to fetch a document by id
+// Internally firestore throws an error if the document does not exist.
+// We treat all errors on fetching as not found.
+// Errors on convertion are treated in a regural way
 func (rs *RoflersStore) GetByUserName(username string) (Rofler, bool, error) {
 	var r Rofler
 	doc := rs.col.Doc(username)
 	snap, err := doc.Get(*rs.ctx)
 
 	if err != nil {
-		return r, false, err
+		return r, false, nil
 	}
 
 	if err := snap.DataTo(&r); err != nil {
@@ -71,12 +75,14 @@ func (rs *RoflersStore) Upsert(r Rofler) error {
 	return nil
 }
 
+func (rs *RoflersStore) Close() {
+	rs.client.Close()
+}
+
 func createClient(ctx context.Context) *firestore.Client {
 	client, err := firestore.NewClient(ctx, config.ProjectId)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
-	// AK TODO Close client when done with in program exit
-	// defer client.Close()
 	return client
 }

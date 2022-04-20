@@ -7,8 +7,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/config"
-	"github.com/kapitan123/telegrofler/internal/routes"
 	"github.com/kapitan123/telegrofler/internal/bot"
+	"github.com/kapitan123/telegrofler/internal/roflers"
+	"github.com/kapitan123/telegrofler/internal/routes"
 	"github.com/kapitan123/telegrofler/pkg/tiktok"
 
 	log "github.com/sirupsen/logrus"
@@ -21,9 +22,13 @@ func main() {
 	router := mux.NewRouter()
 
 	api := routes.API{
-		TikTok: tiktok.New(),
-		Bot: bot.New()
+		TikTok:       tiktok.New(),
+		Bot:          bot.New(),
+		RoflersStore: roflers.New(),
 	}
+
+	// AK TODO should close the whole api
+	defer api.RoflersStore.Close()
 
 	api.AddRoutes(router)
 

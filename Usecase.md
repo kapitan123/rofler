@@ -1,8 +1,3 @@
-5. Put insode docker
-6. Host on cloud run
-7. Make it store stats
-8. Make it get stats
-
 9. Should store statistics
 
    1. PosterId, DatePosted, tiktok url, likescount
