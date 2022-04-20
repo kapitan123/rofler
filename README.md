@@ -1,16 +1,18 @@
 # rofler
+
 Teglegram bot Api documentation
 
 https://core.telegram.org/bots/api
 https://core.telegram.org/bots/webhooks
 https://core.telegram.org/bots/webhooks#testing-your-bot-with-updates
 
-Telegram bot client 
-https://github.com/go-telegram-bot-api/telegram-bot-api
+bot api
+https://go-telegram-bot-api.dev/
 
-
-Unofficial client might work
-https://github.com/siongui/tiktokgo/blob/main/tiktokdl/item.go
-
-python scrapper 
+python scrapper
 https://github.com/drawrowfly/tiktok-scraper
+
+dashboard
+https://console.cloud.google.com/functions/details/europe-central2/telegrofler-bot?env=gen1&authuser=1&project=neat-cycling-346311&tab=source
+
+https://github.com/irevenko/tiktik

@@ -1,0 +1,217 @@
+{
+	"info": {
+		"_postman_id": "42eb8faa-36b8-425a-95c5-37754b4ed342",
+		"name": "Payments",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "BankProxy.API",
+			"item": [
+				{
+					"name": "TrustyBankTransaction success",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"paymentId\": \"90b7e820-cdc3-401f-bb21-81ccee36f009\",\r\n    \"amount\": {\r\n        \"amount\": 100,\r\n        \"currencyCode\": \"USD\"\r\n    },\r\n    \"cardDetails\": {\r\n        \"number\": \"5555555555554444\",\r\n        \"holderName\": \"Test Testov\",\r\n        \"expiration\": \"2026-08-01T07:00:00+00:00\",\r\n        \"cvv\": \"111\"\r\n    },\r\n    \"CreationDate\": \"2022-03-25T12:53:49\",\r\n    \"message\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost/bank-proxy-api/api/v1/IntegrationEvent/PaymentStatusChangedToReadyForExternalTransaction",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"bank-proxy-api",
+								"api",
+								"v1",
+								"IntegrationEvent",
+								"PaymentStatusChangedToReadyForExternalTransaction"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TrustyBankTransaction noMoney",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"paymentId\": \"90b7e820-cdc3-401f-bb21-81ccee36f009\",\r\n    \"amount\": {\r\n        \"amount\": 100,\r\n        \"currencyCode\": \"USD\"\r\n    },\r\n    \"cardDetails\": {\r\n        \"number\": \"5555555555554444\",\r\n        \"holderName\": \"Test Testov\",\r\n        \"expiration\": \"2026-08-01T07:00:00+00:00\",\r\n        \"cvv\": \"111\"\r\n    },\r\n    \"CreationDate\": \"2022-03-25T12:53:49\",\r\n    \"message\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost/bank-proxy-api/api/v1/IntegrationEvent/PaymentStatusChangedToReadyForExternalTransaction",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"bank-proxy-api",
+								"api",
+								"v1",
+								"IntegrationEvent",
+								"PaymentStatusChangedToReadyForExternalTransaction"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Paymetns.API",
+			"item": [
+				{
+					"name": "Get Payment Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-MERCHANT-KEY",
+								"value": "34f25424-088c-482a-a75e-8ccbbecf8112",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost/api/v1/payments/90b7e820-cdc3-401f-bb21-81ccee36f009/details",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payments",
+								"90b7e820-cdc3-401f-bb21-81ccee36f009",
+								"details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-MERCHANT-KEY",
+								"value": "34f25424-088c-482a-a75e-8ccbbecf8112",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"message\": \"\",\r\n    \"sum\": {\r\n        \"amount\": 100,\r\n        \"currencyCode\": \"USD\"\r\n    },\r\n    \"cardDetails\": {\r\n        \"number\": \"5555555555554444\",\r\n        \"holderName\": \"Test Testov\",\r\n        \"expiration\": \"2026-08-01T00:00:00-07:00\",\r\n        \"cvv\": \"111\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost/api/v1/payments/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payments",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit blacklisted card",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-MERCHANT-KEY",
+								"value": "34f25424-088c-482a-a75e-8ccbbecf8112",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"message\": \"blackList\",\r\n    \"sum\": {\r\n        \"amount\": 100,\r\n        \"currencyCode\": \"USD\"\r\n    },\r\n    \"cardDetails\": {\r\n        \"number\": \"5555555555554444\",\r\n        \"holderName\": \"Test Testov\",\r\n        \"expiration\": \"2026-08-01T00:00:00-07:00\",\r\n        \"cvv\": \"111\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost/api/v1/payments/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payments",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit non authorized merchant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-MERCHANT-KEY",
+								"value": "8271c4ee-cb94-4877-a3f7-7382d41d9918",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"message\": \"\",\r\n    \"sum\": {\r\n        \"amount\": 100,\r\n        \"currencyCode\": \"USD\"\r\n    },\r\n    \"cardDetails\": {\r\n        \"number\": \"5555555555554444\",\r\n        \"holderName\": \"Test Testov\",\r\n        \"expiration\": \"2026-08-01T00:00:00-07:00\",\r\n        \"cvv\": \"111\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost/api/v1/payments/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"v1",
+								"payments",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
