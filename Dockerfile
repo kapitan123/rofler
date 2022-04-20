@@ -13,6 +13,7 @@ COPY go.sum .
 RUN go mod download
 
 # Copy Go source files
+COPY config/ ./config/
 COPY cmd/ ./cmd/
 COPY pkg/ ./pkg/
 COPY internal/ ./internal/
@@ -24,9 +25,8 @@ RUN GOOS=linux \
 # ===================================================================================
 # === Stage 2: Create a lightweight container =======================================
 # ===================================================================================
-FROM alpine
-# start from scratch
-# FROM scratch
+FROM scratch
+
 WORKDIR /app
 
 COPY --from=build /build/server . 

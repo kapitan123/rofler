@@ -124,8 +124,8 @@ func (api API) replaceLinkWithMessage(req *http.Request) (bool, error) {
 
 	newPost := roflers.Post{
 		TiktokId: tvp.VideoData.Id,
-		Url:    :  tvp.Url,
-		PostedOn :time.Now(),
+		Url:      tvp.Url,
+		PostedOn: time.Now(),
 	}
 
 	rofler.AddPost(newPost)
