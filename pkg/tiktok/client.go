@@ -21,19 +21,19 @@ var defaultHeaders = map[string]string{
 const tikTokRootUrl = "https://www.tiktok.com/"
 
 type TikTokClient struct {
-	cookies map[string]string
+	cookies []http.Cookie
 }
 
 func New() *TikTokClient {
 	log.Info("Tiktok client. Loading cookies.")
 
-	ttc := &TikTokClient{make(map[string]string)}
+	ttc := &TikTokClient{make([]http.Cookie, 10)}
 	err := ttc.initCookies()
 
 	if err != nil {
 		log.Error("Cookis fetch has failed future requests might fail: ", err)
 	} else {
-		log.Info("Tiktok client. Cookies loaded.")
+		log.Infof("Tiktok client. Cookies loaded.", ttc.cookies)
 	}
 
 	return ttc
@@ -46,6 +46,8 @@ func (ttc *TikTokClient) DownloadVideoFromItem(item *Item) ([]byte, error) {
 // Downloads the video item given the username. (@ not included) and video id in the item URL.
 func (ttc *TikTokClient) GetItemByUrl(url string) (*Item, error) {
 	b, err := ttc.getFromTikTok(url)
+
+	//&http.Client{}
 	if err != nil {
 		return nil, err
 	}
@@ -55,10 +57,8 @@ func (ttc *TikTokClient) GetItemByUrl(url string) (*Item, error) {
 	return ttc.getPersistedDataScript(stringified)
 }
 
-// Poor mans state store
-
 func (ttc *TikTokClient) initCookies() error {
-	resp, err := ttc.doAuthenticatedRequest(http.MethodGet, tikTokRootUrl, defaultHeaders, ttc.cookies)
+	resp, err := ttc.doAuthenticatedRequest(http.MethodGet, tikTokRootUrl)
 
 	if err != nil {
 		return err
@@ -67,14 +67,34 @@ func (ttc *TikTokClient) initCookies() error {
 	defer resp.Body.Close()
 
 	for _, cookie := range resp.Cookies() {
-		ttc.cookies[cookie.Name] = cookie.Value
+		if cookie.Name == "tt_webid_v2" {
+			continue
+		}
+		ttc.cookies = append(ttc.cookies, *cookie)
 	}
+
+	cookiess := http.Cookie{
+		Name:   "sid_tt",
+		Value:  "1d47ff3138d5f6eac04c46663fa7db76",
+		Path:   "/",
+		Domain: ".tiktok.com",
+	}
+
+	cookiewebid := http.Cookie{
+		Name:   "tt_webid_v2",
+		Value:  "689854141086886123",
+		Path:   "/",
+		Domain: "tiktok.com",
+	}
+
+	ttc.cookies = append(ttc.cookies, cookiess)
+	ttc.cookies = append(ttc.cookies, cookiewebid)
 
 	return nil
 }
 
 func (ttc *TikTokClient) getFromTikTok(url string) (b []byte, err error) {
-	resp, err := ttc.doAuthenticatedRequest(http.MethodGet, url, defaultHeaders, ttc.cookies)
+	resp, err := ttc.doAuthenticatedRequest(http.MethodGet, url)
 
 	if err != nil {
 		return nil, err
@@ -85,21 +105,27 @@ func (ttc *TikTokClient) getFromTikTok(url string) (b []byte, err error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
+// AK TODO Change to newAuthenticatedRequest
 // Submits a request to tiktok. If used the body should be closed manually.
-func (ttc *TikTokClient) doAuthenticatedRequest(method string, url string, headers map[string]string, cookies map[string]string) (*http.Response, error) {
+func (ttc *TikTokClient) doAuthenticatedRequest(method string, url string) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, nil)
 
 	if err != nil {
 		return nil, err
 	}
 
-	for name, value := range ttc.cookies {
-		req.AddCookie(&http.Cookie{Name: name, Value: value})
+	for _, c := range ttc.cookies {
+		req.AddCookie(&c)
 	}
 
-	for name, value := range defaultHeaders {
-		req.Header.Set(name, value)
+	for name, h := range defaultHeaders {
+		req.Header.Set(name, h)
 	}
+
+	log.Error("Built request headers ", req.Header)
+	log.Error("Built request cookie ", req.Cookies())
+
+	// AK TODO change to newClient using cookiejar
 
 	resp, err := http.DefaultClient.Do(req)
 
@@ -108,7 +134,10 @@ func (ttc *TikTokClient) doAuthenticatedRequest(method string, url string, heade
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("the request has failde with statuscode %d. Url: %s", resp.StatusCode, tikTokRootUrl)
+		log.Error("resp cookies: ", resp.Cookies())
+		log.Error("resp header: ", resp.Header)
+		details, _ := ioutil.ReadAll(resp.Body)
+		return nil, fmt.Errorf("the request has failde with statuscode %d. Url: %s. Data: %s", resp.StatusCode, url, details)
 	}
 
 	return resp, nil
