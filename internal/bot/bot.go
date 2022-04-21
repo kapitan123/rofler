@@ -24,7 +24,7 @@ func New() *Bot {
 		log.Panic("Error creating Telegram bot API: ", err)
 	}
 
-	log.Info("Authorized on account %s", bot.Self.UserName)
+	log.Info("Authorized on account ", bot.Self.UserName)
 	bot.Debug = true
 
 	return &Bot{api: bot}

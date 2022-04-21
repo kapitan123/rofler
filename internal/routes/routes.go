@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"time"
@@ -8,7 +9,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/roflers"
-	"github.com/kapitan123/telegrofler/pkg/problem"
 	"github.com/kapitan123/telegrofler/pkg/tiktok"
 
 	log "github.com/sirupsen/logrus"
@@ -43,8 +43,7 @@ func (api API) download(resp http.ResponseWriter, req *http.Request) {
 	tiktokUrl, err := url.QueryUnescape(req.URL.Query().Get("url"))
 
 	if err != nil {
-		prob := err.(*problem.Problem)
-		prob.WriteTo(resp)
+		writeTo(err, resp)
 		return
 	}
 
@@ -54,16 +53,14 @@ func (api API) download(resp http.ResponseWriter, req *http.Request) {
 
 	// AK TODO should wrap it in a service
 	if err != nil {
-		prob := err.(*problem.Problem)
-		prob.WriteTo(resp)
+		writeTo(err, resp)
 		return
 	}
 
 	content, err := api.TikTok.DownloadVideoFromItem(item)
 
 	if err != nil {
-		prob := err.(*problem.Problem)
-		prob.WriteTo(resp)
+		writeTo(err, resp)
 		return
 	}
 
@@ -171,4 +168,12 @@ func (api API) captureReaction(req *http.Request) error {
 	}
 
 	return nil
+}
+
+// AK TODO quick fix
+func writeTo(err error, resp http.ResponseWriter) {
+	log.Infof("API error %s", err)
+
+	resp.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(resp).Encode(err)
 }

@@ -23,7 +23,7 @@ func New(url, title string, status int, detail, instance string) *Problem {
 
 // Writes problem as HTTP response.
 func (p *Problem) WriteTo(resp http.ResponseWriter) {
-	log.Info("API error %s", p.Error())
+	log.Infof("API error %s", p.Error())
 
 	resp.Header().Set("Content-Type", "application/json")
 	resp.WriteHeader(p.Status)
