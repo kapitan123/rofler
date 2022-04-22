@@ -9,7 +9,6 @@ type TikTokVideoPost struct {
 	Url               string
 	VideoData         VideoData
 }
-
 type VideoData struct {
 	Id         string
 	Duration   int
@@ -19,5 +18,5 @@ type VideoData struct {
 }
 
 func (tp *TikTokVideoPost) GetCaption() string {
-	return fmt.Sprintf("<b>Rofler</b>: @%s \n<b>Title</b>: %s \n<b>\U0001F525 Likes</b>: %d", tp.Sender, tp.VideoData.Title, tp.VideoData.LikesCount)
+	return fmt.Sprintf("\U0001F525<b>Rofler:</b> @%s\n\U0001F525<b>Title</b>: %s", tp.Sender, tp.VideoData.Title)
 }

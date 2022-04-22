@@ -3,7 +3,9 @@
 # ===================================================================================
 # === Stage 1:Builder container =====================================================
 # ===================================================================================
-FROM golang:1.18-alpine AS build
+FROM golang:1.18-alpine AS builder
+
+# RUN apk --no-cache add ca-certificates
 
 WORKDIR /build
 
@@ -29,7 +31,7 @@ FROM alpine
 
 WORKDIR /app
 
-COPY --from=build /build/server . 
+COPY --from=builder /build/server . 
 
 EXPOSE 9001
 

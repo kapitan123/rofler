@@ -1,15 +1,10 @@
 package bot
 
-// const (
-// 	postCommand  = "/post"
-// 	startCommand = "/start"
-// 	topCommand   = "/top"
-// 	botTag       = "@TelegroflerBot"
-// )
 const (
-	topRofler = "rofler"
-	// 	topWorker = "poster"
-	// 	topTaste  = "taste"
+	// 	postCommand  = "/post"
+	// 	startCommand = "/start"
+	TopCommand = "/top"
+	// 	botTag       = "@TelegroflerBot"
 )
 
 // // var (

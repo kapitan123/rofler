@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/kapitan123/telegrofler/config"
+	"github.com/kapitan123/telegrofler/internal/roflers/reaction"
 )
 
 const collectionName = "roflers"
@@ -73,6 +74,48 @@ func (rs *RoflersStore) Upsert(r Rofler) error {
 	}
 
 	return nil
+}
+
+func (rs *RoflersStore) IncrementLike(vr reaction.VideoReaction) error {
+	rofler, _, err := rs.GetByUserName(vr.Sender)
+
+	if err != nil {
+		return err
+	}
+
+	rofler.AddReaction(vr.VideoId)
+
+	err = rs.Upsert(rofler)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (rs *RoflersStore) GetTopRofler() (*Rofler, int, error) {
+	roflers, err := rs.GetAll()
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var topRofler *Rofler
+	maxReactions := 0
+	for _, r := range roflers {
+		roflerReactions := 0
+		posts := r.Posts
+
+		for _, p := range posts {
+			roflerReactions = roflerReactions + p.ReactionsCount
+		}
+		if roflerReactions > maxReactions {
+			maxReactions = roflerReactions
+			topRofler = &r
+		}
+	}
+
+	return topRofler, maxReactions, nil
 }
 
 func (rs *RoflersStore) Close() {

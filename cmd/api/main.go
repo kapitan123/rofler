@@ -10,7 +10,7 @@ import (
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/roflers"
 	"github.com/kapitan123/telegrofler/internal/routes"
-	"github.com/kapitan123/telegrofler/pkg/tiktok"
+	"github.com/kapitan123/telegrofler/pkg/lovetik"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -22,7 +22,7 @@ func main() {
 	router := mux.NewRouter()
 
 	api := routes.API{
-		TikTok:       tiktok.New(),
+		LoveTik:      lovetik.New(),
 		Bot:          bot.New(),
 		RoflersStore: roflers.New(),
 	}

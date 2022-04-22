@@ -9,32 +9,55 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/roflers"
-	"github.com/kapitan123/telegrofler/pkg/tiktok"
+	"github.com/kapitan123/telegrofler/pkg/lovetik"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
 )
 
 // AK TODO should be in a separate aggreagate
 type API struct {
-	TikTok       *tiktok.TikTokClient
+	//TikTok       *tiktok.TikTokClient
+	LoveTik      *lovetik.LoveTikClient
 	Bot          *bot.Bot
 	RoflersStore *roflers.RoflersStore
 	// AK TODO add base concerns like liviness probe
 }
 
 func (api API) AddRoutes(router *mux.Router) {
-	//router.HandleFunc("/stats", api.getAllStats).Methods("GET")
-	//router.HandleFunc("/stats/top/{category}/{timespan}", api.callBackHandler).Methods("GET")
+	router.HandleFunc("/stats", api.getAllStats).Methods("GET")
+	router.HandleFunc("/stats/top", api.getTopRoflerHandler).Methods("GET")
 	router.HandleFunc("/callback", api.handleCallback).Methods("POST")
-	//router.HandleFunc("/submit", api.callBackHandler).Methods("POST")
 	router.HandleFunc("/download", api.download).Methods("GET")
 }
 
 // Handles callback from Telegram. Extracts url from message, converts video and uploads it back.
 func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {
-	wasHandeled, _ := api.replaceLinkWithMessage(req)
-	if wasHandeled {
-		api.captureReaction(req)
+	upd, err := api.Bot.GetUpdate(req)
+	mess := upd.Message
+
+	if err != nil {
+		writeTo(err, resp)
+		return
+	}
+
+	if mess == nil {
+		return
+	}
+
+	wasHandled, err := api.tryReplaceLinkWithMessage(mess)
+
+	if !wasHandled && err == nil {
+		_, err = api.tryRecordReaction(mess)
+	}
+
+	if !wasHandled && err == nil {
+		_, err = api.tryExecCommand(mess)
+	}
+
+	if err != nil {
+		writeTo(err, resp)
+		return
 	}
 }
 
@@ -49,7 +72,7 @@ func (api API) download(resp http.ResponseWriter, req *http.Request) {
 
 	log.Info("API: downloading video from ", tiktokUrl)
 
-	item, err := api.TikTok.GetItemByUrl(tiktokUrl)
+	lti, err := api.LoveTik.DownloadVideoFromUrl(tiktokUrl)
 
 	// AK TODO should wrap it in a service
 	if err != nil {
@@ -57,70 +80,54 @@ func (api API) download(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	content, err := api.TikTok.DownloadVideoFromItem(item)
-
-	if err != nil {
-		writeTo(err, resp)
-		return
-	}
-
 	resp.Header().Set("Content-Type", "video/mp4")
-	_, _ = resp.Write(content)
+	_, _ = resp.Write(lti.Payload)
 }
 
-func (api API) replaceLinkWithMessage(req *http.Request) (bool, error) {
-	wasHandeled := false
-	tvp, err := api.Bot.TryExtractTikTokUrlData(req)
+func (api API) tryReplaceLinkWithMessage(mess *tgbotapi.Message) (bool, error) {
+	isHandeled := true
+
+	tvp, err := api.Bot.ExtractTikTokVideoPost(mess)
 
 	if tvp == nil {
-		return wasHandeled, nil
+		return !isHandeled, nil
 	}
 
-	wasHandeled = true
 	if err != nil {
-		return wasHandeled, err
+		return isHandeled, err
 	}
 
 	log.Info("Url was found in a callback message: ", tvp.Url)
 
-	item, err := api.TikTok.GetItemByUrl(tvp.Url)
+	lti, err := api.LoveTik.DownloadVideoFromUrl(tvp.Url)
 
 	if err != nil {
-		return wasHandeled, err
+		return isHandeled, err
 	}
 
-	bc, err := api.TikTok.DownloadVideoFromItem(item)
+	tvp.VideoData.Payload = lti.Payload
+	tvp.VideoData.Title = lti.Title
+	tvp.VideoData.Id = lti.Id
 
-	if err != nil {
-		return wasHandeled, err
-	}
-
-	tvp.VideoData.Payload = bc
-	tvp.VideoData.Duration = item.Video.Duration
-	tvp.VideoData.LikesCount = item.Stats.DiggCount
-	tvp.VideoData.Title = item.Desc
-	tvp.VideoData.Id = item.Id
+	log.Info("Trying to post to telegram: ", tvp)
 
 	err = api.Bot.PostTiktokVideoFromUrl(tvp)
 
 	if err != nil {
-		return true, err
+		return isHandeled, err
 	}
 
-	err = api.Bot.DeletePost(tvp.ChatId, tvp.OriginalMessageId)
-
-	if err != nil {
-		return wasHandeled, err
-	}
+	// we don't really care if if has failed and it makes integration tests a lot easier
+	_ = api.Bot.DeletePost(tvp.ChatId, tvp.OriginalMessageId)
 
 	rofler, found, err := api.RoflersStore.GetByUserName(tvp.Sender)
 
 	if err != nil {
-		return wasHandeled, err
+		return isHandeled, err
 	}
 
 	newPost := roflers.Post{
-		TiktokId: tvp.VideoData.Id,
+		VideoId:  tvp.VideoData.Id,
 		Url:      tvp.Url,
 		PostedOn: time.Now(),
 	}
@@ -134,40 +141,76 @@ func (api API) replaceLinkWithMessage(req *http.Request) (bool, error) {
 	err = api.RoflersStore.Upsert(rofler)
 
 	if err != nil {
-		return wasHandeled, err
+		return isHandeled, err
 	}
 
-	return wasHandeled, nil
+	return isHandeled, nil
 }
 
-func (api API) captureReaction(req *http.Request) error {
-	tiktokid, sender, err := api.Bot.TryExtractTikTokReaction(req)
+func (api API) tryRecordReaction(m *tgbotapi.Message) (bool, error) {
+	isHandeled := true
+	reaction, err := api.Bot.TryExtractTikTokReaction(m)
+	if err != nil {
+		return !isHandeled, err
+	}
+
+	if reaction.Sender == "" {
+		return isHandeled, nil
+	}
+
+	log.Infof("Reaction was found for %s sent by %s", reaction.VideoId, reaction.Sender)
+
+	api.RoflersStore.IncrementLike(reaction)
+
+	return isHandeled, nil
+}
+
+func (api API) tryExecCommand(m *tgbotapi.Message) (bool, error) {
+	command, err := api.Bot.GetCommand(m)
+	if err != nil {
+		return false, err
+	}
+
+	if command != bot.TopCommand {
+		return true, nil
+	}
+
+	tr, roflCount, err := api.RoflersStore.GetTopRofler()
+	if err != nil {
+		return false, err
+	}
+
+	err = api.Bot.PostTopRofler(m.Chat.ID, tr.UserName, roflCount)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (api API) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request) {
+	tr, _, err := api.RoflersStore.GetTopRofler()
+	if err != nil {
+		writeTo(err, resp)
+		return
+	}
+
+	resp.Header().Set("Content-Type", "application/json")
+	json, _ := json.Marshal(tr)
+	_, _ = resp.Write(json)
+}
+
+func (api API) getAllStats(resp http.ResponseWriter, req *http.Request) {
+	roflers, err := api.RoflersStore.GetAll()
 
 	if err != nil {
-		return err
+		writeTo(err, resp)
+		return
 	}
 
-	if tiktokid == "" {
-		return nil
-	}
-
-	log.Infof("Reaction was found for %s sent by %s", tiktokid, sender)
-
-	rofler, _, err := api.RoflersStore.GetByUserName(sender)
-
-	if err != nil {
-		return err
-	}
-
-	rofler.IncrementLike(tiktokid)
-
-	err = api.RoflersStore.Upsert(rofler)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	resp.Header().Set("Content-Type", "application/json")
+	json, _ := json.Marshal(roflers)
+	_, _ = resp.Write(json)
 }
 
 // AK TODO quick fix

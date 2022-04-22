@@ -1,10 +1,14 @@
 package bot
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/kapitan123/telegrofler/config"
+	"github.com/kapitan123/telegrofler/internal/roflers/reaction"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5" // https://go-telegram-bot-api.dev/
 	log "github.com/sirupsen/logrus"
@@ -38,7 +42,8 @@ func (b *Bot) PostTiktokVideoFromUrl(tp *TikTokVideoPost) error {
 
 	v := tgbotapi.NewVideo(tp.ChatId, fb)
 
-	v.Duration = tp.VideoData.Duration
+	// AK TODO does it work with no duration?
+	//v.Duration = tp.VideoData.Duration
 	v.Caption = tp.GetCaption()
 	v.ParseMode = tgbotapi.ModeHTML
 
@@ -56,40 +61,32 @@ func (b *Bot) PostTiktokVideoFromUrl(tp *TikTokVideoPost) error {
 // Handles incoming chat messages.
 // Tries to extract a TikTok video url from the message if no url was found returns nil
 // Handles only mobile format
-func (b *Bot) TryExtractTikTokUrlData(req *http.Request) (*TikTokVideoPost, error) {
-	update, err := b.api.HandleUpdate(req)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if r := regexp.MustCompile(mobilePrefixRegex); r.MatchString(update.Message.Text) {
+func (b *Bot) ExtractTikTokVideoPost(m *tgbotapi.Message) (*TikTokVideoPost, error) {
+	if r := regexp.MustCompile(mobilePrefixRegex); r.MatchString(m.Text) {
 		return &TikTokVideoPost{
-			Sender:            update.Message.From.UserName,
-			ChatId:            update.Message.Chat.ID,
-			Url:               update.Message.Text,
-			OriginalMessageId: update.Message.MessageID,
+			Sender:            m.From.UserName,
+			ChatId:            m.Chat.ID,
+			Url:               m.Text,
+			OriginalMessageId: m.MessageID,
 		}, nil
 	}
 
 	return nil, nil
 }
 
-func (b *Bot) TryExtractTikTokReaction(req *http.Request) (string, string, error) {
-	update, err := b.api.HandleUpdate(req)
+func (b *Bot) TryExtractTikTokReaction(m *tgbotapi.Message) (reaction.VideoReaction, error) {
 
-	if err != nil {
-		return "", "", err
+	vr := reaction.VideoReaction{}
+	if m.ReplyToMessage == nil {
+		return vr, nil
 	}
 
-	if !b.api.IsMessageToMe(*update.Message) {
-		return "", "", nil
+	rtm := m.ReplyToMessage
+	if rtm.From.UserName != b.api.Self.UserName {
+		return vr, nil
 	}
 
-	sender := update.Message.ReplyToMessage.From.UserName
-	tiktokId := update.Message.ReplyToMessage.Video.FileName
-
-	return sender, tiktokId, nil
+	return reaction.VideoReaction{Sender: m.From.UserName, VideoId: rtm.Video.FileName}, nil
 }
 
 func (b *Bot) DeletePost(chatId int64, messageId int) error {
@@ -99,6 +96,49 @@ func (b *Bot) DeletePost(chatId int64, messageId int) error {
 	}
 
 	_, err := b.api.Request(dmc)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (b *Bot) GetUpdate(req *http.Request) (*tgbotapi.Update, error) {
+	update, err := b.api.HandleUpdate(req)
+	if err != nil {
+		return nil, err
+	}
+	ujs, err := json.Marshal(update)
+	log.Info("Callback content:", string(ujs))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return update, nil
+}
+
+func (b *Bot) GetCommand(m *tgbotapi.Message) (string, error) {
+	// AK TODO handles only one command
+	if !m.IsCommand() {
+		return "", nil
+	}
+
+	if strings.HasPrefix(TopCommand, m.Command()) {
+		return TopCommand, nil
+	}
+
+	return "", nil
+}
+
+func (b *Bot) PostTopRofler(chatId int64, userName string, roflCount int) error {
+	topPost := fmt.Sprintf("\U0001F451 <b>@%s</b>\n<b>Likes:</b> %d", userName, roflCount)
+	v := tgbotapi.NewMessage(chatId, topPost)
+
+	v.ParseMode = tgbotapi.ModeHTML
+
+	_, err := b.api.Send(v)
+
 	if err != nil {
 		return err
 	}
