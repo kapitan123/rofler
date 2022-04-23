@@ -16,6 +16,7 @@ import (
 
 const (
 	mobilePrefixRegex = `https:\/\/[a-zA-Z]{2}\.tiktok\.com\/`
+	posterMaker       = `🔥@(.*?)🔥`
 )
 
 type Bot struct {
@@ -74,19 +75,23 @@ func (b *Bot) ExtractTikTokVideoPost(m *tgbotapi.Message) (*TikTokVideoPost, err
 	return nil, nil
 }
 
-func (b *Bot) TryExtractTikTokReaction(m *tgbotapi.Message) (reaction.VideoReaction, error) {
-
+func (b *Bot) TryExtractTikTokReaction(rtm *tgbotapi.Message) (reaction.VideoReaction, error) {
 	vr := reaction.VideoReaction{}
-	if m.ReplyToMessage == nil {
+	if rtm == nil {
 		return vr, nil
 	}
 
-	rtm := m.ReplyToMessage
-	if rtm.From.UserName != b.api.Self.UserName {
+	// AK TODO testing stuff
+	rtm.Text = `🔥@(.*?)🔥`
+	r := regexp.MustCompile(posterMaker)
+	poster := string(r.Find([]byte(rtm.Text)))
+
+	poster = "tester"
+	if rtm.From.UserName == poster {
 		return vr, nil
 	}
 
-	return reaction.VideoReaction{Sender: m.From.UserName, VideoId: rtm.Video.FileName}, nil
+	return reaction.VideoReaction{Sender: poster, VideoId: rtm.Video.FileName}, nil
 }
 
 func (b *Bot) DeletePost(chatId int64, messageId int) error {

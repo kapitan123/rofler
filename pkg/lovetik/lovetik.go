@@ -63,7 +63,6 @@ func (ttc *LoveTikClient) DownloadVideoFromUrl(tikUrl string) (*LoveTikItem, err
 }
 
 func download(dUrl string) ([]byte, error) {
-
 	// AK TODO temp solutions
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // <--- Problem

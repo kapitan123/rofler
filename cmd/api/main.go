@@ -31,7 +31,8 @@ func main() {
 	defer api.RoflersStore.Close()
 
 	api.AddRoutes(router)
-
+	api.AddCallback(router)
+	
 	log.Info("Telegrofler: listening on: ", config.ServerPort)
 
 	srv := &http.Server{

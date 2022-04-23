@@ -38,7 +38,7 @@ func (rs *RoflersStore) GetAll() ([]Rofler, error) {
 	roflers := []Rofler{}
 	for _, doc := range docs {
 		r := Rofler{}
-		doc.DataTo(&Rofler{})
+		doc.DataTo(&r)
 		roflers = append(roflers, r)
 	}
 
