@@ -87,12 +87,13 @@ func (b *Bot) TryExtractTikTokReaction(upd *tgbotapi.Message) (reaction.VideoRea
 	r := regexp.MustCompile(posterMaker)
 	poster := r.FindStringSubmatch(rtm.Caption)[1]
 
+	sender := upd.From.UserName
 	// if the user reference his own post it is not a reaction. Can be moved outside the scope
-	if upd.From.UserName == poster {
+	if sender == poster {
 		return vr, nil
 	}
 
-	return reaction.VideoReaction{Sender: poster, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
+	return reaction.VideoReaction{Sender: sender, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
 }
 
 func (b *Bot) DeletePost(chatId int64, messageId int) error {

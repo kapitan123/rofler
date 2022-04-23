@@ -3,11 +3,12 @@ package roflers
 // AK TODO rename package
 import (
 	"context"
-	"log"
 
 	"cloud.google.com/go/firestore"
 	"github.com/kapitan123/telegrofler/config"
 	"github.com/kapitan123/telegrofler/internal/roflers/reaction"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -121,6 +122,9 @@ func (rs *RoflersStore) AddReactionToPost(vr reaction.VideoReaction) error {
 			p.AddReaction(vr.Sender, vr.Text, vr.MessageId)
 
 			err = rs.UpsertPost(p)
+
+			log.Infof("Reaction was saved for %s from %s: ", vr.VideoId, vr.Sender)
+
 			if err != nil {
 				return err
 			}
