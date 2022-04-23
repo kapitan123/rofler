@@ -3,7 +3,7 @@ package bot
 const (
 	// 	postCommand  = "/post"
 	// 	startCommand = "/start"
-	TopCommand = "/top"
+	TopCommand = "top"
 	// 	botTag       = "@TelegroflerBot"
 )
 
