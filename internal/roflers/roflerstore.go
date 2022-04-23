@@ -10,12 +10,17 @@ import (
 	"github.com/kapitan123/telegrofler/internal/roflers/reaction"
 )
 
-const collectionName = "roflers"
+const (
+	roflersColName = "roflers"
+	postsColName   = "posts"
+)
 
+// AK TODO need to separate in different data stores
 type RoflersStore struct {
-	ctx    *context.Context
-	client *firestore.Client
-	col    *firestore.CollectionRef
+	ctx        *context.Context
+	client     *firestore.Client
+	roflersCol *firestore.CollectionRef
+	postsCol   *firestore.CollectionRef
 }
 
 func New() *RoflersStore {
@@ -24,12 +29,14 @@ func New() *RoflersStore {
 	return &RoflersStore{
 		&ctx,
 		client,
-		client.Collection(collectionName),
+		client.Collection(roflersColName),
+		client.Collection(postsColName),
 	}
 }
 
-func (rs *RoflersStore) GetAll() ([]Rofler, error) {
-	docs, err := rs.col.Documents(*rs.ctx).GetAll()
+// actully I rarely need it. Only to store Wins and shit
+func (rs *RoflersStore) GetAllRoflers() ([]Rofler, error) {
+	docs, err := rs.roflersCol.Documents(*rs.ctx).GetAll()
 
 	if err != nil {
 		return nil, err
@@ -45,13 +52,30 @@ func (rs *RoflersStore) GetAll() ([]Rofler, error) {
 	return roflers, nil
 }
 
+func (rs *RoflersStore) GetAllPosts() ([]Post, error) {
+	docs, err := rs.postsCol.Documents(*rs.ctx).GetAll()
+
+	if err != nil {
+		return nil, err
+	}
+
+	posts := []Post{}
+	for _, doc := range docs {
+		p := Post{}
+		doc.DataTo(&p)
+		posts = append(posts, p)
+	}
+
+	return posts, nil
+}
+
 // Tries to fetch a document by id
 // Internally firestore throws an error if the document does not exist.
 // We treat all errors on fetching as not found.
 // Errors on convertion are treated in a regural way
 func (rs *RoflersStore) GetByUserName(username string) (Rofler, bool, error) {
 	var r Rofler
-	doc := rs.col.Doc(username)
+	doc := rs.roflersCol.Doc(username)
 	snap, err := doc.Get(*rs.ctx)
 
 	if err != nil {
@@ -66,7 +90,7 @@ func (rs *RoflersStore) GetByUserName(username string) (Rofler, bool, error) {
 }
 
 func (rs *RoflersStore) Upsert(r Rofler) error {
-	doc := rs.col.Doc(r.UserName)
+	doc := rs.roflersCol.Doc(r.UserName)
 	_, err := doc.Set(*rs.ctx, r)
 
 	if err != nil {
@@ -76,16 +100,9 @@ func (rs *RoflersStore) Upsert(r Rofler) error {
 	return nil
 }
 
-func (rs *RoflersStore) IncrementLike(vr reaction.VideoReaction) error {
-	rofler, _, err := rs.GetByUserName(vr.Sender)
-
-	if err != nil {
-		return err
-	}
-
-	rofler.AddReaction(vr.VideoId)
-
-	err = rs.Upsert(rofler)
+func (rs *RoflersStore) UpsertPost(p Post) error {
+	doc := rs.roflersCol.Doc(p.VideoId)
+	_, err := doc.Set(*rs.ctx, p)
 
 	if err != nil {
 		return err
@@ -94,28 +111,47 @@ func (rs *RoflersStore) IncrementLike(vr reaction.VideoReaction) error {
 	return nil
 }
 
-func (rs *RoflersStore) GetTopRofler() (*Rofler, int, error) {
-	roflers, err := rs.GetAll()
+func (rs *RoflersStore) AddReactionToPost(vr reaction.VideoReaction) error {
+	posts, err := rs.GetAllPosts()
 	if err != nil {
-		return nil, 0, err
+		return err
 	}
 
-	var topRofler *Rofler
-	maxReactions := 0
-	for _, r := range roflers {
-		roflerReactions := 0
-		posts := r.Posts
+	for _, p := range posts {
+		if p.VideoId == vr.VideoId {
+			p.AddReaction(vr.Sender, vr.Text)
 
-		for _, p := range posts {
-			roflerReactions = roflerReactions + p.ReactionsCount
-		}
-		if roflerReactions > maxReactions {
-			maxReactions = roflerReactions
-			topRofler = &r
+			err = rs.UpsertPost(p)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	return topRofler, maxReactions, nil
+	return nil
+}
+
+func (rs *RoflersStore) GetTopRofler() (string, int, error) {
+	posts, err := rs.GetAllPosts()
+	if err != nil {
+		return "", 0, err
+	}
+
+	roflerScores := map[string]int{}
+
+	for _, p := range posts {
+		roflerScores[p.RoflerUserName] += len(p.Reactions)
+	}
+
+	maxUserName, max := "", 0
+	for username, score := range roflerScores {
+		if max < score {
+			max = score
+			maxUserName = username
+		}
+	}
+
+	return maxUserName, max, nil
 }
 
 func (rs *RoflersStore) Close() {

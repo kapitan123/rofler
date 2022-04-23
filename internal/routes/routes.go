@@ -23,7 +23,7 @@ type API struct {
 }
 
 func (api API) AddRoutes(router *mux.Router) {
-	router.HandleFunc("/stats", api.getAllStats).Methods("GET")
+	router.HandleFunc("/stats/posts", api.getAllPosts).Methods("GET")
 	router.HandleFunc("/stats/top", api.getTopRoflerHandler).Methods("GET")
 	router.HandleFunc("/download", api.download).Methods("GET")
 }
@@ -63,8 +63,8 @@ func (api API) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request) 
 	_, _ = resp.Write(json)
 }
 
-func (api API) getAllStats(resp http.ResponseWriter, req *http.Request) {
-	roflers, err := api.RoflersStore.GetAll()
+func (api API) getAllPosts(resp http.ResponseWriter, req *http.Request) {
+	roflers, err := api.RoflersStore.GetAllPosts()
 
 	if err != nil {
 		writeTo(err, resp)

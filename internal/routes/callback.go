@@ -2,9 +2,11 @@ package routes
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
+	"github.com/kapitan123/telegrofler/internal/roflers"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
@@ -31,7 +33,7 @@ func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 	wasHandled, err := api.tryReplaceLinkWithMessage(mess)
 
 	if !wasHandled && err == nil {
-		_, err = api.tryRecordReaction(mess.ReplyToMessage)
+		_, err = api.tryRecordReaction(mess)
 	}
 
 	if !wasHandled && err == nil {
@@ -90,9 +92,16 @@ func (api API) tryReplaceLinkWithMessage(mess *tgbotapi.Message) (bool, error) {
 		rofler.UserName = tvp.Sender
 	}
 
-	rofler.AddPost(tvp.VideoData.Id, tvp.Url)
+	newPost := roflers.Post{
+		VideoId:        tvp.VideoData.Id,
+		RoflerUserName: tvp.Sender,
+		Url:            tvp.Url,
+		Reactions:      []roflers.Reaction{},
+		KeyWords:       []string{},
+		PostedOn:       time.Now(),
+	}
 
-	err = api.RoflersStore.Upsert(rofler)
+	api.RoflersStore.UpsertPost(newPost)
 
 	if err != nil {
 		return isHandeled, err
@@ -114,7 +123,7 @@ func (api API) tryRecordReaction(m *tgbotapi.Message) (bool, error) {
 
 	log.Infof("Reaction was found for %s sent by %s", reaction.VideoId, reaction.Sender)
 
-	api.RoflersStore.IncrementLike(reaction)
+	api.RoflersStore.AddReactionToPost(reaction)
 
 	return isHandeled, nil
 }
@@ -134,7 +143,7 @@ func (api API) tryExecCommand(m *tgbotapi.Message) (bool, error) {
 		return false, err
 	}
 
-	err = api.Bot.PostTopRofler(m.Chat.ID, tr.UserName, roflCount)
+	err = api.Bot.PostTopRofler(m.Chat.ID, tr, roflCount)
 	if err != nil {
 		return false, err
 	}

@@ -75,23 +75,21 @@ func (b *Bot) ExtractTikTokVideoPost(m *tgbotapi.Message) (*TikTokVideoPost, err
 	return nil, nil
 }
 
-func (b *Bot) TryExtractTikTokReaction(rtm *tgbotapi.Message) (reaction.VideoReaction, error) {
+func (b *Bot) TryExtractTikTokReaction(upd *tgbotapi.Message) (reaction.VideoReaction, error) {
 	vr := reaction.VideoReaction{}
+	rtm := upd.ReplyToMessage
 	if rtm == nil {
 		return vr, nil
 	}
 
-	// AK TODO testing stuff
-	rtm.Text = `🔥@(.*?)🔥`
 	r := regexp.MustCompile(posterMaker)
 	poster := string(r.Find([]byte(rtm.Text)))
 
-	poster = "tester"
 	if rtm.From.UserName == poster {
 		return vr, nil
 	}
 
-	return reaction.VideoReaction{Sender: poster, VideoId: rtm.Video.FileName}, nil
+	return reaction.VideoReaction{Sender: poster, VideoId: rtm.Video.FileName, Text: upd.Text}, nil
 }
 
 func (b *Bot) DeletePost(chatId int64, messageId int) error {
