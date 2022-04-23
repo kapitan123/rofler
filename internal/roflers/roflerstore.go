@@ -93,22 +93,21 @@ func (rs *RoflersStore) Upsert(r Rofler) error {
 	doc := rs.roflersCol.Doc(r.UserName)
 	_, err := doc.Set(*rs.ctx, r)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (rs *RoflersStore) UpsertPost(p Post) error {
-	doc := rs.roflersCol.Doc(p.VideoId)
+	doc := rs.postsCol.Doc(p.VideoId)
 	_, err := doc.Set(*rs.ctx, p)
 
-	if err != nil {
-		return err
-	}
+	return err
+}
 
-	return nil
+func (rs *RoflersStore) CreatPost(p Post) error {
+	doc := rs.postsCol.Doc(p.VideoId)
+	_, err := doc.Create(*rs.ctx, p)
+
+	return err
 }
 
 func (rs *RoflersStore) AddReactionToPost(vr reaction.VideoReaction) error {
@@ -119,7 +118,7 @@ func (rs *RoflersStore) AddReactionToPost(vr reaction.VideoReaction) error {
 
 	for _, p := range posts {
 		if p.VideoId == vr.VideoId {
-			p.AddReaction(vr.Sender, vr.Text)
+			p.AddReaction(vr.Sender, vr.Text, vr.MessageId)
 
 			err = rs.UpsertPost(p)
 			if err != nil {
@@ -161,7 +160,7 @@ func (rs *RoflersStore) Close() {
 func createClient(ctx context.Context) *firestore.Client {
 	client, err := firestore.NewClient(ctx, config.ProjectId)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("Failed to create client: %v", err) // AK TODO shouldn't be fatal
 	}
 	return client
 }

@@ -82,18 +82,9 @@ func (api API) tryReplaceLinkWithMessage(mess *tgbotapi.Message) (bool, error) {
 	// we don't really care if if has failed and it makes integration tests a lot easier
 	_ = api.Bot.DeletePost(tvp.ChatId, tvp.OriginalMessageId)
 
-	rofler, found, err := api.RoflersStore.GetByUserName(tvp.Sender)
-
-	if err != nil {
-		return isHandeled, err
-	}
-
-	if !found {
-		rofler.UserName = tvp.Sender
-	}
-
 	newPost := roflers.Post{
 		VideoId:        tvp.VideoData.Id,
+		Source:         "tiktok", // AK TODO extract to constants
 		RoflerUserName: tvp.Sender,
 		Url:            tvp.Url,
 		Reactions:      []roflers.Reaction{},

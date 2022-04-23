@@ -75,21 +75,24 @@ func (b *Bot) ExtractTikTokVideoPost(m *tgbotapi.Message) (*TikTokVideoPost, err
 	return nil, nil
 }
 
+// AK TODO add sucess parameter
 func (b *Bot) TryExtractTikTokReaction(upd *tgbotapi.Message) (reaction.VideoReaction, error) {
 	vr := reaction.VideoReaction{}
 	rtm := upd.ReplyToMessage
-	if rtm == nil {
+
+	if rtm == nil || rtm.From.UserName != "TelegroflBot" || rtm.Video == nil {
 		return vr, nil
 	}
 
 	r := regexp.MustCompile(posterMaker)
-	poster := string(r.Find([]byte(rtm.Text)))
+	poster := r.FindStringSubmatch(rtm.Caption)[1]
 
-	if rtm.From.UserName == poster {
+	// if the user reference his own post it is not a reaction. Can be moved outside the scope
+	if upd.From.UserName == poster {
 		return vr, nil
 	}
 
-	return reaction.VideoReaction{Sender: poster, VideoId: rtm.Video.FileName, Text: upd.Text}, nil
+	return reaction.VideoReaction{Sender: poster, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
 }
 
 func (b *Bot) DeletePost(chatId int64, messageId int) error {
