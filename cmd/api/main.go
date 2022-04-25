@@ -10,7 +10,6 @@ import (
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/roflers"
 	"github.com/kapitan123/telegrofler/internal/routes"
-	"github.com/kapitan123/telegrofler/pkg/lovetik"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -22,7 +21,6 @@ func main() {
 	router := mux.NewRouter()
 
 	api := routes.API{
-		LoveTik:      lovetik.New(),
 		Bot:          bot.New(),
 		RoflersStore: roflers.New(),
 	}
@@ -32,7 +30,7 @@ func main() {
 
 	api.AddRoutes(router)
 	api.AddCallback(router)
-	
+
 	log.Info("Telegrofler: listening on: ", config.ServerPort)
 
 	srv := &http.Server{

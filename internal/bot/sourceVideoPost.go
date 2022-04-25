@@ -2,7 +2,7 @@ package bot
 
 import "fmt"
 
-type TikTokVideoPost struct {
+type SourceVideoPost struct {
 	Sender            string
 	ChatId            int64
 	OriginalMessageId int
@@ -17,6 +17,6 @@ type VideoData struct {
 	LikesCount int
 }
 
-func (tp *TikTokVideoPost) GetCaption() string {
+func (tp *SourceVideoPost) GetCaption() string {
 	return fmt.Sprintf("<b>Rofler:</b> 🔥@%s🔥\n<b>Title</b>: %s", tp.Sender, tp.VideoData.Title)
 }

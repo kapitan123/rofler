@@ -6,7 +6,6 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/kapitan123/telegrofler/config"
-	"github.com/kapitan123/telegrofler/internal/roflers/reaction"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -36,16 +35,16 @@ func New() *RoflersStore {
 }
 
 // actully I rarely need it. Only to store Wins and shit
-func (rs *RoflersStore) GetAllRoflers() ([]Rofler, error) {
+func (rs *RoflersStore) GetAllRoflers() ([]model.Rofler, error) {
 	docs, err := rs.roflersCol.Documents(*rs.ctx).GetAll()
 
 	if err != nil {
 		return nil, err
 	}
 
-	roflers := []Rofler{}
+	roflers := []model.Rofler{}
 	for _, doc := range docs {
-		r := Rofler{}
+		r := model.Rofler{}
 		doc.DataTo(&r)
 		roflers = append(roflers, r)
 	}
@@ -53,16 +52,16 @@ func (rs *RoflersStore) GetAllRoflers() ([]Rofler, error) {
 	return roflers, nil
 }
 
-func (rs *RoflersStore) GetAllPosts() ([]Post, error) {
+func (rs *RoflersStore) GetAllPosts() ([]model.Post, error) {
 	docs, err := rs.postsCol.Documents(*rs.ctx).GetAll()
 
 	if err != nil {
 		return nil, err
 	}
 
-	posts := []Post{}
+	posts := []model.Post{}
 	for _, doc := range docs {
-		p := Post{}
+		p := model.Post{}
 		doc.DataTo(&p)
 		posts = append(posts, p)
 	}
@@ -74,8 +73,8 @@ func (rs *RoflersStore) GetAllPosts() ([]Post, error) {
 // Internally firestore throws an error if the document does not exist.
 // We treat all errors on fetching as not found.
 // Errors on convertion are treated in a regural way
-func (rs *RoflersStore) GetByUserName(username string) (Rofler, bool, error) {
-	var r Rofler
+func (rs *RoflersStore) GetByUserName(username string) (model.Rofler, bool, error) {
+	var r model.Rofler
 	doc := rs.roflersCol.Doc(username)
 	snap, err := doc.Get(*rs.ctx)
 
@@ -90,21 +89,21 @@ func (rs *RoflersStore) GetByUserName(username string) (Rofler, bool, error) {
 	return r, true, nil
 }
 
-func (rs *RoflersStore) Upsert(r Rofler) error {
+func (rs *RoflersStore) Upsert(r model.Rofler) error {
 	doc := rs.roflersCol.Doc(r.UserName)
 	_, err := doc.Set(*rs.ctx, r)
 
 	return err
 }
 
-func (rs *RoflersStore) UpsertPost(p Post) error {
+func (rs *RoflersStore) UpsertPost(p model.Post) error {
 	doc := rs.postsCol.Doc(p.VideoId)
 	_, err := doc.Set(*rs.ctx, p)
 
 	return err
 }
 
-func (rs *RoflersStore) CreatPost(p Post) error {
+func (rs *RoflersStore) CreatPost(p model.Post) error {
 	doc := rs.postsCol.Doc(p.VideoId)
 	_, err := doc.Create(*rs.ctx, p)
 

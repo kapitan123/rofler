@@ -1,4 +1,4 @@
-package roflers
+package model
 
 import (
 	"time"

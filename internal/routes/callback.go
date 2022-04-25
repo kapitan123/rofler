@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/roflers"
+	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
@@ -48,45 +49,45 @@ func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 
 func (api API) tryReplaceLinkWithMessage(mess *tgbotapi.Message) (bool, error) {
 	isHandeled := true
-
-	tvp, err := api.Bot.ExtractTikTokVideoPost(mess)
-
-	if tvp == nil {
+	source, found := sourceFactory.TryGetSource(mess.Text)
+	if !found {
 		return !isHandeled, nil
 	}
 
+	svp := api.Bot.ConvertToSourceVideoPost(mess)
+
+	if svp == nil {
+		return !isHandeled, nil
+	}
+
+	log.Info("Url was found in a callback message: ", svp.Url)
+
+	evi, err := source.ExtractVideoFromUrl(svp.Url)
+
 	if err != nil {
 		return isHandeled, err
 	}
 
-	log.Info("Url was found in a callback message: ", tvp.Url)
+	svp.VideoData.Payload = evi.Payload
+	svp.VideoData.Title = evi.Title
+	svp.VideoData.Id = evi.Id
 
-	lti, err := api.LoveTik.DownloadVideoFromUrl(tvp.Url)
+	log.Info("Trying to post to telegram: ", svp)
 
-	if err != nil {
-		return isHandeled, err
-	}
-
-	tvp.VideoData.Payload = lti.Payload
-	tvp.VideoData.Title = lti.Title
-	tvp.VideoData.Id = lti.Id
-
-	log.Info("Trying to post to telegram: ", tvp)
-
-	err = api.Bot.PostTiktokVideoFromUrl(tvp)
+	err = api.Bot.RepostConvertedVideo(svp)
 
 	if err != nil {
 		return isHandeled, err
 	}
 
 	// we don't really care if if has failed and it makes integration tests a lot easier
-	_ = api.Bot.DeletePost(tvp.ChatId, tvp.OriginalMessageId)
+	_ = api.Bot.DeletePost(svp.ChatId, svp.OriginalMessageId)
 
 	newPost := roflers.Post{
-		VideoId:        tvp.VideoData.Id,
-		Source:         "tiktok", // AK TODO extract to constants
-		RoflerUserName: tvp.Sender,
-		Url:            tvp.Url,
+		VideoId:        svp.VideoData.Id,
+		Source:         evi.Type,
+		RoflerUserName: svp.Sender,
+		Url:            svp.Url,
 		Reactions:      []roflers.Reaction{},
 		KeyWords:       []string{},
 		PostedOn:       time.Now(),

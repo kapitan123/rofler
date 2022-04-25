@@ -8,17 +8,15 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/roflers"
-	"github.com/kapitan123/telegrofler/pkg/lovetik"
+	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
 	log "github.com/sirupsen/logrus"
 )
 
 // AK TODO should be in a separate aggreagate
 type API struct {
-	//TikTok       *tiktok.TikTokClient
-	LoveTik      *lovetik.LoveTikClient
-	Bot          *bot.Bot
-	RoflersStore *roflers.RoflersStore
+	*bot.Bot
+	*roflers.RoflersStore
 	// AK TODO add base concerns like liviness probe
 }
 
@@ -30,16 +28,29 @@ func (api API) AddRoutes(router *mux.Router) {
 
 // Downloads video from url and returns it as mp4 file compitable with telegram.
 func (api API) download(resp http.ResponseWriter, req *http.Request) {
-	tiktokUrl, err := url.QueryUnescape(req.URL.Query().Get("url"))
+	vidUrl, err := url.QueryUnescape(req.URL.Query().Get("url"))
 
 	if err != nil {
 		writeTo(err, resp)
 		return
 	}
 
-	log.Info("API: downloading video from ", tiktokUrl)
+	log.Info("API: downloading video from ", vidUrl)
+	source, found := sourceFactory.TryGetSource(vidUrl)
 
-	lti, err := api.LoveTik.DownloadVideoFromUrl(tiktokUrl)
+	if !found {
+		resp.WriteHeader(http.StatusNotFound)
+		message := make(map[string]string)
+		message["message"] = "No handler for this url"
+		jsonResp, err := json.Marshal(message)
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		resp.Write(jsonResp)
+		return
+	}
+
+	lti, err := source.ExtractVideoFromUrl(vidUrl)
 
 	// AK TODO should wrap it in a service
 	if err != nil {

@@ -8,15 +8,14 @@ import (
 	"strings"
 
 	"github.com/kapitan123/telegrofler/config"
-	"github.com/kapitan123/telegrofler/internal/roflers/reaction"
+	"github.com/kapitan123/telegrofler/internal/data/model"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5" // https://go-telegram-bot-api.dev/
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	mobilePrefixRegex = `https:\/\/[a-zA-Z]{2}\.tiktok\.com\/`
-	posterMaker       = `🔥@(.*?)🔥`
+	posterMaker = `🔥@(.*?)🔥`
 )
 
 type Bot struct {
@@ -37,7 +36,7 @@ func New() *Bot {
 
 // Post TikTok back to the Telegram channel.
 // Tags original poster and tiktok video info in description.
-func (b *Bot) PostTiktokVideoFromUrl(tp *TikTokVideoPost) error {
+func (b *Bot) RepostConvertedVideo(tp *SourceVideoPost) error {
 	// Filename is id of the video
 	fb := tgbotapi.FileBytes{Name: tp.VideoData.Id, Bytes: tp.VideoData.Payload}
 
@@ -62,22 +61,18 @@ func (b *Bot) PostTiktokVideoFromUrl(tp *TikTokVideoPost) error {
 // Handles incoming chat messages.
 // Tries to extract a TikTok video url from the message if no url was found returns nil
 // Handles only mobile format
-func (b *Bot) ExtractTikTokVideoPost(m *tgbotapi.Message) (*TikTokVideoPost, error) {
-	if r := regexp.MustCompile(mobilePrefixRegex); r.MatchString(m.Text) {
-		return &TikTokVideoPost{
-			Sender:            m.From.UserName,
-			ChatId:            m.Chat.ID,
-			Url:               m.Text,
-			OriginalMessageId: m.MessageID,
-		}, nil
+func (b *Bot) ConvertToSourceVideoPost(m *tgbotapi.Message) *SourceVideoPost {
+	return &SourceVideoPost{
+		Sender:            m.From.UserName,
+		ChatId:            m.Chat.ID,
+		Url:               m.Text,
+		OriginalMessageId: m.MessageID,
 	}
-
-	return nil, nil
 }
 
 // AK TODO add sucess parameter
-func (b *Bot) TryExtractTikTokReaction(upd *tgbotapi.Message) (reaction.VideoReaction, error) {
-	vr := reaction.VideoReaction{}
+func (b *Bot) TryExtractTikTokReaction(upd *tgbotapi.Message) (model.VideoReaction, error) {
+	vr := model.VideoReaction{}
 	rtm := upd.ReplyToMessage
 
 	if rtm == nil || rtm.From.UserName != "TelegroflBot" || rtm.Video == nil {
@@ -93,7 +88,7 @@ func (b *Bot) TryExtractTikTokReaction(upd *tgbotapi.Message) (reaction.VideoRea
 		return vr, nil
 	}
 
-	return reaction.VideoReaction{Sender: sender, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
+	return model.VideoReaction{Sender: sender, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
 }
 
 func (b *Bot) DeletePost(chatId int64, messageId int) error {
