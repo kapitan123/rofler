@@ -20,3 +20,6 @@ cmd/api/api
 # Vscode setup
 .vscode/
 .devcontainer/
+
+# Dev keys
+keys/

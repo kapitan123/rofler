@@ -1,27 +1,12 @@
-9. Should store statistics
-
-   1. PosterId, DatePosted, tiktok url, likescount
-   2. /rofler top_rofl week shoud return the tiktokurl with top likes over the week
-   3. Separate keker collection id\kekedOnDateTime\KekedOnTiktok\
-
-10. Rofl counter
-
-    1. Should count likes and emoji reactions on the post.
-    2. Should count replyies to the post
-
 11. Should provide top roflers
     Top rofler of the week is @maypoldruha (tiktoks posted:10, likes collected: 30, likes to tiktok ration 1/3)
     Top keker @andreyivanov (keked: 10 times)
 
-12. Repostfinder
-
-    1. Should check if db contains tiktok uri and send a raply to message with the uri
-
-13. Extract tags from the video.
+12. Extract tags from the video.
     Store the tags stats.
     Get funniest tags
 
-14. Post One of the trending videos or by a keyword
+13. Post One of the trending videos or by a keyword
     1. /trending [tag]
     2. should track which trends were posted
     3. should keep stats for trending videos as telegroflers own

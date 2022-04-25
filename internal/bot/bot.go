@@ -139,8 +139,16 @@ func (b *Bot) GetCommand(m *tgbotapi.Message) (string, error) {
 }
 
 func (b *Bot) PostTopRofler(chatId int64, userName string, roflCount int) error {
-	topPost := fmt.Sprintf("\U0001F451 <b>@%s</b>\n<b>Likes:</b> %d", userName, roflCount)
-	v := tgbotapi.NewMessage(chatId, topPost)
+	// AK TODO fetch rofler
+	// AK TODO get user id
+	// AK TODO fetch profile pic by Id
+	// AK TODO apply watermark to image
+	data := []byte("leleks")
+
+	fb := tgbotapi.FileBytes{Name: "topRofler.jpg", Bytes: data}
+	v := tgbotapi.NewPhoto(chatId, fb)
+
+	v.Caption = fmt.Sprintf("\U0001F451 <b>@%s</b>\n<b>Likes:</b> %d", userName, roflCount)
 
 	v.ParseMode = tgbotapi.ModeHTML
 

@@ -5,8 +5,6 @@
 # ===================================================================================
 FROM golang:1.18-alpine AS builder
 
-# RUN apk --no-cache add ca-certificates
-
 WORKDIR /build
 
 # Fetch modules
@@ -27,7 +25,9 @@ RUN GOOS=linux \
 # ===================================================================================
 # === Stage 2: Create a lightweight container =======================================
 # ===================================================================================
-FROM alpine
+
+# AK TODO transfer to scratch
+FROM alpine 
 
 WORKDIR /app
 
