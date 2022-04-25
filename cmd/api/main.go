@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/config"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/roflers"
+	roflers "github.com/kapitan123/telegrofler/internal/data"
 	"github.com/kapitan123/telegrofler/internal/routes"
 
 	log "github.com/sirupsen/logrus"
@@ -21,8 +21,8 @@ func main() {
 	router := mux.NewRouter()
 
 	api := routes.API{
-		Bot:          bot.New(),
-		RoflersStore: roflers.New(),
+		bot.New(),
+		roflers.New(),
 	}
 
 	// AK TODO should close the whole api

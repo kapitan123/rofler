@@ -1,4 +1,4 @@
-package roflers
+package data
 
 // AK TODO rename package
 import (
@@ -6,6 +6,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/kapitan123/telegrofler/config"
+	"github.com/kapitan123/telegrofler/internal/data/model"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -110,7 +111,7 @@ func (rs *RoflersStore) CreatPost(p model.Post) error {
 	return err
 }
 
-func (rs *RoflersStore) AddReactionToPost(vr reaction.VideoReaction) error {
+func (rs *RoflersStore) AddReactionToPost(vr model.VideoReaction) error {
 	posts, err := rs.GetAllPosts()
 	if err != nil {
 		return err

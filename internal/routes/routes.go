@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/roflers"
+	roflers "github.com/kapitan123/telegrofler/internal/data"
 	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
 	log "github.com/sirupsen/logrus"

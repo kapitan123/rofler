@@ -6,7 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/roflers"
+	"github.com/kapitan123/telegrofler/internal/data/model"
 	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -17,9 +17,11 @@ func (api API) AddCallback(router *mux.Router) {
 	router.HandleFunc("/callback", api.handleCallback).Methods("POST")
 }
 
+// AK TODO after extraction f handlers move back to routes
 // Handles callback from Telegram. Extracts url from message, converts video and uploads it back.
 func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {
-	upd, err := api.Bot.GetUpdate(req)
+	// AK TODO extract a Handler interface
+	upd, err := api.GetUpdate(req)
 	mess := upd.Message
 
 	if err != nil {
@@ -83,12 +85,12 @@ func (api API) tryReplaceLinkWithMessage(mess *tgbotapi.Message) (bool, error) {
 	// we don't really care if if has failed and it makes integration tests a lot easier
 	_ = api.Bot.DeletePost(svp.ChatId, svp.OriginalMessageId)
 
-	newPost := roflers.Post{
+	newPost := model.Post{
 		VideoId:        svp.VideoData.Id,
 		Source:         evi.Type,
 		RoflerUserName: svp.Sender,
 		Url:            svp.Url,
-		Reactions:      []roflers.Reaction{},
+		Reactions:      []model.Reaction{},
 		KeyWords:       []string{},
 		PostedOn:       time.Now(),
 	}
@@ -104,7 +106,7 @@ func (api API) tryReplaceLinkWithMessage(mess *tgbotapi.Message) (bool, error) {
 
 func (api API) tryRecordReaction(m *tgbotapi.Message) (bool, error) {
 	isHandeled := true
-	reaction, err := api.Bot.TryExtractTikTokReaction(m)
+	reaction, err := api.Bot.TryExtractVideoRepostReaction(m)
 	if err != nil {
 		return !isHandeled, err
 	}

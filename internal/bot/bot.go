@@ -18,6 +18,7 @@ const (
 	posterMaker = `🔥@(.*?)🔥`
 )
 
+// AK TODO compose an object from little mixin parts like TelegramPoster, 
 type Bot struct {
 	api *tgbotapi.BotAPI
 }
@@ -71,7 +72,7 @@ func (b *Bot) ConvertToSourceVideoPost(m *tgbotapi.Message) *SourceVideoPost {
 }
 
 // AK TODO add sucess parameter
-func (b *Bot) TryExtractTikTokReaction(upd *tgbotapi.Message) (model.VideoReaction, error) {
+func (b *Bot) TryExtractVideoRepostReaction(upd *tgbotapi.Message) (model.VideoReaction, error) {
 	vr := model.VideoReaction{}
 	rtm := upd.ReplyToMessage
 
