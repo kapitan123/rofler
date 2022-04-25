@@ -16,7 +16,7 @@ import (
 // AK TODO should be in a separate aggreagate
 type API struct {
 	*bot.Bot
-	*roflers.RoflersStore
+	*roflers.PostsStore
 	// AK TODO add base concerns like liviness probe
 }
 
@@ -63,7 +63,7 @@ func (api API) download(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (api API) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request) {
-	tr, _, err := api.RoflersStore.GetTopRofler()
+	tr, _, err := api.GetTopRoflerFromPosts()
 	if err != nil {
 		writeTo(err, resp)
 		return
@@ -75,7 +75,7 @@ func (api API) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request) 
 }
 
 func (api API) getAllPosts(resp http.ResponseWriter, req *http.Request) {
-	roflers, err := api.RoflersStore.GetAllPosts()
+	roflers, err := api.GetAllPosts()
 
 	if err != nil {
 		writeTo(err, resp)

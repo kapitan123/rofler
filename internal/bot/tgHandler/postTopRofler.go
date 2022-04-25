@@ -9,11 +9,11 @@ import (
 
 type PostTopRofler struct {
 	*bot.Bot
-	*data.RoflersStore
+	*data.PostsStore
 }
 
 func (h *PostTopRofler) Handle(m *tgbotapi.Message) (bool, error) {
-	tr, roflCount, err := h.GetTopRofler()
+	tr, roflCount, err := h.GetTopRoflerFromPosts()
 	if err != nil {
 		return false, err
 	}

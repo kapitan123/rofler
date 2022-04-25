@@ -95,7 +95,7 @@ func (api API) tryReplaceLinkWithMessage(mess *tgbotapi.Message) (bool, error) {
 		PostedOn:       time.Now(),
 	}
 
-	api.RoflersStore.UpsertPost(newPost)
+	api.Upsert(newPost)
 
 	if err != nil {
 		return isHandeled, err
@@ -117,7 +117,7 @@ func (api API) tryRecordReaction(m *tgbotapi.Message) (bool, error) {
 
 	log.Infof("Reaction was found for %s sent by %s", reaction.VideoId, reaction.Sender)
 
-	api.RoflersStore.AddReactionToPost(reaction)
+	api.AddReactionToPost(reaction)
 
 	return isHandeled, nil
 }
@@ -132,7 +132,7 @@ func (api API) tryExecCommand(m *tgbotapi.Message) (bool, error) {
 		return true, nil
 	}
 
-	tr, roflCount, err := api.RoflersStore.GetTopRofler()
+	tr, roflCount, err := api.GetTopRoflerFromPosts()
 	if err != nil {
 		return false, err
 	}

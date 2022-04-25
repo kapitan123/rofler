@@ -10,7 +10,7 @@ import (
 
 type RecordReaction struct {
 	*bot.Bot
-	*data.RoflersStore
+	*data.PostsStore
 }
 
 func (h *RecordReaction) Handle(m *tgbotapi.Message) (bool, error) {

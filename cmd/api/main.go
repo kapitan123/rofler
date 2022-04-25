@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/config"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	roflers "github.com/kapitan123/telegrofler/internal/data"
+	"github.com/kapitan123/telegrofler/internal/data"
 	"github.com/kapitan123/telegrofler/internal/routes"
 
 	log "github.com/sirupsen/logrus"
@@ -22,11 +22,11 @@ func main() {
 
 	api := routes.API{
 		bot.New(),
-		roflers.New(),
+		data.NewPostsStore(),
 	}
 
 	// AK TODO should close the whole api
-	defer api.RoflersStore.Close()
+	defer api.Close()
 
 	api.AddRoutes(router)
 	api.AddCallback(router)

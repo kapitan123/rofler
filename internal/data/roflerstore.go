@@ -11,10 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	roflersColName = "roflers"
-	postsColName   = "posts"
-)
+const roflersColName = "roflers"
 
 // AK TODO need to separate in different data stores
 type RoflersStore struct {
@@ -24,7 +21,7 @@ type RoflersStore struct {
 	postsCol   *firestore.CollectionRef
 }
 
-func New() *RoflersStore {
+func NewRoflerStore() *RoflersStore {
 	ctx := context.Background()
 	client := createClient(ctx)
 	return &RoflersStore{
@@ -51,23 +48,6 @@ func (rs *RoflersStore) GetAllRoflers() ([]model.Rofler, error) {
 	}
 
 	return roflers, nil
-}
-
-func (rs *RoflersStore) GetAllPosts() ([]model.Post, error) {
-	docs, err := rs.postsCol.Documents(*rs.ctx).GetAll()
-
-	if err != nil {
-		return nil, err
-	}
-
-	posts := []model.Post{}
-	for _, doc := range docs {
-		p := model.Post{}
-		doc.DataTo(&p)
-		posts = append(posts, p)
-	}
-
-	return posts, nil
 }
 
 // Tries to fetch a document by id
@@ -109,52 +89,6 @@ func (rs *RoflersStore) CreatPost(p model.Post) error {
 	_, err := doc.Create(*rs.ctx, p)
 
 	return err
-}
-
-func (rs *RoflersStore) AddReactionToPost(vr model.VideoReaction) error {
-	posts, err := rs.GetAllPosts()
-	if err != nil {
-		return err
-	}
-
-	for _, p := range posts {
-		if p.VideoId == vr.VideoId {
-			p.AddReaction(vr.Sender, vr.Text, vr.MessageId)
-
-			err = rs.UpsertPost(p)
-
-			log.Infof("Reaction was saved for %s from %s: ", vr.VideoId, vr.Sender)
-
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
-func (rs *RoflersStore) GetTopRofler() (string, int, error) {
-	posts, err := rs.GetAllPosts()
-	if err != nil {
-		return "", 0, err
-	}
-
-	roflerScores := map[string]int{}
-
-	for _, p := range posts {
-		roflerScores[p.RoflerUserName] += len(p.Reactions)
-	}
-
-	maxUserName, max := "", 0
-	for username, score := range roflerScores {
-		if max < score {
-			max = score
-			maxUserName = username
-		}
-	}
-
-	return maxUserName, max, nil
 }
 
 func (rs *RoflersStore) Close() {

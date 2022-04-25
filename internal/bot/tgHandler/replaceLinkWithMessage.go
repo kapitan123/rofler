@@ -14,7 +14,7 @@ import (
 
 type ReplaceLinkWithMessage struct {
 	*bot.Bot
-	*data.RoflersStore
+	*data.PostsStore
 }
 
 func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message) (bool, error) {
@@ -63,7 +63,7 @@ func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message) (bool, error) {
 		PostedOn:       time.Now(),
 	}
 
-	h.UpsertPost(newPost)
+	h.Upsert(newPost)
 
 	if err != nil {
 		return isHandeled, err
