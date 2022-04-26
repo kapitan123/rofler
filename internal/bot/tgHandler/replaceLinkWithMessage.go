@@ -16,6 +16,13 @@ type ReplaceLinkWithMessage struct {
 	*post.PostsStore
 }
 
+func NewReplaceLinkWithMessage(b *bot.Bot, ps *post.PostsStore) *ReplaceLinkWithMessage {
+	return &ReplaceLinkWithMessage{
+		Bot:        b,
+		PostsStore: ps,
+	}
+}
+
 func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message) (bool, error) {
 	isHandeled := true
 	source, found := sourceFactory.TryGetSource(mess.Text)

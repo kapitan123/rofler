@@ -3,6 +3,7 @@ module github.com/kapitan123/telegrofler
 go 1.18
 
 require (
+	cloud.google.com/go/firestore v1.6.1
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/sirupsen/logrus v1.8.1
@@ -10,7 +11,6 @@ require (
 
 require (
 	cloud.google.com/go v0.97.0 // indirect
-	cloud.google.com/go/firestore v1.6.1 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect

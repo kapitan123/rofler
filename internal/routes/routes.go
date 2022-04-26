@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
+	"github.com/kapitan123/telegrofler/internal/bot/tghandler"
 	"github.com/kapitan123/telegrofler/internal/data/post"
 	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
@@ -17,7 +18,8 @@ import (
 type API struct {
 	*bot.Bot
 	*post.PostsStore
-	// AK TODO add base concerns like liviness probe
+	handlers []tghandler.BotMessageHandler
+	commands map[string]tghandler.BotCommandHandler
 }
 
 func (api API) AddRoutes(router *mux.Router) {

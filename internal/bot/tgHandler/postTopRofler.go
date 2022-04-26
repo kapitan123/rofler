@@ -12,6 +12,13 @@ type PostTopRoflerCommand struct {
 	*post.PostsStore
 }
 
+func NewPostTopRoflerCommand(b *bot.Bot, ps *post.PostsStore) *PostTopRoflerCommand {
+	return &PostTopRoflerCommand{
+		Bot:         b,
+		PostsStore:  ps,
+	}
+}
+
 func (h *PostTopRoflerCommand) Handle(m *tgbotapi.Message) (bool, error) {
 	tr, roflCount, err := h.GetTopRoflerFromPosts()
 	if err != nil {

@@ -21,8 +21,8 @@ func main() {
 	router := mux.NewRouter()
 
 	api := routes.API{
-		bot.New(),
-		post.NewStore(),
+		Bot:        bot.New(),
+		PostsStore: post.NewStore(),
 	}
 
 	// AK TODO should close the whole api

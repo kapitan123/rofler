@@ -13,6 +13,13 @@ type RecordReaction struct {
 	*post.PostsStore
 }
 
+func NewRecordReaction(b *bot.Bot, ps *post.PostsStore) *RecordReaction {
+	return &RecordReaction{
+		Bot:        b,
+		PostsStore: ps,
+	}
+}
+
 func (h *RecordReaction) Handle(m *tgbotapi.Message) (bool, error) {
 	isHandeled := true
 	reaction, err := h.TryExtractVideoRepostReaction(m)

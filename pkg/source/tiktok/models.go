@@ -1,4 +1,4 @@
-// package tiktok
+package tiktok
 
 // type Stats struct {
 // 	DiggCount    int `json:"diggCount"`

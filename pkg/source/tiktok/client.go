@@ -1,4 +1,4 @@
-// package tiktok
+package tiktok
 
 // import (
 // 	"encoding/json"
