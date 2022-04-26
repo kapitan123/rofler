@@ -1,4 +1,4 @@
-package tghandler
+package tgaction
 
 import (
 	"github.com/kapitan123/telegrofler/internal/bot"
@@ -8,19 +8,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type RecordReaction struct {
+type RecordBotPostReaction struct {
 	*bot.Bot
 	*post.PostsStore
 }
 
-func NewRecordReaction(b *bot.Bot, ps *post.PostsStore) *RecordReaction {
-	return &RecordReaction{
+func NewRecordBotPostReaction(b *bot.Bot, ps *post.PostsStore) *RecordBotPostReaction {
+	return &RecordBotPostReaction{
 		Bot:        b,
 		PostsStore: ps,
 	}
 }
 
-func (h *RecordReaction) Handle(m *tgbotapi.Message) (bool, error) {
+func (h *RecordBotPostReaction) Handle(m *tgbotapi.Message) (bool, error) {
 	isHandeled := true
 	reaction, err := h.TryExtractVideoRepostReaction(m)
 	if err != nil {

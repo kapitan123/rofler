@@ -16,7 +16,7 @@ type Post struct {
 }
 
 type Reaction struct {
-	MessageId int       `firestore:"message_id"`
+	MessageId int       `firestore:"message_id"` // RepllyToMessage.ID not the update.Message.ID
 	Sender    string    `firestore:"sender"`
 	Text      string    `firestore:"text"`
 	PostedOn  time.Time `firestore:"posted_on"`

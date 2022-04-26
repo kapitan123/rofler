@@ -53,6 +53,22 @@ func (rs *PostsStore) Upsert(p Post) error {
 	return err
 }
 
+func (rs *PostsStore) GetById(videoId string) (Post, bool, error) {
+	var p Post
+	doc := rs.postsCol.Doc(videoId)
+	snap, err := doc.Get(*rs.ctx)
+
+	if err != nil {
+		return p, false, nil
+	}
+
+	if err := snap.DataTo(&p); err != nil {
+		return p, false, err
+	}
+
+	return p, true, nil
+}
+
 func (rs *PostsStore) Create(p Post) error {
 	doc := rs.postsCol.Doc(p.VideoId)
 	_, err := doc.Create(*rs.ctx, p)

@@ -1,4 +1,4 @@
-package tghandler
+package tgaction
 
 import (
 	"time"

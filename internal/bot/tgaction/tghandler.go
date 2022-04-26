@@ -1,4 +1,4 @@
-package tghandler
+package tgaction
 
 import (
 	log "github.com/sirupsen/logrus"
@@ -24,6 +24,8 @@ func InitCommands(b *bot.Bot, ps *post.PostsStore) map[string]BotCommandHandler 
 	commands := make(map[string]BotCommandHandler)
 	command1 := NewPostTopRoflerCommand(b, ps)
 	commands[command1.GetCommandText()] = command1
+
+	log.Infof("Commands registered %+v\n", commands)
 	return commands
 }
 
@@ -31,11 +33,15 @@ func InitCommands(b *bot.Bot, ps *post.PostsStore) map[string]BotCommandHandler 
 // Requires dependencies to be passed to the function
 // Order of execution is determined by the order of the array.
 func InitHandlers(b *bot.Bot, ps *post.PostsStore) []BotMessageHandler {
-	hadler1 := NewPostTopRoflerCommand(b, ps)
-	hadler2 := NewRecordReaction(b, ps)
-	hadler3 := NewReplaceLinkWithMessage(b, ps)
-	handlers := []BotMessageHandler{hadler1, hadler2, hadler3}
+	// reply to 300 doesn't stp the execution of other handlers
+	handler0 := NewReplyTo300(b)
+	handler1 := NewPostTopRoflerCommand(b, ps)
+	handler2 := NewRecordBotPostReaction(b, ps)
+	handler3 := NewReplaceLinkWithMessage(b, ps)
+	handler4 := NewRecordReactionToUserMediaPost(b, ps)
 
-	log.Infof("%+v\n", handlers)
+	handlers := []BotMessageHandler{handler0, handler1, handler2, handler3, handler4}
+
+	log.Infof("Handlers registered %+v\n", handlers)
 	return handlers
 }

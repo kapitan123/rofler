@@ -157,3 +157,29 @@ func (b *Bot) PostTopRofler(chatId int64, userName string, roflCount int) error 
 
 	return nil
 }
+
+func (b *Bot) PostReplyTo300(chatId int64, replyToMessageId int) error {
+	msg := tgbotapi.NewMessage(chatId, "🤣🚜 ♂ Отсоси у тракториста ♂ 🚜🤣")
+	msg.ReplyToMessageID = replyToMessageId
+
+	_, err := b.api.Send(msg)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// AK TODO add sucess parameter
+func (b *Bot) ExtractUserMediaReaction(upd *tgbotapi.Message) (post.VideoReaction, error) {
+	rtm := upd.ReplyToMessage
+	vr := post.VideoReaction{}
+
+	vr.Sender = upd.From.UserName
+	vr.MessageId = rtm.MessageID
+	vr.Text = upd.Text
+	vr.VideoId = rtm.Video.FileID
+
+	return vr, nil
+}

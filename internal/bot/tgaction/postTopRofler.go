@@ -1,4 +1,4 @@
-package tghandler
+package tgaction
 
 import (
 	"github.com/kapitan123/telegrofler/internal/bot"
@@ -14,8 +14,8 @@ type PostTopRoflerCommand struct {
 
 func NewPostTopRoflerCommand(b *bot.Bot, ps *post.PostsStore) *PostTopRoflerCommand {
 	return &PostTopRoflerCommand{
-		Bot:         b,
-		PostsStore:  ps,
+		Bot:        b,
+		PostsStore: ps,
 	}
 }
 

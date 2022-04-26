@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/kapitan123/telegrofler/internal/bot/tghandler"
+	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
 )
 
 func (api API) AddCallback(router *mux.Router) {
 	router.HandleFunc("/callback", api.handleCallback).Methods("POST")
-	api.handlers = tghandler.InitHandlers(api.Bot, api.PostsStore)
-	api.commands = tghandler.InitCommands(api.Bot, api.PostsStore)
+	api.handlers = tgaction.InitHandlers(api.Bot, api.PostsStore)
+	api.commands = tgaction.InitCommands(api.Bot, api.PostsStore)
 }
 
 func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {

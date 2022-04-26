@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/bot/tghandler"
+	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
 	"github.com/kapitan123/telegrofler/internal/data/post"
 	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
@@ -18,8 +18,8 @@ import (
 type API struct {
 	*bot.Bot
 	*post.PostsStore
-	handlers []tghandler.BotMessageHandler
-	commands map[string]tghandler.BotCommandHandler
+	handlers []tgaction.BotMessageHandler
+	commands map[string]tgaction.BotCommandHandler
 }
 
 func (api API) AddRoutes(router *mux.Router) {
