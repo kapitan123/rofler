@@ -13,10 +13,7 @@ func (api API) AddCallback(router *mux.Router) {
 	api.commands = tghandler.InitCommands(api.Bot, api.PostsStore)
 }
 
-// AK TODO after extraction f handlers move back to routes
-// Handles callback from Telegram. Extracts url from message, converts video and uploads it back.
 func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {
-	// AK TODO extract a Handler interface
 	upd, err := api.GetUpdate(req)
 	mess := upd.Message
 
@@ -29,8 +26,6 @@ func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// it invokes only handlers
-	// does not invoke commands
 	for _, h := range api.handlers {
 		wasHandled, err := h.Handle(mess)
 

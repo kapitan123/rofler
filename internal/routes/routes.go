@@ -14,7 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// AK TODO should be in a separate aggreagate
+// AK TODO should be in a separate file
 type API struct {
 	*bot.Bot
 	*post.PostsStore

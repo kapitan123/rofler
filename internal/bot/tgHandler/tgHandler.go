@@ -8,17 +8,18 @@ import (
 	"github.com/kapitan123/telegrofler/internal/data/post"
 )
 
-// AK TODO come up with a way of execution so we don't do this tupid error handling
+// Performs an action on recieving any message. Returns true if the execution should be stopped.
 type BotMessageHandler interface {
 	Handle(*tgbotapi.Message) (bool, error)
 }
 
-// marks only commands
+// Executes the command from the message. Returns true if the command was handled.
 type BotCommandHandler interface {
 	BotMessageHandler
 	GetCommandText() string
 }
 
+// Creates a map of handlers. Key is the command text, value is a handler.
 func InitCommands(b *bot.Bot, ps *post.PostsStore) map[string]BotCommandHandler {
 	commands := make(map[string]BotCommandHandler)
 	command1 := NewPostTopRoflerCommand(b, ps)
@@ -26,6 +27,9 @@ func InitCommands(b *bot.Bot, ps *post.PostsStore) map[string]BotCommandHandler 
 	return commands
 }
 
+// Creates an array of handlers. Which will be tried to execute.
+// Requires dependencies to be passed to the function
+// Order of execution is determined by the order of the array.
 func InitHandlers(b *bot.Bot, ps *post.PostsStore) []BotMessageHandler {
 	hadler1 := NewPostTopRoflerCommand(b, ps)
 	hadler2 := NewRecordReaction(b, ps)

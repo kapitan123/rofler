@@ -18,7 +18,8 @@ const (
 	posterMaker = `🔥@(.*?)🔥`
 )
 
-// AK TODO compose an object from little mixin parts like TelegramPoster,
+// A proxy for the Telegram API.
+// Encapsulates all logic related to telegram interactions
 type Bot struct {
 	api *tgbotapi.BotAPI
 }
