@@ -1,18 +1,18 @@
-package tgHandler
+package tghandler
 
 import (
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/data"
+	"github.com/kapitan123/telegrofler/internal/data/post"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type PostTopRofler struct {
+type PostTopRoflerCommand struct {
 	*bot.Bot
-	*data.PostsStore
+	*post.PostsStore
 }
 
-func (h *PostTopRofler) Handle(m *tgbotapi.Message) (bool, error) {
+func (h *PostTopRoflerCommand) Handle(m *tgbotapi.Message) (bool, error) {
 	tr, roflCount, err := h.GetTopRoflerFromPosts()
 	if err != nil {
 		return false, err
@@ -26,6 +26,6 @@ func (h *PostTopRofler) Handle(m *tgbotapi.Message) (bool, error) {
 	return true, nil
 }
 
-func (h *PostTopRofler) GetCommandText() string {
+func (h *PostTopRoflerCommand) GetCommandText() string {
 	return "top"
 }

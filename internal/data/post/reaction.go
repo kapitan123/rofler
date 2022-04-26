@@ -1,4 +1,4 @@
-package model
+package post
 
 type VideoReaction struct {
 	Sender    string

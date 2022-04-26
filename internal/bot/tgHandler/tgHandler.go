@@ -1,4 +1,4 @@
-package tgHandler
+package tghandler
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -11,5 +11,6 @@ type BotCallbackHandler interface {
 
 // marks only commands
 type BotCommand interface {
+	*BotCallbackHandler
 	GetCommandText() string
 }

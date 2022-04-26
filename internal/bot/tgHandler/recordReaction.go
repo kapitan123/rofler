@@ -1,8 +1,8 @@
-package tgHandler
+package tghandler
 
 import (
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/data"
+	"github.com/kapitan123/telegrofler/internal/data/post"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
@@ -10,7 +10,7 @@ import (
 
 type RecordReaction struct {
 	*bot.Bot
-	*data.PostsStore
+	*post.PostsStore
 }
 
 func (h *RecordReaction) Handle(m *tgbotapi.Message) (bool, error) {

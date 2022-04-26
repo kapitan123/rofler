@@ -1,7 +1,14 @@
-package model
+package rofler
 
 import (
 	"time"
+)
+
+const (
+	OfTheWeek  = "of_the_week"
+	OfTheMonth = "of_the_month"
+	TopRofler  = "top_rofler"
+	TopTaste   = "top_taste"
 )
 
 type Rofler struct {
@@ -12,7 +19,7 @@ type Rofler struct {
 }
 
 type Accolade struct {
-	Type      string    `firestore:"type"`       // rofler, worker, taste
-	TimeFrame string    `firestore:"time_frame"` // week, month, year
+	Type      string    `firestore:"type"`
+	TimeFrame string    `firestore:"time_frame"`
 	WonOn     time.Time `firestore:"won_on"`
 }

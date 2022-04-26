@@ -1,11 +1,11 @@
-package data
+package post
 
 // AK TODO rename package
 import (
 	"context"
 
 	"cloud.google.com/go/firestore"
-	"github.com/kapitan123/telegrofler/internal/data/model"
+	"github.com/kapitan123/telegrofler/config"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -19,7 +19,7 @@ type PostsStore struct {
 	postsCol *firestore.CollectionRef
 }
 
-func NewPostsStore() *PostsStore {
+func NewStore() *PostsStore {
 	ctx := context.Background()
 	client := createClient(ctx)
 	return &PostsStore{
@@ -29,16 +29,16 @@ func NewPostsStore() *PostsStore {
 	}
 }
 
-func (rs *PostsStore) GetAllPosts() ([]model.Post, error) {
+func (rs *PostsStore) GetAllPosts() ([]Post, error) {
 	docs, err := rs.postsCol.Documents(*rs.ctx).GetAll()
 
 	if err != nil {
 		return nil, err
 	}
 
-	posts := []model.Post{}
+	posts := []Post{}
 	for _, doc := range docs {
-		p := model.Post{}
+		p := Post{}
 		doc.DataTo(&p)
 		posts = append(posts, p)
 	}
@@ -46,21 +46,21 @@ func (rs *PostsStore) GetAllPosts() ([]model.Post, error) {
 	return posts, nil
 }
 
-func (rs *PostsStore) Upsert(p model.Post) error {
+func (rs *PostsStore) Upsert(p Post) error {
 	doc := rs.postsCol.Doc(p.VideoId)
 	_, err := doc.Set(*rs.ctx, p)
 
 	return err
 }
 
-func (rs *PostsStore) Create(p model.Post) error {
+func (rs *PostsStore) Create(p Post) error {
 	doc := rs.postsCol.Doc(p.VideoId)
 	_, err := doc.Create(*rs.ctx, p)
 
 	return err
 }
 
-func (rs *PostsStore) AddReactionToPost(vr model.VideoReaction) error {
+func (rs *PostsStore) AddReactionToPost(vr VideoReaction) error {
 	posts, err := rs.GetAllPosts()
 	if err != nil {
 		return err
@@ -108,4 +108,12 @@ func (rs *PostsStore) GetTopRoflerFromPosts() (string, int, error) {
 
 func (rs *PostsStore) Close() {
 	rs.client.Close()
+}
+
+func createClient(ctx context.Context) *firestore.Client {
+	client, err := firestore.NewClient(ctx, config.ProjectId)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err) // AK TODO shouldn't be fatal
+	}
+	return client
 }

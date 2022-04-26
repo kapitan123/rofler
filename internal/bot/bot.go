@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/kapitan123/telegrofler/config"
-	"github.com/kapitan123/telegrofler/internal/data/model"
+	"github.com/kapitan123/telegrofler/internal/data/post"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5" // https://go-telegram-bot-api.dev/
 	log "github.com/sirupsen/logrus"
@@ -18,7 +18,7 @@ const (
 	posterMaker = `🔥@(.*?)🔥`
 )
 
-// AK TODO compose an object from little mixin parts like TelegramPoster, 
+// AK TODO compose an object from little mixin parts like TelegramPoster,
 type Bot struct {
 	api *tgbotapi.BotAPI
 }
@@ -72,8 +72,8 @@ func (b *Bot) ConvertToSourceVideoPost(m *tgbotapi.Message) *SourceVideoPost {
 }
 
 // AK TODO add sucess parameter
-func (b *Bot) TryExtractVideoRepostReaction(upd *tgbotapi.Message) (model.VideoReaction, error) {
-	vr := model.VideoReaction{}
+func (b *Bot) TryExtractVideoRepostReaction(upd *tgbotapi.Message) (post.VideoReaction, error) {
+	vr := post.VideoReaction{}
 	rtm := upd.ReplyToMessage
 
 	if rtm == nil || rtm.From.UserName != "TelegroflBot" || rtm.Video == nil {
@@ -89,7 +89,7 @@ func (b *Bot) TryExtractVideoRepostReaction(upd *tgbotapi.Message) (model.VideoR
 		return vr, nil
 	}
 
-	return model.VideoReaction{Sender: sender, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
+	return post.VideoReaction{Sender: sender, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
 }
 
 func (b *Bot) DeletePost(chatId int64, messageId int) error {
@@ -127,8 +127,8 @@ func (b *Bot) GetCommand(m *tgbotapi.Message) (string, error) {
 		return "", nil
 	}
 
-	if strings.HasPrefix(TopCommand, m.Command()) {
-		return TopCommand, nil
+	if strings.HasPrefix("top", m.Command()) {
+		return "top", nil
 	}
 
 	return "", nil

@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	roflers "github.com/kapitan123/telegrofler/internal/data"
+	"github.com/kapitan123/telegrofler/internal/data/post"
 	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
 	log "github.com/sirupsen/logrus"
@@ -16,7 +16,7 @@ import (
 // AK TODO should be in a separate aggreagate
 type API struct {
 	*bot.Bot
-	*roflers.PostsStore
+	*post.PostsStore
 	// AK TODO add base concerns like liviness probe
 }
 

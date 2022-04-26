@@ -5,8 +5,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/data/model"
+	"github.com/kapitan123/telegrofler/internal/data/post"
 	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -85,12 +84,12 @@ func (api API) tryReplaceLinkWithMessage(mess *tgbotapi.Message) (bool, error) {
 	// we don't really care if if has failed and it makes integration tests a lot easier
 	_ = api.Bot.DeletePost(svp.ChatId, svp.OriginalMessageId)
 
-	newPost := model.Post{
+	newPost := post.Post{
 		VideoId:        svp.VideoData.Id,
 		Source:         evi.Type,
 		RoflerUserName: svp.Sender,
 		Url:            svp.Url,
-		Reactions:      []model.Reaction{},
+		Reactions:      []post.Reaction{},
 		KeyWords:       []string{},
 		PostedOn:       time.Now(),
 	}
@@ -128,7 +127,7 @@ func (api API) tryExecCommand(m *tgbotapi.Message) (bool, error) {
 		return false, err
 	}
 
-	if command != bot.TopCommand {
+	if command != "top" {
 		return true, nil
 	}
 
