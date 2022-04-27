@@ -2,6 +2,7 @@ package source
 
 import (
 	"crypto/tls"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -30,6 +31,10 @@ func DownloadBytesFromUrl(dUrl string) ([]byte, error) {
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("the request has failde with statuscode %d. Data: %s", resp.StatusCode, body)
+	}
 
 	return body, nil
 }

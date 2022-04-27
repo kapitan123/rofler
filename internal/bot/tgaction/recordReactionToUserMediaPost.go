@@ -39,7 +39,7 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 
 	// AK TODO should actually return nil
 	if reaction.Sender == "" {
-		return isHandeled, nil
+		return !isHandeled, nil
 	}
 
 	log.Infof("Reaction was found for %s sent by %s", reaction.VideoId, reaction.Sender)

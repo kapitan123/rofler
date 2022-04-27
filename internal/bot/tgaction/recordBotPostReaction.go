@@ -28,7 +28,7 @@ func (h *RecordBotPostReaction) Handle(m *tgbotapi.Message) (bool, error) {
 	}
 
 	if reaction.Sender == "" {
-		return isHandeled, nil
+		return !isHandeled, nil
 	}
 
 	log.Infof("Reaction was found for %s sent by %s", reaction.VideoId, reaction.Sender)

@@ -32,16 +32,15 @@ func InitCommands(b *bot.Bot, ps *post.PostsStore) map[string]BotCommandHandler 
 // Creates an array of handlers. Which will be tried to execute.
 // Requires dependencies to be passed to the function
 // Order of execution is determined by the order of the array.
-func InitHandlers(b *bot.Bot, ps *post.PostsStore) []BotMessageHandler {
+func InitHandlers(b *bot.Bot, ps *post.PostsStore) *[]BotMessageHandler {
 	// reply to 300 doesn't stp the execution of other handlers
 	handler0 := NewReplyTo300(b)
-	handler1 := NewPostTopRoflerCommand(b, ps)
+	handler1 := NewReplaceLinkWithMessage(b, ps)
 	handler2 := NewRecordBotPostReaction(b, ps)
-	handler3 := NewReplaceLinkWithMessage(b, ps)
-	handler4 := NewRecordReactionToUserMediaPost(b, ps)
+	handler3 := NewRecordReactionToUserMediaPost(b, ps)
 
-	handlers := []BotMessageHandler{handler0, handler1, handler2, handler3, handler4}
+	handlers := []BotMessageHandler{handler0, handler1, handler2, handler3}
 
 	log.Infof("Handlers registered %+v\n", handlers)
-	return handlers
+	return &handlers
 }

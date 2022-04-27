@@ -7,9 +7,9 @@ import (
 )
 
 func TryGetSource(message string) (source.Downloader, bool) {
-	if lovetik.IsMatchingUrl(message) {
+	if shortsget.IsMatchingUrl(message) {
 		return shortsget.New(), true
-	} else if shortsget.IsMatchingUrl(message) {
+	} else if lovetik.IsMatchingUrl(message) {
 		return lovetik.New(), true
 	}
 	return nil, false

@@ -7,13 +7,13 @@ import (
 	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
 )
 
-func (api API) AddCallback(router *mux.Router) {
+func (api *API) AddCallback(router *mux.Router) {
 	router.HandleFunc("/callback", api.handleCallback).Methods("POST")
 	api.handlers = tgaction.InitHandlers(api.Bot, api.PostsStore)
 	api.commands = tgaction.InitCommands(api.Bot, api.PostsStore)
 }
 
-func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {
+func (api *API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 	upd, err := api.GetUpdate(req)
 	mess := upd.Message
 
@@ -26,7 +26,7 @@ func (api API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	for _, h := range api.handlers {
+	for _, h := range *api.handlers {
 		wasHandled, err := h.Handle(mess)
 
 		if err != nil {

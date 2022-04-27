@@ -18,11 +18,11 @@ import (
 type API struct {
 	*bot.Bot
 	*post.PostsStore
-	handlers []tgaction.BotMessageHandler
+	handlers *[]tgaction.BotMessageHandler
 	commands map[string]tgaction.BotCommandHandler
 }
 
-func (api API) AddRoutes(router *mux.Router) {
+func (api *API) AddRoutes(router *mux.Router) {
 	router.HandleFunc("/stats/posts", api.getAllPosts).Methods("GET")
 	router.HandleFunc("/stats/top", api.getTopRoflerHandler).Methods("GET")
 	router.HandleFunc("/download", api.download).Methods("GET")
