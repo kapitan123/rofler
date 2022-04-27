@@ -3,8 +3,10 @@ package routes
 import (
 	"net/http"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
+	log "github.com/sirupsen/logrus"
 )
 
 func (api *API) AddCallback(router *mux.Router) {
@@ -18,7 +20,7 @@ func (api *API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 	mess := upd.Message
 
 	if err != nil {
-		writeTo(err, resp)
+		log.Error(err)
 		return
 	}
 
@@ -26,15 +28,20 @@ func (api *API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	go tryHandleMessage(api, mess)
+}
+
+func tryHandleMessage(api *API, mess *tgbotapi.Message) {
 	for _, h := range *api.handlers {
 		wasHandled, err := h.Handle(mess)
 
 		if err != nil {
-			writeTo(err, resp)
+			log.Error(err)
 			return
 		}
 
 		if wasHandled {
+			log.Infof("Handled by: %T", h)
 			return
 		}
 	}
@@ -42,7 +49,7 @@ func (api *API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 	command, err := api.GetCommand(mess)
 
 	if err != nil {
-		writeTo(err, resp)
+		log.Error(err)
 		return
 	}
 
@@ -59,7 +66,9 @@ func (api *API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 	_, err = cmd.Handle(mess)
 
 	if err != nil {
-		writeTo(err, resp)
+		log.Error(err)
 		return
 	}
+
+	log.Infof("Handled by: %T", cmd)
 }

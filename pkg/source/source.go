@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 type Downloader interface {
@@ -23,7 +24,12 @@ func DownloadBytesFromUrl(dUrl string) ([]byte, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // <--- Problem
 	}
-	client := &http.Client{Transport: tr}
+
+	client := &http.Client{
+		Transport: tr,
+		Timeout:   50 * time.Second,
+	}
+
 	resp, err := client.Get(dUrl)
 	if err != nil {
 		return nil, err

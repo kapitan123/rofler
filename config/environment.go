@@ -12,10 +12,12 @@ const (
 	gcloudAppCredsEnv = "GOOGLE_APPLICATION_CREDENTIALS"
 )
 
-var TelegramToken = os.Getenv(telegramTokenEnv)
-var ProjectId = os.Getenv(projectIdEnv)
-var ServerPort = 9001
-var GcloudCreds = os.Getenv(gcloudAppCredsEnv)
+var (
+	TelegramToken = os.Getenv(telegramTokenEnv)
+	ProjectId     = os.Getenv(projectIdEnv)
+	ServerPort    = 9001 // AK TODO pass in env var
+	GcloudCreds   = os.Getenv(gcloudAppCredsEnv)
+)
 
 func init() {
 	if TelegramToken == "" {

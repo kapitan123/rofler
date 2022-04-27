@@ -25,7 +25,7 @@ func InitCommands(b *bot.Bot, ps *post.PostsStore) map[string]BotCommandHandler 
 	command1 := NewPostTopRoflerCommand(b, ps)
 	commands[command1.GetCommandText()] = command1
 
-	log.Infof("Commands registered %+v\n", commands)
+	log.Infof("Commands registered %+T\n", commands)
 	return commands
 }
 
@@ -41,6 +41,6 @@ func InitHandlers(b *bot.Bot, ps *post.PostsStore) *[]BotMessageHandler {
 
 	handlers := []BotMessageHandler{handler0, handler1, handler2, handler3}
 
-	log.Infof("Handlers registered %+v\n", handlers)
+	log.Infof("Handlers registered %+T\n", handlers)
 	return &handlers
 }

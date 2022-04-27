@@ -1,6 +1,5 @@
 package post
 
-// AK TODO rename package
 import (
 	"context"
 
@@ -12,7 +11,6 @@ import (
 
 const postsColName = "posts"
 
-// AK TODO need to separate in different data stores
 type PostsStore struct {
 	ctx      *context.Context
 	client   *firestore.Client

@@ -6,21 +6,10 @@ import (
 	"net/url"
 
 	"github.com/gorilla/mux"
-	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
-	"github.com/kapitan123/telegrofler/internal/data/post"
 	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
 	log "github.com/sirupsen/logrus"
 )
-
-// AK TODO should be in a separate file
-type API struct {
-	*bot.Bot
-	*post.PostsStore
-	handlers *[]tgaction.BotMessageHandler
-	commands map[string]tgaction.BotCommandHandler
-}
 
 func (api *API) AddRoutes(router *mux.Router) {
 	router.HandleFunc("/stats/posts", api.getAllPosts).Methods("GET")
