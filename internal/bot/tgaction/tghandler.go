@@ -34,12 +34,13 @@ func InitCommands(b *bot.Bot, ps *post.PostsStore) map[string]BotCommandHandler 
 // Order of execution is determined by the order of the array.
 func InitHandlers(b *bot.Bot, ps *post.PostsStore) *[]BotMessageHandler {
 	// reply to 300 doesn't stp the execution of other handlers
-	handler0 := NewReplyTo300(b)
-	handler1 := NewReplaceLinkWithMessage(b, ps)
-	handler2 := NewRecordBotPostReaction(b, ps)
-	handler3 := NewRecordReactionToUserMediaPost(b, ps)
-
-	handlers := []BotMessageHandler{handler0, handler1, handler2, handler3}
+	handlers := []BotMessageHandler{
+		NewReplyTo300(b),
+		NewReplyToYes(b),
+		NewReplaceLinkWithMessage(b, ps),
+		NewRecordBotPostReaction(b, ps),
+		NewRecordReactionToUserMediaPost(b, ps),
+	}
 
 	log.Infof("Handlers registered %+T\n", handlers)
 	return &handlers
