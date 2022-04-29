@@ -10,6 +10,7 @@ import (
 	"github.com/kapitan123/telegrofler/config"
 	"github.com/kapitan123/telegrofler/internal/data/post"
 
+	_ "embed"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5" // https://go-telegram-bot-api.dev/
 	log "github.com/sirupsen/logrus"
 )
@@ -160,6 +161,22 @@ func (b *Bot) PostTopRofler(chatId int64, userName string, roflCount int) error 
 
 func (b *Bot) PostReplyTo300(chatId int64, replyToMessageId int) error {
 	msg := tgbotapi.NewMessage(chatId, "🤣🚜 ♂ Отсоси у тракториста ♂ 🚜🤣")
+	msg.ReplyToMessageID = replyToMessageId
+
+	_, err := b.api.Send(msg)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//go:embed assets/kirkorov.png
+var yesPicture []byte
+
+func (b *Bot) PostReplyToYes(chatId int64, replyToMessageId int) error {
+	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: "kirkorov.png", Bytes: yesPicture})
 	msg.ReplyToMessageID = replyToMessageId
 
 	_, err := b.api.Send(msg)
