@@ -21,12 +21,11 @@ var (
 
 func init() {
 	if TelegramToken == "" {
-		log.Panic("Telegram bot token is not set. Please set it in the environment variable ", telegramTokenEnv)
+		log.Panic("Telegram bot token is not set. Please set the environment variable ", telegramTokenEnv)
 	}
 
 	if ProjectId == "" {
-		ProjectId = "neat-cycling-346311"
-		log.Panic("Firestore projectid is not set. Please set it in the environment variable ", projectIdEnv)
+		log.Panic("Firestore projectid is not set. Please set the environment variable ", projectIdEnv)
 	}
 
 	if GcloudCreds == "" {

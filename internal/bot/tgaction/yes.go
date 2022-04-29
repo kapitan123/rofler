@@ -7,7 +7,7 @@ import (
 	"github.com/kapitan123/telegrofler/internal/bot"
 )
 
-var yesRegex = regexp.MustCompile(`^da|Да|да$`)
+var yesRegex = regexp.MustCompile(`^(da|Да|да)(.|\?|!)?$`)
 
 type ReplyToYes struct {
 	*bot.Bot
