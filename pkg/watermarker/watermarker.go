@@ -6,12 +6,16 @@ import (
 	"image/draw"
 	_ "image/jpeg"
 	"image/png"
-	"log"
+	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Watermark operates with bytes
 func ApplyWatermark(bakground []byte, foreground []byte) ([]byte, error) {
-	log.Printf("Generating watermark")
+	log.Info("Start watermarking ", time.Now())
+	defer log.Info("Finish watermarking", time.Now())
+
 	bgImg, _, err := image.Decode(bytes.NewReader(bakground))
 	if err != nil {
 		return nil, err
