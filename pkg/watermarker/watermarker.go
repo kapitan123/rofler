@@ -1,32 +1,39 @@
-package lovetik
+package watermarker
 
 import (
+	"bytes"
 	"image"
 	"image/draw"
+	_ "image/jpeg"
 	"image/png"
 	"log"
-	"os"
 )
 
-func ApplyWatermark(ppic image.Image) (image.Image, error) {
-	crownfile, err := os.Open("asset/crown.png")
+// Watermark operates with bytes
+func ApplyWatermark(bakground []byte, foreground []byte) ([]byte, error) {
+	log.Printf("Generating watermark")
+	bgImg, _, err := image.Decode(bytes.NewReader(bakground))
 	if err != nil {
-		log.Fatalf("failed to open: %s", err)
+		return nil, err
 	}
 
-	second, err := png.Decode(crownfile)
+	fgImg, err := png.Decode(bytes.NewReader(foreground))
+
 	if err != nil {
-		log.Fatalf("failed to decode: %s", err)
+		return nil, err
 	}
-	defer crownfile.Close()
 
-	offset := image.Pt(300, 200) // AK TODO fix offset
-	b := ppic.Bounds()
-	image3 := image.NewRGBA(b)
-	draw.Draw(image3, b, ppic, image.ZP, draw.Src)
-	draw.Draw(image3, second.Bounds().Add(offset), second, image.ZP, draw.Over)
+	b := bgImg.Bounds()
+	resImg := image.NewRGBA(b)
+	draw.Draw(resImg, b, bgImg, image.Point{}, draw.Src)
+	draw.Draw(resImg, fgImg.Bounds(), fgImg, image.Point{}, draw.Over)
 
-	// AK TODO return an image
-	//jpeg.Encode(third, image3, &jpeg.Options{jpeg.DefaultQuality})
-	return image3, nil
+	resBuf := new(bytes.Buffer)
+	err = png.Encode(resBuf, resImg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resBuf.Bytes(), nil
 }

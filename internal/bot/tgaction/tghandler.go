@@ -37,6 +37,7 @@ func InitHandlers(b *bot.Bot, ps *post.PostsStore) *[]BotMessageHandler {
 	handlers := []BotMessageHandler{
 		NewReplyTo300(b),
 		NewReplyToYes(b),
+		NewReplyToNo(b),
 		NewReplaceLinkWithMessage(b, ps),
 		NewRecordBotPostReaction(b, ps),
 		NewRecordReactionToUserMediaPost(b, ps),

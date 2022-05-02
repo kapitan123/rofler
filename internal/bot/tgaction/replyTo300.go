@@ -28,7 +28,7 @@ func (h *ReplyTo300) Handle(m *tgbotapi.Message) (bool, error) {
 		return false, nil
 	}
 
-	h.PostReplyTo300(m.Chat.ID, m.MessageID)
+	h.PostReplyWithText(m.Chat.ID, m.MessageID, "🤣🚜 ♂ Отсоси у тракториста ♂ 🚜🤣")
 
 	return false, nil
 }

@@ -31,7 +31,7 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 
 	isHandeled := true
 
-	reaction, err := h.ExtractUserMediaReaction(m)
+	reaction, err := bot.ExtractUserMediaReaction(m)
 
 	if err != nil {
 		return !isHandeled, err

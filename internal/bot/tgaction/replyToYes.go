@@ -1,6 +1,7 @@
 package tgaction
 
 import (
+	_ "embed"
 	"regexp"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -8,6 +9,9 @@ import (
 )
 
 var yesRegex = regexp.MustCompile(`^(da|Да|да)(.|\?|!)?$`)
+
+//go:embed assets/kirkorov.png
+var yesPicture []byte
 
 type ReplyToYes struct {
 	*bot.Bot
@@ -26,7 +30,8 @@ func (h *ReplyToYes) Handle(m *tgbotapi.Message) (bool, error) {
 		return false, nil
 	}
 
-	err := h.PostReplyToYes(m.Chat.ID, m.MessageID)
+	err := h.PostReplyWithImage(m.Chat.ID, m.MessageID, yesPicture, "kirkorov.png", "")
+
 	if err != nil {
 		return false, err
 	}

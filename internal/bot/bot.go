@@ -4,19 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"regexp"
-	"strings"
-
-	"github.com/kapitan123/telegrofler/config"
-	"github.com/kapitan123/telegrofler/internal/data/post"
 
 	_ "embed"
+
+	"github.com/kapitan123/telegrofler/config"
+	"github.com/kapitan123/telegrofler/pkg/source"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5" // https://go-telegram-bot-api.dev/
 	log "github.com/sirupsen/logrus"
-)
-
-const (
-	posterMaker = `🔥@(.*?)🔥`
 )
 
 // A proxy for the Telegram API.
@@ -61,39 +56,6 @@ func (b *Bot) RepostConvertedVideo(tp *SourceVideoPost) error {
 	return nil
 }
 
-// Handles incoming chat messages.
-// Tries to extract a TikTok video url from the message if no url was found returns nil
-// Handles only mobile format
-func (b *Bot) ConvertToSourceVideoPost(m *tgbotapi.Message) *SourceVideoPost {
-	return &SourceVideoPost{
-		Sender:            m.From.UserName,
-		ChatId:            m.Chat.ID,
-		Url:               m.Text,
-		OriginalMessageId: m.MessageID,
-	}
-}
-
-// AK TODO add sucess parameter
-func (b *Bot) TryExtractVideoRepostReaction(upd *tgbotapi.Message) (post.VideoReaction, error) {
-	vr := post.VideoReaction{}
-	rtm := upd.ReplyToMessage
-
-	if rtm == nil || rtm.From.UserName != "TelegroflBot" || rtm.Video == nil {
-		return vr, nil
-	}
-
-	r := regexp.MustCompile(posterMaker)
-	poster := r.FindStringSubmatch(rtm.Caption)[1]
-
-	sender := upd.From.UserName
-	// if the user reference his own post it is not a reaction. Can be moved outside the scope
-	if sender == poster {
-		return vr, nil
-	}
-
-	return post.VideoReaction{Sender: sender, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
-}
-
 func (b *Bot) DeletePost(chatId int64, messageId int) error {
 	dmc := tgbotapi.DeleteMessageConfig{
 		ChatID:    chatId,
@@ -123,19 +85,7 @@ func (b *Bot) GetUpdate(req *http.Request) (*tgbotapi.Update, error) {
 	return update, nil
 }
 
-func (b *Bot) GetCommand(m *tgbotapi.Message) (string, error) {
-	// AK TODO handles only one command
-	if !m.IsCommand() {
-		return "", nil
-	}
-
-	if strings.HasPrefix("top", m.Command()) {
-		return "top", nil
-	}
-
-	return "", nil
-}
-
+// AK TODO remove after migration to a more abstract wrapper
 func (b *Bot) PostTopRofler(chatId int64, userName string, roflCount int) error {
 	// AK TODO fetch rofler
 	// AK TODO get user id
@@ -159,8 +109,8 @@ func (b *Bot) PostTopRofler(chatId int64, userName string, roflCount int) error 
 	return nil
 }
 
-func (b *Bot) PostReplyTo300(chatId int64, replyToMessageId int) error {
-	msg := tgbotapi.NewMessage(chatId, "🤣🚜 ♂ Отсоси у тракториста ♂ 🚜🤣")
+func (b *Bot) PostReplyWithText(chatId int64, replyToMessageId int, caption string) error {
+	msg := tgbotapi.NewMessage(chatId, caption)
 	msg.ReplyToMessageID = replyToMessageId
 
 	_, err := b.api.Send(msg)
@@ -172,12 +122,38 @@ func (b *Bot) PostReplyTo300(chatId int64, replyToMessageId int) error {
 	return nil
 }
 
-//go:embed assets/kirkorov.png
-var yesPicture []byte
+func (b *Bot) GetCurrentUserProfilePic(userId int64) ([]byte, error) {
+	ppicReq := tgbotapi.UserProfilePhotosConfig{
+		UserID: userId,
+		Offset: 0,
+		Limit:  1,
+	}
 
-func (b *Bot) PostReplyToYes(chatId int64, replyToMessageId int) error {
-	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: "kirkorov.png", Bytes: yesPicture})
+	pics, err := b.api.GetUserProfilePhotos(ppicReq)
+	if err != nil {
+		return nil, err
+	}
+
+	ppicMeta := pics.Photos[0][2]
+
+	ppic, err := b.api.GetFile(tgbotapi.FileConfig{FileID: ppicMeta.FileID})
+
+	if err != nil {
+		return nil, err
+	}
+
+	downloadLink := ppic.Link(b.api.Token)
+
+	return source.DownloadBytesFromUrl(downloadLink)
+}
+
+func (b *Bot) PostReplyWithImage(chatId int64, replyToMessageId int, img []byte, imgName string, caption string) error {
+	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: img})
 	msg.ReplyToMessageID = replyToMessageId
+
+	if caption != "" {
+		msg.Caption = caption
+	}
 
 	_, err := b.api.Send(msg)
 
@@ -186,17 +162,4 @@ func (b *Bot) PostReplyToYes(chatId int64, replyToMessageId int) error {
 	}
 
 	return nil
-}
-
-// AK TODO add sucess parameter
-func (b *Bot) ExtractUserMediaReaction(upd *tgbotapi.Message) (post.VideoReaction, error) {
-	rtm := upd.ReplyToMessage
-	vr := post.VideoReaction{}
-
-	vr.Sender = upd.From.UserName
-	vr.MessageId = rtm.MessageID
-	vr.Text = upd.Text
-	vr.VideoId = rtm.Video.FileID
-
-	return vr, nil
 }
