@@ -12,6 +12,8 @@ import (
 
 var noRegex = regexp.MustCompile(`^(Net|net|Нет|нет)(.|\?|!)?$`)
 
+const pidorText = "Пидора ответ."
+
 type ReplyToNo struct {
 	*bot.Bot
 }
@@ -26,27 +28,28 @@ func NewReplyToNo(b *bot.Bot) *ReplyToNo {
 var pidormarkPicture []byte
 
 func (h *ReplyToNo) Handle(m *tgbotapi.Message) (bool, error) {
-	// AK TODO post a picture with watermark to the chat
 	found := noRegex.MatchString(m.Text)
 
 	if !found {
 		return false, nil
 	}
 
-	ppic, err := h.GetCurrentUserProfilePic(m.From.ID)
-	if err != nil {
-		return false, err
-	}
+	ppic, _ := h.GetCurrentUserProfilePic(m.From.ID)
 
-	markedPic, err := watermarker.ApplyWatermark(ppic, pidormarkPicture)
-	if err != nil {
-		return false, err
-	}
+	if ppic == nil {
+		h.PostReplyWithText(m.Chat.ID, m.MessageID, pidorText)
+		return true, nil
+	} else {
+		markedPic, err := watermarker.ApplyWatermark(ppic, pidormarkPicture)
+		if err != nil {
+			return true, err
+		}
 
-	err = h.PostReplyWithImage(m.Chat.ID, m.MessageID, markedPic, "pidormark.png", "Пидора ответ.")
+		err = h.PostReplyWithImage(m.Chat.ID, m.MessageID, markedPic, "pidormark.png", pidorText)
 
-	if err != nil {
-		return false, err
+		if err != nil {
+			return true, err
+		}
+		return true, nil
 	}
-	return true, nil
 }

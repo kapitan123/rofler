@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Downloader interface {
@@ -20,6 +22,8 @@ type ExtrctedVideoItem struct {
 }
 
 func DownloadBytesFromUrl(dUrl string) ([]byte, error) {
+	log.Info("Start downloading ", time.Now())
+	defer log.Info("Finish downloading ", time.Now())
 	// AK TODO temp solutions
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // <--- Problem

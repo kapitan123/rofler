@@ -2,6 +2,7 @@ package bot
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -132,6 +133,10 @@ func (b *Bot) GetCurrentUserProfilePic(userId int64) ([]byte, error) {
 	pics, err := b.api.GetUserProfilePhotos(ppicReq)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(pics.Photos) == 0 {
+		return nil, errors.New("no profile picture was found")
 	}
 
 	ppicMeta := pics.Photos[0][2]
