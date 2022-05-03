@@ -1,11 +1,11 @@
 package tgaction
 
 import (
-	log "github.com/sirupsen/logrus"
-
+	"cloud.google.com/go/firestore"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/data/firestore"
 	"github.com/kapitan123/telegrofler/internal/bot"
+	log "github.com/sirupsen/logrus"
 )
 
 // Performs an action on recieving any message. Returns true if the execution should be stopped.
@@ -20,7 +20,7 @@ type BotCommandHandler interface {
 }
 
 // Creates a map of handlers. Key is the command text, value is a handler.
-func InitCommands(b *bot.Bot, ps *firestore.PostsStore) map[string]BotCommandHandler {
+func InitCommands(b *bot.Bot, ps *firestore.Client) map[string]BotCommandHandler {
 	commands := make(map[string]BotCommandHandler)
 	command1 := NewPostTopRoflerCommand(b, ps)
 	commands[command1.GetCommandText()] = command1
@@ -32,7 +32,7 @@ func InitCommands(b *bot.Bot, ps *firestore.PostsStore) map[string]BotCommandHan
 // Creates an array of handlers. Which will be tried to execute.
 // Requires dependencies to be passed to the function
 // Order of execution is determined by the order of the array.
-func InitHandlers(b *bot.Bot, ps *firestore.PostsStore) *[]BotMessageHandler {
+func InitHandlers(b *bot.Bot, ps *firestore.Client) *[]BotMessageHandler {
 	// reply to 300 doesn't stp the execution of other handlers
 	// Can handlers be jut functons with closures?
 	handlers := []BotMessageHandler{

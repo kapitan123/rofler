@@ -1,7 +1,7 @@
 package tgaction
 
 import (
-	"github.com/kapitan123/telegrofler/data/firestore"
+	"github.com/kapitan123/telegrofler/data/firestore/posts"
 	"github.com/kapitan123/telegrofler/internal/bot"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
