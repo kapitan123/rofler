@@ -21,7 +21,7 @@ func main() {
 	app, err := routes.NewApp()
 
 	if err != nil {
-		log.Panic("The application could not be started: ", err)
+		log.Fatalf("The application could not be started: %v", err)
 	}
 
 	// AK TODO should close the whole api
