@@ -7,8 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/config"
+	"github.com/kapitan123/telegrofler/data/firestore"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/firestore"
 	"github.com/kapitan123/telegrofler/internal/routes"
 
 	log "github.com/sirupsen/logrus"
