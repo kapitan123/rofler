@@ -14,7 +14,7 @@ func ExtractUserMediaReaction(upd *tgbotapi.Message) (ReplyToMediaPost, error) {
 	rtm := upd.ReplyToMessage
 	vr := ReplyToMediaPost{
 		VideoId: rtm.Video.FileID,
-		Reaction: Reaction{
+		Details: Details{
 			Sender:    upd.From.UserName,
 			MessageId: rtm.MessageID,
 			Text:      upd.Text,
@@ -71,7 +71,7 @@ func TryExtractVideoRepostReaction(upd *tgbotapi.Message) (ReplyToMediaPost, err
 
 	reply := ReplyToMediaPost{
 		VideoId: rtm.Video.FileName,
-		Reaction: Reaction{
+		Details: Details{
 			Sender:    sender,
 			Text:      upd.Text,
 			MessageId: upd.MessageID,

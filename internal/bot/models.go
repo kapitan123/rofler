@@ -23,11 +23,11 @@ func (tp *SourceVideoPost) GetCaption() string {
 }
 
 type ReplyToMediaPost struct {
-	VideoId  string
-	Reaction Reaction
+	VideoId string
+	Details Details
 }
 
-type Reaction struct {
+type Details struct {
 	MessageId int // RepllyToMessage.ID not the update.Message.ID
 	Sender    string
 	Text      string
