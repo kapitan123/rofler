@@ -4,8 +4,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/kapitan123/telegrofler/data/firestore"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/firestore"
 )
 
 // Performs an action on recieving any message. Returns true if the execution should be stopped.

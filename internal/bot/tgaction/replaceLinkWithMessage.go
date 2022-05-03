@@ -4,8 +4,8 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/kapitan123/telegrofler/data/firestore"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/firestore"
 	"github.com/kapitan123/telegrofler/internal/source/sourceFactory"
 
 	log "github.com/sirupsen/logrus"
