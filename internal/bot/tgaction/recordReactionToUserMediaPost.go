@@ -32,17 +32,17 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 	isHandeled := true
 
 	mediaRepy, err := bot.ExtractUserMediaReaction(m)
-
+	details := mediaRepy.Details
 	if err != nil {
 		return !isHandeled, err
 	}
 
 	// AK TODO should actually return nil
-	if mediaRepy.Reaction.Sender == "" {
+	if details.Sender == "" {
 		return !isHandeled, nil
 	}
 
-	log.Infof("Reaction was found for %s sent by %s", mediaRepy.VideoId, mediaRepy.Reaction.Sender)
+	log.Infof("Reaction was found for %s sent by %s", mediaRepy.VideoId, details.Sender)
 
 	exPost, found, err := h.GetById(mediaRepy.VideoId)
 
@@ -61,9 +61,8 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 			PostedOn:       time.Now(),
 		}
 	}
-	reaction := mediaRepy.Reaction
 
-	exPost.AddReaction(reaction.Sender, reaction.Text, reaction.MessageId)
+	exPost.AddReaction(details.Sender, details.Text, details.MessageId)
 	h.Upsert(exPost)
 
 	return isHandeled, nil
