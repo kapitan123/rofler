@@ -74,29 +74,6 @@ func (rs *PostsStore) Create(p Post) error {
 	return err
 }
 
-func (rs *PostsStore) AddReactionToPost(vr VideoReaction) error {
-	posts, err := rs.GetAllPosts()
-	if err != nil {
-		return err
-	}
-
-	for _, p := range posts {
-		if p.VideoId == vr.VideoId {
-			p.AddReaction(vr.Sender, vr.Text, vr.MessageId)
-
-			err = rs.Upsert(p)
-
-			log.Infof("Reaction was saved for %s from %s: ", vr.VideoId, vr.Sender)
-
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
 func (rs *PostsStore) GetTopRoflerFromPosts() (string, int, error) {
 	posts, err := rs.GetAllPosts()
 	if err != nil {

@@ -22,7 +22,9 @@ func NewRecordBotPostReaction(b *bot.Bot, ps *firestore.PostsStore) *RecordBotPo
 
 func (h *RecordBotPostReaction) Handle(m *tgbotapi.Message) (bool, error) {
 	isHandeled := true
-	reaction, err := bot.TryExtractVideoRepostReaction(m)
+	mediaRepy, err := bot.TryExtractVideoRepostReaction(m)
+	reaction := mediaRepy.Reaction
+
 	if err != nil {
 		return !isHandeled, err
 	}
@@ -31,9 +33,20 @@ func (h *RecordBotPostReaction) Handle(m *tgbotapi.Message) (bool, error) {
 		return !isHandeled, nil
 	}
 
-	log.Infof("Reaction was found for %s sent by %s", reaction.VideoId, reaction.Sender)
+	log.Infof("Reaction was found for %s sent by %s", mediaRepy.VideoId, reaction.Sender)
 
-	h.AddReactionToPost(reaction)
+	exPost, found, err := h.GetById(mediaRepy.VideoId)
 
+	// in this case we don't record reaction as all bot posts should be saved already
+	if !found {
+		return isHandeled, nil
+	}
+
+	if err != nil {
+		return isHandeled, err
+	}
+
+	exPost.AddReaction(reaction.Sender, reaction.Text, reaction.MessageId)
+	h.Upsert(exPost)
 	return isHandeled, nil
 }

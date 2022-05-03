@@ -9,6 +9,7 @@ type SourceVideoPost struct {
 	Url               string
 	VideoData         VideoData
 }
+
 type VideoData struct {
 	Id         string
 	Duration   int
@@ -19,4 +20,15 @@ type VideoData struct {
 
 func (tp *SourceVideoPost) GetCaption() string {
 	return fmt.Sprintf("<b>Rofler:</b> 🔥@%s🔥\n<b>Title</b>: %s", tp.Sender, tp.VideoData.Title)
+}
+
+type ReplyToMediaPost struct {
+	VideoId  string
+	Reaction Reaction
+}
+
+type Reaction struct {
+	MessageId int // RepllyToMessage.ID not the update.Message.ID
+	Sender    string
+	Text      string
 }

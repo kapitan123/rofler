@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
-	"github.com/kapitan123/telegrofler/internal/source"
+	"github.com/kapitan123/telegrofler/internal/source/sourceFactory"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,7 +35,7 @@ func (api *API) download(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Info("API: downloading video from ", vidUrl)
-	extract, found := source.TryGetExtractor(vidUrl)
+	extract, found := sourceFactory.TryGetExtractor(vidUrl)
 
 	if !found {
 		resp.WriteHeader(http.StatusNotFound)

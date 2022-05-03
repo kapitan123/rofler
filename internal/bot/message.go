@@ -4,22 +4,22 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/kapitan123/telegrofler/internal/firestore"
-
 	_ "embed"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5" // https://go-telegram-bot-api.dev/
 )
 
 // AK TODO add sucess parameter remove it from bot add it as an extemsion
-func ExtractUserMediaReaction(upd *tgbotapi.Message) (firestore.VideoReaction, error) {
+func ExtractUserMediaReaction(upd *tgbotapi.Message) (ReplyToMediaPost, error) {
 	rtm := upd.ReplyToMessage
-	vr := firestore.VideoReaction{}
-
-	vr.Sender = upd.From.UserName
-	vr.MessageId = rtm.MessageID
-	vr.Text = upd.Text
-	vr.VideoId = rtm.Video.FileID
+	vr := ReplyToMediaPost{
+		VideoId: rtm.Video.FileID,
+		Reaction: Reaction{
+			Sender:    upd.From.UserName,
+			MessageId: rtm.MessageID,
+			Text:      upd.Text,
+		},
+	}
 
 	return vr, nil
 }
@@ -52,8 +52,8 @@ func (b *Bot) ConvertToSourceVideoPost(m *tgbotapi.Message) *SourceVideoPost {
 const posterMaker = `🔥@(.*?)🔥`
 
 // AK TODO add sucess parameter
-func TryExtractVideoRepostReaction(upd *tgbotapi.Message) (firestore.VideoReaction, error) {
-	vr := firestore.VideoReaction{}
+func TryExtractVideoRepostReaction(upd *tgbotapi.Message) (ReplyToMediaPost, error) {
+	vr := ReplyToMediaPost{}
 	rtm := upd.ReplyToMessage
 
 	if rtm == nil || rtm.From.UserName != "TelegroflBot" || rtm.Video == nil {
@@ -69,5 +69,14 @@ func TryExtractVideoRepostReaction(upd *tgbotapi.Message) (firestore.VideoReacti
 		return vr, nil
 	}
 
-	return firestore.VideoReaction{Sender: sender, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
+	reply := ReplyToMediaPost{
+		VideoId: rtm.Video.FileName,
+		Reaction: Reaction{
+			Sender:    sender,
+			Text:      upd.Text,
+			MessageId: upd.MessageID,
+		},
+	}
+
+	return reply, nil
 }

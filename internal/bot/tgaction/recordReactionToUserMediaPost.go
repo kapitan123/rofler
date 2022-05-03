@@ -31,20 +31,20 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 
 	isHandeled := true
 
-	reaction, err := bot.ExtractUserMediaReaction(m)
+	mediaRepy, err := bot.ExtractUserMediaReaction(m)
 
 	if err != nil {
 		return !isHandeled, err
 	}
 
 	// AK TODO should actually return nil
-	if reaction.Sender == "" {
+	if mediaRepy.Reaction.Sender == "" {
 		return !isHandeled, nil
 	}
 
-	log.Infof("Reaction was found for %s sent by %s", reaction.VideoId, reaction.Sender)
+	log.Infof("Reaction was found for %s sent by %s", mediaRepy.VideoId, mediaRepy.Reaction.Sender)
 
-	exPost, found, err := h.GetById(reaction.VideoId)
+	exPost, found, err := h.GetById(mediaRepy.VideoId)
 
 	if err != nil {
 		return isHandeled, err
@@ -53,7 +53,7 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 	if !found {
 		reactions := make([]firestore.Reaction, 0)
 		exPost = firestore.Post{
-			VideoId:        reaction.VideoId,
+			VideoId:        mediaRepy.VideoId,
 			Source:         "misc",
 			RoflerUserName: rtm.From.UserName,
 			Url:            "",
@@ -61,6 +61,7 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 			PostedOn:       time.Now(),
 		}
 	}
+	reaction := mediaRepy.Reaction
 
 	exPost.AddReaction(reaction.Sender, reaction.Text, reaction.MessageId)
 	h.Upsert(exPost)
