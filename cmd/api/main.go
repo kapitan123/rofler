@@ -20,16 +20,13 @@ func main() {
 
 	router := mux.NewRouter()
 
-	api := routes.API{
-		Bot:        bot.New(),
-		PostsStore: firestore.NewPostsStore(),
-	}
+	app := app.NewApp()
 
 	// AK TODO should close the whole api
-	defer api.Close()
+	defer app.Close()
 
-	api.AddRoutes(router)
-	api.AddHandlers()
+	app.AddRoutes(router)
+	app.AddHandlers()
 
 	log.Info("Telegrofler: listening on: ", config.ServerPort)
 

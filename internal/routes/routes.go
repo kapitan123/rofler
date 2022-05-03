@@ -13,20 +13,20 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (api *API) AddRoutes(router *mux.Router) {
-	router.HandleFunc("/stats/posts", api.getAllPosts).Methods("GET")
-	router.HandleFunc("/stats/top", api.getTopRoflerHandler).Methods("GET")
-	router.HandleFunc("/download", api.download).Methods("GET")
-	router.HandleFunc("/callback", api.handleCallback).Methods("POST")
+func (app *App) AddRoutes(router *mux.Router) {
+	router.HandleFunc("/stats/posts", app.getAllPosts).Methods("GET")
+	router.HandleFunc("/stats/top", app.getTopRoflerHandler).Methods("GET")
+	router.HandleFunc("/download", app.download).Methods("GET")
+	router.HandleFunc("/callback", app.handleCallback).Methods("POST")
 }
 
-func (api *API) AddHandlers() {
-	api.handlers = tgaction.InitHandlers(api.Bot, api.PostsStore)
-	api.commands = tgaction.InitCommands(api.Bot, api.PostsStore)
+func (app *App) AddHandlers() {
+	app.handlers = tgaction.InitHandlers(app.Bot, app.PostsStore)
+	app.commands = tgaction.InitCommands(app.Bot, app.PostsStore)
 }
 
 // Downloads video from url and returns it as mp4 file compitable with telegram.
-func (api *API) download(resp http.ResponseWriter, req *http.Request) {
+func (app *App) download(resp http.ResponseWriter, req *http.Request) {
 	vidUrl, err := url.QueryUnescape(req.URL.Query().Get("url"))
 
 	if err != nil {
@@ -61,8 +61,8 @@ func (api *API) download(resp http.ResponseWriter, req *http.Request) {
 	_, _ = resp.Write(lti.Payload)
 }
 
-func (api *API) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request) {
-	tr, _, err := api.GetTopRoflerFromPosts()
+func (app *App) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request) {
+	tr, _, err := app.GetTopRoflerFromPosts()
 	if err != nil {
 		writeTo(err, resp)
 		return
@@ -73,8 +73,8 @@ func (api *API) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request)
 	_, _ = resp.Write(json)
 }
 
-func (api *API) getAllPosts(resp http.ResponseWriter, req *http.Request) {
-	roflers, err := api.GetAllPosts()
+func (app *App) getAllPosts(resp http.ResponseWriter, req *http.Request) {
+	roflers, err := app.GetAllPosts()
 
 	if err != nil {
 		writeTo(err, resp)
@@ -86,8 +86,8 @@ func (api *API) getAllPosts(resp http.ResponseWriter, req *http.Request) {
 	_, _ = resp.Write(json)
 }
 
-func (api *API) handleCallback(resp http.ResponseWriter, req *http.Request) {
-	upd, err := api.GetUpdate(req)
+func (app *App) handleCallback(resp http.ResponseWriter, req *http.Request) {
+	upd, err := app.GetUpdate(req)
 	mess := upd.Message
 
 	if err != nil {
@@ -99,11 +99,11 @@ func (api *API) handleCallback(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	go tryHandleMessage(api, mess)
+	go tryHandleMessage(app, mess)
 }
 
-func tryHandleMessage(api *API, mess *tgbotapi.Message) {
-	for _, h := range *api.handlers {
+func tryHandleMessage(app *App, mess *tgbotapi.Message) {
+	for _, h := range *app.handlers {
 		wasHandled, err := h.Handle(mess)
 
 		if err != nil {
@@ -128,7 +128,7 @@ func tryHandleMessage(api *API, mess *tgbotapi.Message) {
 		return
 	}
 
-	cmd, found := api.commands[command]
+	cmd, found := app.commands[command]
 
 	if !found {
 		return
