@@ -1,6 +1,7 @@
 package tgaction
 
 import (
+	"context"
 	_ "embed"
 	"regexp"
 
@@ -27,7 +28,7 @@ func NewReplyToNo(b *bot.Bot) *ReplyToNo {
 //go:embed assets/pidormark.png
 var pidormarkPicture []byte
 
-func (h *ReplyToNo) Handle(m *tgbotapi.Message) (bool, error) {
+func (h *ReplyToNo) Handle(m *tgbotapi.Message, ctx context.Context) (bool, error) {
 	found := noRegex.MatchString(m.Text)
 
 	if !found {

@@ -1,9 +1,11 @@
 package tgaction
 
 import (
+	"context"
 	"time"
 
-	"github.com/kapitan123/telegrofler/data/firestore"
+	"cloud.google.com/go/firestore"
+	"github.com/kapitan123/telegrofler/data/firestore/posts"
 	"github.com/kapitan123/telegrofler/internal/bot"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -12,17 +14,17 @@ import (
 
 type RecordReactionToUserMediaPost struct {
 	*bot.Bot
-	*firestore.PostsStore
+	FsClient *firestore.Client
 }
 
-func NewRecordReactionToUserMediaPost(b *bot.Bot, ps *firestore.PostsStore) *RecordReactionToUserMediaPost {
+func NewRecordReactionToUserMediaPost(b *bot.Bot, fs *firestore.Client) *RecordReactionToUserMediaPost {
 	return &RecordReactionToUserMediaPost{
-		Bot:        b,
-		PostsStore: ps,
+		Bot:      b,
+		FsClient: fs,
 	}
 }
 
-func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error) {
+func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message, ctx context.Context) (bool, error) {
 	rtm := m.ReplyToMessage
 
 	if rtm == nil || rtm.Video == nil {
@@ -44,15 +46,15 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 
 	log.Infof("Reaction was found for %s sent by %s", mediaRepy.VideoId, details.Sender)
 
-	exPost, found, err := h.GetById(mediaRepy.VideoId)
+	exPost, found, err := posts.GetById(ctx, h.FsClient, mediaRepy.VideoId)
 
 	if err != nil {
 		return isHandeled, err
 	}
 
 	if !found {
-		reactions := make([]firestore.Reaction, 0)
-		exPost = firestore.Post{
+		reactions := make([]posts.Reaction, 0)
+		exPost = posts.Post{
 			VideoId:        mediaRepy.VideoId,
 			Source:         "misc",
 			RoflerUserName: rtm.From.UserName,
@@ -63,7 +65,7 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 	}
 
 	exPost.AddReaction(details.Sender, details.Text, details.MessageId)
-	h.Upsert(exPost)
+	posts.Upsert(ctx, h.FsClient, exPost)
 
 	return isHandeled, nil
 }

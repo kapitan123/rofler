@@ -1,6 +1,9 @@
 package tgaction
 
 import (
+	"context"
+
+	"cloud.google.com/go/firestore"
 	"github.com/kapitan123/telegrofler/data/firestore/posts"
 	"github.com/kapitan123/telegrofler/internal/bot"
 
@@ -9,18 +12,18 @@ import (
 
 type PostTopRoflerCommand struct {
 	*bot.Bot
-	*firestore.PostsStore
+	FsClient *firestore.Client
 }
 
-func NewPostTopRoflerCommand(b *bot.Bot, ps *firestore.PostsStore) *PostTopRoflerCommand {
+func NewPostTopRoflerCommand(b *bot.Bot, fs *firestore.Client) *PostTopRoflerCommand {
 	return &PostTopRoflerCommand{
-		Bot:        b,
-		PostsStore: ps,
+		Bot:      b,
+		FsClient: fs,
 	}
 }
 
-func (h *PostTopRoflerCommand) Handle(m *tgbotapi.Message) (bool, error) {
-	tr, roflCount, err := h.GetTopRoflerFromPosts()
+func (h *PostTopRoflerCommand) Handle(m *tgbotapi.Message, ctx context.Context) (bool, error) {
+	tr, roflCount, err := posts.GetTopRoflerFromPosts(ctx, h.FsClient)
 	if err != nil {
 		return false, err
 	}

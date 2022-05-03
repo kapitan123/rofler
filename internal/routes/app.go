@@ -1,27 +1,31 @@
 package routes
 
 import (
-	"github.com/kapitan123/telegrofler/data/firestore"
+	"context"
+	"fmt"
+
+	"cloud.google.com/go/firestore"
+	"github.com/kapitan123/telegrofler/config"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
 )
 
 type App struct {
 	*bot.Bot
-	*firestore.PostsStore
+	FsClient *firestore.Client
 	handlers *[]tgaction.BotMessageHandler
 	commands map[string]tgaction.BotCommandHandler
 }
 
-func NewApp() *App {
-	//ctx := context.Background()
-	// fsClient, err := firestore.NewClient(ctx, projectID)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("firestore.NewClient: %v", err)
-	// }
+func NewApp() (*App, error) {
+	ctx := context.Background()
+	fsClient, err := firestore.NewClient(ctx, config.ProjectId)
+	if err != nil {
+		return nil, fmt.Errorf("firestore.NewClient: %v", err)
+	}
 
 	return &App{
-		Bot:        bot.New(),
-		PostsStore: firestore.NewPostsStore(),
-	}
+		Bot:      bot.New(),
+		FsClient: fsClient,
+	}, nil
 }

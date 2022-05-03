@@ -7,8 +7,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/config"
-	"github.com/kapitan123/telegrofler/data/firestore"
-	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/routes"
 
 	log "github.com/sirupsen/logrus"
@@ -20,10 +18,14 @@ func main() {
 
 	router := mux.NewRouter()
 
-	app := app.NewApp()
+	app, err := routes.NewApp()
+
+	if err != nil {
+		log.Panic("The application could not be started: ", err)
+	}
 
 	// AK TODO should close the whole api
-	defer app.Close()
+	//defer app.Close()
 
 	app.AddRoutes(router)
 	app.AddHandlers()
@@ -38,7 +40,7 @@ func main() {
 		IdleTimeout:  10 * time.Second,
 	}
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		panic(err.Error())
 	}
