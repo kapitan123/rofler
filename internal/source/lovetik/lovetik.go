@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/kapitan123/telegrofler/pkg/source"
+	"github.com/kapitan123/telegrofler/internal/source"
 )
 
 const (

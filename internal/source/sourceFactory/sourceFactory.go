@@ -1,9 +1,9 @@
 package sourceFactory
 
 import (
-	"github.com/kapitan123/telegrofler/pkg/source"
-	"github.com/kapitan123/telegrofler/pkg/source/lovetik"
-	"github.com/kapitan123/telegrofler/pkg/source/shortsget"
+	"github.com/kapitan123/telegrofler/internal/source"
+	"github.com/kapitan123/telegrofler/internal/source/lovetik"
+	"github.com/kapitan123/telegrofler/internal/source/shortsget"
 )
 
 func TryGetSource(message string) (source.Downloader, bool) {
