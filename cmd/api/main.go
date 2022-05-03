@@ -25,7 +25,7 @@ func main() {
 	}
 
 	// AK TODO should close the whole api
-	//defer app.Close()
+	defer app.Close()
 
 	app.AddRoutes(router)
 	app.AddHandlers()

@@ -29,3 +29,7 @@ func NewApp() (*App, error) {
 		fsClient: fsClient,
 	}, nil
 }
+
+func (app *App) Close() {
+	app.fsClient.Close()
+}
