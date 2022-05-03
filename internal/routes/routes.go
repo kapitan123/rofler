@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
-	"github.com/kapitan123/telegrofler/internal/source/sourceFactory"
+	"github.com/kapitan123/telegrofler/internal/source"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,7 +35,7 @@ func (api *API) download(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Info("API: downloading video from ", vidUrl)
-	source, found := sourceFactory.TryGetSource(vidUrl)
+	extract, found := source.TryGetExtractor(vidUrl)
 
 	if !found {
 		resp.WriteHeader(http.StatusNotFound)
@@ -49,7 +49,7 @@ func (api *API) download(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	lti, err := source.ExtractVideoFromUrl(vidUrl)
+	lti, err := extract(vidUrl)
 
 	// AK TODO should wrap it in a service
 	if err != nil {

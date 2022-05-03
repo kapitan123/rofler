@@ -16,15 +16,7 @@ const (
 	sourcePrefix = "https://youtube.com/shorts"
 )
 
-type ShortsGetClient struct {
-}
-
-func New() *ShortsGetClient {
-	sgc := &ShortsGetClient{}
-	return sgc
-}
-
-func (ttc *ShortsGetClient) ExtractVideoFromUrl(youtubeUrl string) (*source.ExtrctedVideoItem, error) {
+func ExtractVideoFromUrl(youtubeUrl string) (*source.ExtrctedVideoItem, error) {
 	// AK TODO make requests in parallel
 	vInfo, err := getVideoInfo(youtubeUrl)
 	if err != nil {

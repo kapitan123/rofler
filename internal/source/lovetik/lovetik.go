@@ -21,15 +21,7 @@ const (
 	mobilePrefixRegex = `https:\/\/[a-zA-Z]{2}\.tiktok\.com\/`
 )
 
-type LoveTikClient struct {
-}
-
-func New() *LoveTikClient {
-	ttc := &LoveTikClient{}
-	return ttc
-}
-
-func (ttc *LoveTikClient) ExtractVideoFromUrl(tikUrl string) (*source.ExtrctedVideoItem, error) {
+func ExtractVideoFromUrl(tikUrl string) (*source.ExtrctedVideoItem, error) {
 	escapedUrl := url.QueryEscape(tikUrl)
 	jsonStr := []byte("query=" + escapedUrl)
 	resp, err := http.Post(sourceLink, contentType, bytes.NewBuffer(jsonStr))

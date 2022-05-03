@@ -3,11 +3,10 @@ package tgaction
 import (
 	"time"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/firestore"
 	"github.com/kapitan123/telegrofler/internal/source/sourceFactory"
-
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -25,7 +24,7 @@ func NewReplaceLinkWithMessage(b *bot.Bot, ps *firestore.PostsStore) *ReplaceLin
 
 func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message) (bool, error) {
 	isHandeled := true
-	source, found := sourceFactory.TryGetSource(mess.Text)
+	extract, found := sourceFactory.TryGetExtractor(mess.Text)
 	if !found {
 		return !isHandeled, nil
 	}
@@ -38,7 +37,7 @@ func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message) (bool, error) {
 
 	log.Info("Url was found in a callback message: ", svp.Url)
 
-	evi, err := source.ExtractVideoFromUrl(svp.Url)
+	evi, err := extract(svp.Url)
 
 	if err != nil {
 		return isHandeled, err

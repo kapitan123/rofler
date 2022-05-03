@@ -10,10 +10,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Downloader interface {
-	ExtractVideoFromUrl(string) (*ExtrctedVideoItem, error)
-}
-
 type ExtrctedVideoItem struct {
 	Id      string
 	Title   string
