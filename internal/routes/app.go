@@ -12,7 +12,7 @@ import (
 
 type App struct {
 	*bot.Bot
-	FsClient *firestore.Client
+	fsClient *firestore.Client
 	handlers *[]tgaction.BotMessageHandler
 	commands map[string]tgaction.BotCommandHandler
 }
@@ -26,6 +26,6 @@ func NewApp() (*App, error) {
 
 	return &App{
 		Bot:      bot.New(),
-		FsClient: fsClient,
+		fsClient: fsClient,
 	}, nil
 }

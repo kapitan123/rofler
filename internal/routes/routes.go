@@ -23,8 +23,8 @@ func (app *App) AddRoutes(router *mux.Router) {
 }
 
 func (app *App) AddHandlers() {
-	app.handlers = tgaction.InitHandlers(app.Bot, app.FsClient)
-	app.commands = tgaction.InitCommands(app.Bot, app.FsClient)
+	app.handlers = tgaction.InitHandlers(app.Bot, app.fsClient)
+	app.commands = tgaction.InitCommands(app.Bot, app.fsClient)
 }
 
 // Downloads video from url and returns it as mp4 file compitable with telegram.
@@ -64,7 +64,7 @@ func (app *App) download(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (app *App) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request) {
-	tr, _, err := posts.GetTopRoflerFromPosts(req.Context(), app.FsClient)
+	tr, _, err := posts.GetTopRoflerFromPosts(req.Context(), app.fsClient)
 	if err != nil {
 		writeTo(err, resp)
 		return
@@ -76,7 +76,7 @@ func (app *App) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request)
 }
 
 func (app *App) getAllPosts(resp http.ResponseWriter, req *http.Request) {
-	roflers, err := posts.GetAll(req.Context(), app.FsClient)
+	roflers, err := posts.GetAll(req.Context(), app.fsClient)
 
 	if err != nil {
 		writeTo(err, resp)
