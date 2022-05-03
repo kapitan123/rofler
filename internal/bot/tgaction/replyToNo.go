@@ -5,7 +5,7 @@ import (
 	"regexp"
 
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/watermarker"
+	"github.com/kapitan123/telegrofler/internal/watermark"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -40,7 +40,7 @@ func (h *ReplyToNo) Handle(m *tgbotapi.Message) (bool, error) {
 		h.PostReplyWithText(m.Chat.ID, m.MessageID, pidorText)
 		return true, nil
 	} else {
-		markedPic, err := watermarker.ApplyWatermark(ppic, pidormarkPicture)
+		markedPic, err := watermark.Apply(ppic, pidormarkPicture)
 		if err != nil {
 			return true, err
 		}

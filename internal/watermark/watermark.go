@@ -1,4 +1,4 @@
-package watermarker
+package watermark
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 )
 
 // Watermark operates with bytes
-func ApplyWatermark(bakground []byte, foreground []byte) ([]byte, error) {
+func Apply(bakground []byte, foreground []byte) ([]byte, error) {
 	log.Info("Start watermarking ", time.Now())
 	defer log.Info("Finish watermarking", time.Now())
 
