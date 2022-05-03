@@ -9,7 +9,7 @@ import (
 	_ "embed"
 
 	"github.com/kapitan123/telegrofler/config"
-	"github.com/kapitan123/telegrofler/pkg/source"
+	"github.com/kapitan123/telegrofler/internal/source"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5" // https://go-telegram-bot-api.dev/
 	log "github.com/sirupsen/logrus"

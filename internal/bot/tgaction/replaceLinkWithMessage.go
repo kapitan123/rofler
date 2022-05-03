@@ -5,7 +5,7 @@ import (
 
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/firestore"
-	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
+	"github.com/kapitan123/telegrofler/internal/source/sourceFactory"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"

@@ -5,7 +5,7 @@ import (
 	"regexp"
 
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/pkg/watermarker"
+	"github.com/kapitan123/telegrofler/internal/watermarker"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )

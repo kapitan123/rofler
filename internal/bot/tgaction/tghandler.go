@@ -34,6 +34,7 @@ func InitCommands(b *bot.Bot, ps *firestore.PostsStore) map[string]BotCommandHan
 // Order of execution is determined by the order of the array.
 func InitHandlers(b *bot.Bot, ps *firestore.PostsStore) *[]BotMessageHandler {
 	// reply to 300 doesn't stp the execution of other handlers
+	// Can handlers be jut functons with closures?
 	handlers := []BotMessageHandler{
 		NewReplyTo300(b),
 		NewReplyToYes(b),

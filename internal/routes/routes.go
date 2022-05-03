@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
-	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
+	"github.com/kapitan123/telegrofler/internal/source/sourceFactory"
 	log "github.com/sirupsen/logrus"
 )
 
