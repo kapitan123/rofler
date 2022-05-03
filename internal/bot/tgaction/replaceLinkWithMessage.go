@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/data/post"
+	"github.com/kapitan123/telegrofler/internal/firestore"
 	"github.com/kapitan123/telegrofler/pkg/source/sourceFactory"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -13,10 +13,10 @@ import (
 
 type ReplaceLinkWithMessage struct {
 	*bot.Bot
-	*post.PostsStore
+	*firestore.PostsStore
 }
 
-func NewReplaceLinkWithMessage(b *bot.Bot, ps *post.PostsStore) *ReplaceLinkWithMessage {
+func NewReplaceLinkWithMessage(b *bot.Bot, ps *firestore.PostsStore) *ReplaceLinkWithMessage {
 	return &ReplaceLinkWithMessage{
 		Bot:        b,
 		PostsStore: ps,
@@ -59,12 +59,12 @@ func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message) (bool, error) {
 	// we don't really care if if has failed and it makes integration tests a lot easier
 	_ = h.DeletePost(svp.ChatId, svp.OriginalMessageId)
 
-	newPost := post.Post{
+	newPost := firestore.Post{
 		VideoId:        svp.VideoData.Id,
 		Source:         evi.Type,
 		RoflerUserName: svp.Sender,
 		Url:            svp.Url,
-		Reactions:      []post.Reaction{},
+		Reactions:      []firestore.Reaction{},
 		KeyWords:       []string{},
 		PostedOn:       time.Now(),
 	}

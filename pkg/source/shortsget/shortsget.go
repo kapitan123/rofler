@@ -25,8 +25,6 @@ func New() *ShortsGetClient {
 }
 
 func (ttc *ShortsGetClient) ExtractVideoFromUrl(youtubeUrl string) (*source.ExtrctedVideoItem, error) {
-	//escapedUrl := url.QueryEscape(youtubeUrl)
-
 	// AK TODO make requests in parallel
 	vInfo, err := getVideoInfo(youtubeUrl)
 	if err != nil {
@@ -66,13 +64,6 @@ func getVideoInfo(escapedUrl string) (*VideoDetails, error) {
 	vidResp := &Response{}
 	json.Unmarshal(body, vidResp)
 
-	// for _, f := range vidResp.Formats {
-	// 	isMp4 := strings.Contains(f.MimeType, "video/mp4")
-	// 	//isAvc:= strings()
-	// 	if f.QualityLabel == "480p" && isMp4 {
-	// 		return &vidResp.VideoDetails, f.Itag, nil
-	// 	}
-	// }
 	return &vidResp.VideoDetails, nil
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/config"
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/data/post"
+	"github.com/kapitan123/telegrofler/internal/firestore"
 	"github.com/kapitan123/telegrofler/internal/routes"
 
 	log "github.com/sirupsen/logrus"
@@ -22,14 +22,14 @@ func main() {
 
 	api := routes.API{
 		Bot:        bot.New(),
-		PostsStore: post.NewStore(),
+		PostsStore: firestore.NewPostsStore(),
 	}
 
 	// AK TODO should close the whole api
 	defer api.Close()
 
 	api.AddRoutes(router)
-	api.AddCallback(router)
+	api.AddHandlers()
 
 	log.Info("Telegrofler: listening on: ", config.ServerPort)
 

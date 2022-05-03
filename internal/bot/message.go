@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/kapitan123/telegrofler/internal/data/post"
+	"github.com/kapitan123/telegrofler/internal/firestore"
 
 	_ "embed"
 
@@ -12,9 +12,9 @@ import (
 )
 
 // AK TODO add sucess parameter remove it from bot add it as an extemsion
-func ExtractUserMediaReaction(upd *tgbotapi.Message) (post.VideoReaction, error) {
+func ExtractUserMediaReaction(upd *tgbotapi.Message) (firestore.VideoReaction, error) {
 	rtm := upd.ReplyToMessage
-	vr := post.VideoReaction{}
+	vr := firestore.VideoReaction{}
 
 	vr.Sender = upd.From.UserName
 	vr.MessageId = rtm.MessageID
@@ -52,8 +52,8 @@ func (b *Bot) ConvertToSourceVideoPost(m *tgbotapi.Message) *SourceVideoPost {
 const posterMaker = `🔥@(.*?)🔥`
 
 // AK TODO add sucess parameter
-func (b *Bot) TryExtractVideoRepostReaction(upd *tgbotapi.Message) (post.VideoReaction, error) {
-	vr := post.VideoReaction{}
+func TryExtractVideoRepostReaction(upd *tgbotapi.Message) (firestore.VideoReaction, error) {
+	vr := firestore.VideoReaction{}
 	rtm := upd.ReplyToMessage
 
 	if rtm == nil || rtm.From.UserName != "TelegroflBot" || rtm.Video == nil {
@@ -69,5 +69,5 @@ func (b *Bot) TryExtractVideoRepostReaction(upd *tgbotapi.Message) (post.VideoRe
 		return vr, nil
 	}
 
-	return post.VideoReaction{Sender: sender, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
+	return firestore.VideoReaction{Sender: sender, VideoId: rtm.Video.FileName, Text: upd.Text, MessageId: upd.MessageID}, nil
 }

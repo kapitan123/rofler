@@ -1,4 +1,4 @@
-package post
+package firestore
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type PostsStore struct {
 	postsCol *firestore.CollectionRef
 }
 
-func NewStore() *PostsStore {
+func NewPostsStore() *PostsStore {
 	ctx := context.Background()
 	client := createClient(ctx)
 	return &PostsStore{

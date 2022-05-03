@@ -1,4 +1,4 @@
-package post
+package firestore
 
 import (
 	"time"

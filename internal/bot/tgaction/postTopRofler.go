@@ -2,17 +2,17 @@ package tgaction
 
 import (
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/data/post"
+	"github.com/kapitan123/telegrofler/internal/firestore"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type PostTopRoflerCommand struct {
 	*bot.Bot
-	*post.PostsStore
+	*firestore.PostsStore
 }
 
-func NewPostTopRoflerCommand(b *bot.Bot, ps *post.PostsStore) *PostTopRoflerCommand {
+func NewPostTopRoflerCommand(b *bot.Bot, ps *firestore.PostsStore) *PostTopRoflerCommand {
 	return &PostTopRoflerCommand{
 		Bot:        b,
 		PostsStore: ps,

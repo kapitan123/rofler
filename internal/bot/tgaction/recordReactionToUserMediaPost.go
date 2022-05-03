@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/data/post"
+	"github.com/kapitan123/telegrofler/internal/firestore"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
@@ -12,10 +12,10 @@ import (
 
 type RecordReactionToUserMediaPost struct {
 	*bot.Bot
-	*post.PostsStore
+	*firestore.PostsStore
 }
 
-func NewRecordReactionToUserMediaPost(b *bot.Bot, ps *post.PostsStore) *RecordReactionToUserMediaPost {
+func NewRecordReactionToUserMediaPost(b *bot.Bot, ps *firestore.PostsStore) *RecordReactionToUserMediaPost {
 	return &RecordReactionToUserMediaPost{
 		Bot:        b,
 		PostsStore: ps,
@@ -51,8 +51,8 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message) (bool, error
 	}
 
 	if !found {
-		reactions := make([]post.Reaction, 0)
-		exPost = post.Post{
+		reactions := make([]firestore.Reaction, 0)
+		exPost = firestore.Post{
 			VideoId:        reaction.VideoId,
 			Source:         "misc",
 			RoflerUserName: rtm.From.UserName,

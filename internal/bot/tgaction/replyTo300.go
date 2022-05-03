@@ -1,7 +1,6 @@
 package tgaction
 
 import (
-	//"github.com/kapitan123/telegrofler/internal/bot"
 	"regexp"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"

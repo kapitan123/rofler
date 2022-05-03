@@ -1,12 +1,9 @@
-package rofler
+package firestore
 
 import (
 	"context"
 
 	"cloud.google.com/go/firestore"
-	"github.com/kapitan123/telegrofler/config"
-
-	log "github.com/sirupsen/logrus"
 )
 
 const roflersColName = "roflers"
@@ -17,7 +14,7 @@ type RoflersStore struct {
 	roflersCol *firestore.CollectionRef
 }
 
-func NewStore() *RoflersStore {
+func NewRoflerStore() *RoflersStore {
 	ctx := context.Background()
 	client := createClient(ctx)
 	return &RoflersStore{
@@ -74,12 +71,4 @@ func (rs *RoflersStore) Upsert(r Rofler) error {
 
 func (rs *RoflersStore) Close() {
 	rs.client.Close()
-}
-
-func createClient(ctx context.Context) *firestore.Client {
-	client, err := firestore.NewClient(ctx, config.ProjectId)
-	if err != nil {
-		log.Fatalf("Failed to create client: %v", err) // AK TODO shouldn't be fatal
-	}
-	return client
 }
