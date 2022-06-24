@@ -1,6 +1,7 @@
 package tgaction
 
 import (
+	"context"
 	_ "embed"
 	"regexp"
 
@@ -23,7 +24,7 @@ func NewReplyToYes(b *bot.Bot) *ReplyToYes {
 	}
 }
 
-func (h *ReplyToYes) Handle(m *tgbotapi.Message) (bool, error) {
+func (h *ReplyToYes) Handle(m *tgbotapi.Message, ctx context.Context) (bool, error) {
 	found := yesRegex.MatchString(m.Text)
 
 	if !found {

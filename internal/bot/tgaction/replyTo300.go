@@ -1,6 +1,7 @@
 package tgaction
 
 import (
+	"context"
 	"regexp"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -19,7 +20,7 @@ func NewReplyTo300(b *bot.Bot) *ReplyTo300 {
 	}
 }
 
-func (h *ReplyTo300) Handle(m *tgbotapi.Message) (bool, error) {
+func (h *ReplyTo300) Handle(m *tgbotapi.Message, ctx context.Context) (bool, error) {
 	r := regexp.MustCompile(matcher300)
 	found := r.MatchString(m.Text)
 

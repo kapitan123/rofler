@@ -1,10 +1,12 @@
 package tgaction
 
 import (
+	"context"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/data/firestore"
+	"github.com/kapitan123/telegrofler/data/firestore/posts"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/source/sourceFactory"
 
@@ -13,17 +15,17 @@ import (
 
 type ReplaceLinkWithMessage struct {
 	*bot.Bot
-	*firestore.PostsStore
+	FsClient *firestore.Client
 }
 
-func NewReplaceLinkWithMessage(b *bot.Bot, ps *firestore.PostsStore) *ReplaceLinkWithMessage {
+func NewReplaceLinkWithMessage(b *bot.Bot, ps *firestore.Client) *ReplaceLinkWithMessage {
 	return &ReplaceLinkWithMessage{
-		Bot:        b,
-		PostsStore: ps,
+		Bot:      b,
+		FsClient: ps,
 	}
 }
 
-func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message) (bool, error) {
+func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message, ctx context.Context) (bool, error) {
 	isHandeled := true
 	extract, found := sourceFactory.TryGetExtractor(mess.Text)
 	if !found {
@@ -59,17 +61,17 @@ func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message) (bool, error) {
 	// we don't really care if if has failed and it makes integration tests a lot easier
 	_ = h.DeletePost(svp.ChatId, svp.OriginalMessageId)
 
-	newPost := firestore.Post{
+	newPost := posts.Post{
 		VideoId:        svp.VideoData.Id,
 		Source:         evi.Type,
 		RoflerUserName: svp.Sender,
 		Url:            svp.Url,
-		Reactions:      []firestore.Reaction{},
+		Reactions:      []posts.Reaction{},
 		KeyWords:       []string{},
 		PostedOn:       time.Now(),
 	}
 
-	h.Upsert(newPost)
+	posts.Upsert(ctx, h.FsClient, newPost)
 
 	if err != nil {
 		return isHandeled, err

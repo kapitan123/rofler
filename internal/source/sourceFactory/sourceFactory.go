@@ -6,7 +6,10 @@ import (
 	"github.com/kapitan123/telegrofler/internal/source/shortsget"
 )
 
-func TryGetExtractor(message string) (func(string) (*source.ExtrctedVideoItem, error), bool) {
+type Extractor func(string) (*source.ExtrctedVideoItem, error)
+
+// AK TODO fix dependancies and move to the source package
+func TryGetExtractor(message string) (Extractor, bool) {
 	if shortsget.IsMatchingUrl(message) {
 		return shortsget.ExtractVideoFromUrl, true
 	} else if lovetik.IsMatchingUrl(message) {

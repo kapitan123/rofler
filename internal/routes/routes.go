@@ -1,12 +1,14 @@
 package routes
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gorilla/mux"
+	"github.com/kapitan123/telegrofler/data/firestore/posts"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
 	"github.com/kapitan123/telegrofler/internal/source/sourceFactory"
@@ -21,8 +23,8 @@ func (app *App) AddRoutes(router *mux.Router) {
 }
 
 func (app *App) AddHandlers() {
-	app.handlers = tgaction.InitHandlers(app.Bot, app.PostsStore)
-	app.commands = tgaction.InitCommands(app.Bot, app.PostsStore)
+	app.handlers = tgaction.InitHandlers(app.Bot, app.fsClient)
+	app.commands = tgaction.InitCommands(app.Bot, app.fsClient)
 }
 
 // Downloads video from url and returns it as mp4 file compitable with telegram.
@@ -62,7 +64,7 @@ func (app *App) download(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (app *App) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request) {
-	tr, _, err := app.GetTopRoflerFromPosts()
+	tr, _, err := posts.GetTopRoflerFromPosts(req.Context(), app.fsClient)
 	if err != nil {
 		writeTo(err, resp)
 		return
@@ -74,7 +76,7 @@ func (app *App) getTopRoflerHandler(resp http.ResponseWriter, req *http.Request)
 }
 
 func (app *App) getAllPosts(resp http.ResponseWriter, req *http.Request) {
-	roflers, err := app.GetAllPosts()
+	roflers, err := posts.GetAll(req.Context(), app.fsClient)
 
 	if err != nil {
 		writeTo(err, resp)
@@ -99,12 +101,12 @@ func (app *App) handleCallback(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	go tryHandleMessage(app, mess)
+	go tryHandleMessage(app, mess, req.Context())
 }
 
-func tryHandleMessage(app *App, mess *tgbotapi.Message) {
+func tryHandleMessage(app *App, mess *tgbotapi.Message, ctx context.Context) {
 	for _, h := range *app.handlers {
-		wasHandled, err := h.Handle(mess)
+		wasHandled, err := h.Handle(mess, ctx)
 
 		if err != nil {
 			log.Error(err)
@@ -134,7 +136,7 @@ func tryHandleMessage(app *App, mess *tgbotapi.Message) {
 		return
 	}
 
-	_, err = cmd.Handle(mess)
+	_, err = cmd.Handle(mess, ctx)
 
 	if err != nil {
 		log.Error(err)
