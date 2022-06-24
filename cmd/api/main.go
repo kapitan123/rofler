@@ -10,7 +10,10 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/command"
-	"github.com/kapitan123/telegrofler/internal/command/rofler"
+	"github.com/kapitan123/telegrofler/internal/command/replyTo300"
+	"github.com/kapitan123/telegrofler/internal/command/replyToNo"
+	"github.com/kapitan123/telegrofler/internal/command/replyToYes"
+	"github.com/kapitan123/telegrofler/internal/command/toprofler"
 	"github.com/kapitan123/telegrofler/internal/messenger"
 	"github.com/kapitan123/telegrofler/internal/storage"
 	log "github.com/sirupsen/logrus"
@@ -40,9 +43,13 @@ func main() {
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create bot api")
 	}
+
 	m := messenger.New(botapi)
 	commandRunner := command.NewRunner(config.WorkersCount,
-		rofler.New(m, s),
+		toprofler.New(m, s),
+		replyToNo.New(m),
+		replyTo300.New(m),
+		replyToYes.New(m),
 	)
 
 	log.WithField("addr", config.ServerPort).Info("Starting server on :%d", config.ServerPort)

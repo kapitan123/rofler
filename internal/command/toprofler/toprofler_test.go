@@ -23,11 +23,11 @@ func (s *mockPostsStorage) GetAll(_ context.Context) ([]storage.Post, error) {
 }
 
 type mockMessenger struct {
-	sendMessage func(chatId int64, message string) error
+	sendText func(chatId int64, message string) error
 }
 
-func (m *mockMessenger) SendMessage(chatId int64, text string) error {
-	return m.sendMessage(chatId, text)
+func (m *mockMessenger) SendText(chatId int64, text string) error {
+	return m.sendText(chatId, text)
 }
 
 func TestTopRofler_Handle(t *testing.T) {
@@ -38,7 +38,7 @@ func TestTopRofler_Handle(t *testing.T) {
 			{RoflerUserName: "Klim"},
 		}
 		s := &mockPostsStorage{posts: posts}
-		m := &mockMessenger{sendMessage: func(chatId int64, message string) error {
+		m := &mockMessenger{sendText: func(chatId int64, message string) error {
 			assert.Equal(t, chatId, int64(228))
 			assert.Equal(t, message, formatTopRofler("Gleb", 5))
 			return nil
@@ -50,7 +50,7 @@ func TestTopRofler_Handle(t *testing.T) {
 
 	t.Run("should not send message if there are no posts", func(t *testing.T) {
 		s := &mockPostsStorage{posts: []storage.Post{}}
-		m := &mockMessenger{sendMessage: func(chatId int64, message string) error {
+		m := &mockMessenger{sendText: func(chatId int64, message string) error {
 			assert.Fail(t, "should not send message")
 			return nil
 		}}

@@ -21,15 +21,6 @@ type BotCommandHandler interface {
 	GetCommandText() string
 }
 
-// Creates a map of handlers. Key is the command text, value is a handler.
-func InitCommands(b *bot.Bot, ps *posts.PostsStorage) map[string]BotCommandHandler {
-	commands := make(map[string]BotCommandHandler)
-	commands[command1.GetCommandText()] = command1
-
-	log.Infof("Commands registered %+T\n", commands)
-	return commands
-}
-
 // Creates an array of handlers. Which will be tried to execute.
 // Requires dependencies to be passed to the function
 // Order of execution is determined by the order of the array.
@@ -37,9 +28,6 @@ func InitHandlers(b *bot.Bot, ps *posts.PostsStorage) *[]BotMessageHandler {
 	// reply to 300 doesn't stp the execution of other handlers
 	// Can handlers be jut functons with closures?
 	handlers := []BotMessageHandler{
-		NewReplyTo300(b),
-		NewReplyToYes(b),
-		NewReplyToNo(b),
 		NewReplaceLinkWithMessage(b, ps),
 		NewRecordBotPostReaction(b, ps),
 		NewRecordReactionToUserMediaPost(b, ps),
