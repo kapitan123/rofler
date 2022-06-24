@@ -4,6 +4,8 @@ import (
 	_ "embed"
 	"errors"
 
+	"github.com/kapitan123/telegrofler/internal/bot"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/source"
 )
@@ -82,16 +84,36 @@ func (m *Messenger) GetCurrentUserProfilePic(userId int64) ([]byte, error) {
 	return source.DownloadBytesFromUrl(downloadLink)
 }
 
-func (m *Messenger) Delete(chatId int64, messageId int) error {
+func (b *Messenger) Delete(chatId int64, messageId int) error {
 	dmc := tgbotapi.DeleteMessageConfig{
 		ChatID:    chatId,
 		MessageID: messageId,
 	}
 
-	_, err := m.api.Request(dmc)
+	_, err := b.api.Request(dmc)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// Post TikTok back to the Telegram channel.
+// Tags original poster and tiktok video info in description.
+// remove unneeded depemdamcoes
+// AK TODO rewrite without custom structure???
+func (b *Messenger) RepostConvertedVideo(tp *bot.SourceVideoPost) error {
+	// Filename is id of the video
+	fb := tgbotapi.FileBytes{Name: tp.VideoData.Id, Bytes: tp.VideoData.Payload}
+
+	v := tgbotapi.NewVideo(tp.ChatId, fb)
+
+	// AK TODO does it work with no duration?
+	//v.Duration = tp.VideoData.Duration
+	v.Caption = tp.GetCaption()
+	v.ParseMode = tgbotapi.ModeHTML
+
+	_, err := b.api.Send(v)
+
+	return err
 }

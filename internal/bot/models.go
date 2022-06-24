@@ -10,7 +10,6 @@ type (
 		Url               string
 		VideoData         VideoData
 	}
-
 	VideoData struct {
 		Id         string
 		Duration   int
@@ -18,7 +17,9 @@ type (
 		Payload    []byte
 		LikesCount int
 	}
+)
 
+type (
 	ReplyToMediaPost struct {
 		VideoId string
 		Details Details
@@ -31,6 +32,7 @@ type (
 	}
 )
 
+// AK TODO this method should be extracted
 func (tp *SourceVideoPost) GetCaption() string {
 	return fmt.Sprintf("<b>Rofler:</b> 🔥@%s🔥\n<b>Title</b>: %s", tp.Sender, tp.VideoData.Title)
 }

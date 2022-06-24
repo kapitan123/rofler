@@ -59,3 +59,33 @@ func (s *Storage) GetAll(ctx context.Context) ([]Post, error) {
 	}
 	return posts, nil
 }
+
+func (s *Storage) Upsert(ctx context.Context, p Post) error {
+	doc := s.client.Collection(postsCollection).Doc(p.VideoId)
+	_, err := doc.Set(ctx, p)
+
+	return err
+}
+
+func (s *Storage) GetById(ctx context.Context, videoId string) (Post, bool, error) {
+	var p Post
+	doc := s.client.Collection(postsCollection).Doc(videoId)
+	snap, err := doc.Get(ctx)
+
+	if err != nil {
+		return p, false, nil
+	}
+
+	if err := snap.DataTo(&p); err != nil {
+		return p, false, err
+	}
+
+	return p, true, nil
+}
+
+func (s *Storage) Create(ctx context.Context, p Post) error {
+	doc := s.client.Collection(postsCollection).Doc(p.VideoId)
+	_, err := doc.Create(ctx, p)
+
+	return err
+}
