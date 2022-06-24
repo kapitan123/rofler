@@ -17,6 +17,7 @@ var (
 	ProjectId     = os.Getenv(projectIdEnv)
 	ServerPort    = 9001 // AK TODO pass in env var
 	GcloudCreds   = os.Getenv(gcloudAppCredsEnv)
+	WorkersCount  = 1
 )
 
 func init() {

@@ -2,13 +2,19 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
+
+	"github.com/gorilla/mux"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/command"
-	"net/http"
 )
 
-func setupRouter(r *http.ServeMux, runner *command.Runner) {
-	r.Handle("/message", messageHandler(runner))
+func setupRouter(r *mux.Router, runner *command.Runner) {
+	r.HandleFunc("/callback", messageHandler(runner)).Methods("POST")
+	// For scheduling
+	//r.HandleFunc("/chat/rofler/top/{week}", app.getTopRoflerHandler).Methods("POST")
+	//r.HandleFunc("/chat/gayoftheday", app.getTopRoflerHandler).Methods("POST")
 }
 
 func messageHandler(runner *command.Runner) http.HandlerFunc {

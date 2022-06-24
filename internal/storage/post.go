@@ -2,25 +2,40 @@ package storage
 
 import (
 	"context"
-	"google.golang.org/api/iterator"
 	"time"
+
+	"google.golang.org/api/iterator"
 )
 
-type Post struct {
-	VideoId        string     `firestore:"video_id"`
-	Source         string     `firestore:"source"`
-	RoflerUserName string     `firestore:"rofler_user_name"`
-	Url            string     `firestore:"url"`
-	Reactions      []Reaction `firestore:"reactions"`
-	KeyWords       []string   `firestore:"key_words"`
-	PostedOn       time.Time  `firestore:"posted_on"`
-}
+// Video post stats for future important analytics
+type (
+	Post struct {
+		VideoId        string     `firestore:"video_id"`
+		Source         string     `firestore:"source"`
+		RoflerUserName string     `firestore:"rofler_user_name"`
+		Url            string     `firestore:"url"`
+		Reactions      []Reaction `firestore:"reactions"`
+		KeyWords       []string   `firestore:"key_words"`
+		PostedOn       time.Time  `firestore:"posted_on"`
+	}
 
-type Reaction struct {
-	MessageId int       `firestore:"message_id"` // ReplyToMessage.ID not the update.Message.ID
-	Sender    string    `firestore:"sender"`
-	Text      string    `firestore:"text"`
-	PostedOn  time.Time `firestore:"posted_on"`
+	Reaction struct {
+		MessageId int       `firestore:"message_id"` // RepllyToMessage.ID not the update.Message.ID
+		Sender    string    `firestore:"sender"`
+		Text      string    `firestore:"text"`
+		PostedOn  time.Time `firestore:"posted_on"`
+	}
+)
+
+func (p *Post) AddReaction(sender, text string, messageid int) {
+	reaction := Reaction{
+		Sender:    sender,
+		Text:      text,
+		MessageId: messageid,
+		PostedOn:  time.Now(),
+	}
+
+	p.Reactions = append(p.Reactions, reaction)
 }
 
 const postsCollection = "posts"

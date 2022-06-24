@@ -1,47 +1,62 @@
 package main
 
 import (
+	"context"
+	"flag"
 	"fmt"
 	"net/http"
-	"time"
 
+	"cloud.google.com/go/firestore"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gorilla/mux"
-	"github.com/kapitan123/telegrofler/config"
-	"github.com/kapitan123/telegrofler/internal/routes"
-
+	"github.com/kapitan123/telegrofler/internal/command"
+	"github.com/kapitan123/telegrofler/internal/command/rofler"
+	"github.com/kapitan123/telegrofler/internal/messenger"
+	"github.com/kapitan123/telegrofler/internal/storage"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/kapitan123/telegrofler/config"
 )
 
-// Main entry point. Starts HTTP service
+const workers = 1
+
 func main() {
-	log.Info("Telegrofler: starting...")
+	flag.Parse()
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+	client, err := firestore.NewClient(ctx, config.ProjectId)
+	if err != nil {
+		log.WithError(err).Fatal("Failed to create firestore client")
+	}
+	defer func() {
+		err := client.Close()
+		if err != nil {
+			log.WithError(err).Fatal("Failed to close firestore client")
+		}
+	}()
+	s := storage.New(client)
+
+	botapi, err := tgbotapi.NewBotAPI(config.TelegramToken)
+	if err != nil {
+		log.WithError(err).Fatal("Failed to create bot api")
+	}
+	m := messenger.New(botapi)
+	commandRunner := command.NewRunner(config.WorkersCount,
+		rofler.New(m, s),
+	)
+
+	log.WithField("addr", config.ServerPort).Info("Starting server on :%d", config.ServerPort)
 
 	router := mux.NewRouter()
-
-	app, err := routes.NewApp()
-
-	if err != nil {
-		log.Fatalf("The application could not be started: %v", err)
-	}
-
-	// AK TODO should close the whole api
-	defer app.Close()
-
-	app.AddRoutes(router)
-	app.AddHandlers()
-
-	log.Info("Telegrofler: listening on: ", config.ServerPort)
+	setupRouter(router, commandRunner)
 
 	srv := &http.Server{
-		Handler:      router,
-		Addr:         fmt.Sprintf(":%d", config.ServerPort),
-		WriteTimeout: 10 * time.Second,
-		ReadTimeout:  10 * time.Second,
-		IdleTimeout:  10 * time.Second,
+		Handler: router,
+		Addr:    fmt.Sprintf(":%d", config.ServerPort),
 	}
 
 	err = srv.ListenAndServe()
 	if err != nil {
-		panic(err.Error())
+		log.WithError(err).Fatal("Failed to start server")
 	}
 }
