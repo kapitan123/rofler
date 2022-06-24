@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"github.com/kapitan123/telegrofler/data/firestore/posts"
 	"github.com/kapitan123/telegrofler/internal/bot"
 
@@ -14,13 +13,13 @@ import (
 
 type RecordReactionToUserMediaPost struct {
 	*bot.Bot
-	FsClient *firestore.Client
+	postsStorage *posts.PostsStorage
 }
 
-func NewRecordReactionToUserMediaPost(b *bot.Bot, fs *firestore.Client) *RecordReactionToUserMediaPost {
+func NewRecordReactionToUserMediaPost(b *bot.Bot, ps *posts.PostsStorage) *RecordReactionToUserMediaPost {
 	return &RecordReactionToUserMediaPost{
-		Bot:      b,
-		FsClient: fs,
+		Bot:          b,
+		postsStorage: ps,
 	}
 }
 
@@ -46,7 +45,7 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message, ctx context.
 
 	log.Infof("Reaction was found for %s sent by %s", mediaRepy.VideoId, details.Sender)
 
-	exPost, found, err := posts.GetById(ctx, h.FsClient, mediaRepy.VideoId)
+	exPost, found, err := h.postsStorage.GetById(ctx, mediaRepy.VideoId)
 
 	if err != nil {
 		return isHandeled, err
@@ -65,7 +64,7 @@ func (h *RecordReactionToUserMediaPost) Handle(m *tgbotapi.Message, ctx context.
 	}
 
 	exPost.AddReaction(details.Sender, details.Text, details.MessageId)
-	posts.Upsert(ctx, h.FsClient, exPost)
+	h.postsStorage.Upsert(ctx, exPost)
 
 	return isHandeled, nil
 }

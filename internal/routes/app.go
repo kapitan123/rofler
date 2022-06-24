@@ -6,15 +6,16 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/kapitan123/telegrofler/config"
+	"github.com/kapitan123/telegrofler/data/firestore/posts"
 	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/bot/tgaction"
 )
 
 type App struct {
 	*bot.Bot
-	fsClient *firestore.Client
-	handlers *[]tgaction.BotMessageHandler
-	commands map[string]tgaction.BotCommandHandler
+	PostsStorage *posts.PostsStorage
+	handlers     *[]tgaction.BotMessageHandler
+	commands     map[string]tgaction.BotCommandHandler
 }
 
 func NewApp() (*App, error) {
@@ -25,11 +26,11 @@ func NewApp() (*App, error) {
 	}
 
 	return &App{
-		Bot:      bot.New(),
-		fsClient: fsClient,
+		Bot:          bot.New(),
+		PostsStorage: posts.New(fsClient),
 	}, nil
 }
 
 func (app *App) Close() {
-	app.fsClient.Close()
+	app.PostsStorage.Close()
 }

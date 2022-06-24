@@ -8,8 +8,18 @@ import (
 
 const postsColName = "posts"
 
-func GetAll(ctx context.Context, client *firestore.Client) ([]Post, error) {
-	docs, err := client.Collection(postsColName).Documents(ctx).GetAll()
+type PostsStorage struct {
+	client *firestore.Client
+}
+
+func New(client *firestore.Client) *PostsStorage {
+	return &PostsStorage{
+		client: client,
+	}
+}
+
+func (s *PostsStorage) GetAll(ctx context.Context) ([]Post, error) {
+	docs, err := s.client.Collection(postsColName).Documents(ctx).GetAll()
 
 	if err != nil {
 		return nil, err
@@ -25,16 +35,16 @@ func GetAll(ctx context.Context, client *firestore.Client) ([]Post, error) {
 	return posts, nil
 }
 
-func Upsert(ctx context.Context, client *firestore.Client, p Post) error {
-	doc := client.Collection(postsColName).Doc(p.VideoId)
+func (s *PostsStorage) Upsert(ctx context.Context, p Post) error {
+	doc := s.client.Collection(postsColName).Doc(p.VideoId)
 	_, err := doc.Set(ctx, p)
 
 	return err
 }
 
-func GetById(ctx context.Context, client *firestore.Client, videoId string) (Post, bool, error) {
+func (s *PostsStorage) GetById(ctx context.Context, videoId string) (Post, bool, error) {
 	var p Post
-	doc := client.Collection(postsColName).Doc(videoId)
+	doc := s.client.Collection(postsColName).Doc(videoId)
 	snap, err := doc.Get(ctx)
 
 	if err != nil {
@@ -48,15 +58,15 @@ func GetById(ctx context.Context, client *firestore.Client, videoId string) (Pos
 	return p, true, nil
 }
 
-func Create(ctx context.Context, client *firestore.Client, p Post) error {
+func (s *PostsStorage) Create(ctx context.Context, client *firestore.Client, p Post) error {
 	doc := client.Collection(postsColName).Doc(p.VideoId)
 	_, err := doc.Create(ctx, p)
 
 	return err
 }
 
-func GetTopRoflerFromPosts(ctx context.Context, client *firestore.Client) (string, int, error) {
-	posts, err := GetAll(ctx, client)
+func (s *PostsStorage) GetTopRoflerFromPosts(ctx context.Context) (string, int, error) {
+	posts, err := s.GetAll(ctx)
 	if err != nil {
 		return "", 0, err
 	}
@@ -78,6 +88,6 @@ func GetTopRoflerFromPosts(ctx context.Context, client *firestore.Client) (strin
 	return maxUserName, max, nil
 }
 
-func Close(client *firestore.Client) {
-	client.Close()
+func (s *PostsStorage) Close() {
+	s.client.Close()
 }

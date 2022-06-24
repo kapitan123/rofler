@@ -8,9 +8,19 @@ import (
 
 const roflersColName = "roflers"
 
+type RoflerStorage struct {
+	client *firestore.Client
+}
+
+func New(client *firestore.Client) *RoflerStorage {
+	return &RoflerStorage{
+		client: client,
+	}
+}
+
 // actully I rarely need it. Only to store Wins and shit
-func GetAll(ctx context.Context, client *firestore.Client) ([]Rofler, error) {
-	docs, err := client.Collection(roflersColName).Documents(ctx).GetAll()
+func (s *RoflerStorage) GetAll(ctx context.Context) ([]Rofler, error) {
+	docs, err := s.client.Collection(roflersColName).Documents(ctx).GetAll()
 
 	if err != nil {
 		return nil, err
@@ -30,9 +40,9 @@ func GetAll(ctx context.Context, client *firestore.Client) ([]Rofler, error) {
 // Internally firestore throws an error if the document does not exist.
 // We treat all errors on fetching as not found.
 // Errors on convertion are treated in a regural way
-func GetByUserName(ctx context.Context, client *firestore.Client, username string) (Rofler, bool, error) {
+func (s *RoflerStorage) GetByUserName(ctx context.Context, username string) (Rofler, bool, error) {
 	var r Rofler
-	doc := client.Collection(roflersColName).Doc(username)
+	doc := s.client.Collection(roflersColName).Doc(username)
 	snap, err := doc.Get(ctx)
 
 	if err != nil {
@@ -46,13 +56,13 @@ func GetByUserName(ctx context.Context, client *firestore.Client, username strin
 	return r, true, nil
 }
 
-func Upsert(ctx context.Context, client *firestore.Client, r Rofler) error {
-	doc := client.Collection(roflersColName).Doc(r.UserName)
+func (s *RoflerStorage) Upsert(ctx context.Context, r Rofler) error {
+	doc := s.client.Collection(roflersColName).Doc(r.UserName)
 	_, err := doc.Set(ctx, r)
 
 	return err
 }
 
-func Close(client *firestore.Client) {
-	client.Close()
+func (s *RoflerStorage) Close() {
+	s.client.Close()
 }

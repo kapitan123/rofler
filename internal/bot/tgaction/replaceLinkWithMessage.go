@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/data/firestore/posts"
 	"github.com/kapitan123/telegrofler/internal/bot"
@@ -15,13 +14,13 @@ import (
 
 type ReplaceLinkWithMessage struct {
 	*bot.Bot
-	FsClient *firestore.Client
+	postsStorage *posts.PostsStorage
 }
 
-func NewReplaceLinkWithMessage(b *bot.Bot, ps *firestore.Client) *ReplaceLinkWithMessage {
+func NewReplaceLinkWithMessage(b *bot.Bot, ps *posts.PostsStorage) *ReplaceLinkWithMessage {
 	return &ReplaceLinkWithMessage{
-		Bot:      b,
-		FsClient: ps,
+		Bot:          b,
+		postsStorage: ps,
 	}
 }
 
@@ -71,7 +70,7 @@ func (h *ReplaceLinkWithMessage) Handle(mess *tgbotapi.Message, ctx context.Cont
 		PostedOn:       time.Now(),
 	}
 
-	posts.Upsert(ctx, h.FsClient, newPost)
+	h.postsStorage.Upsert(ctx, newPost)
 
 	if err != nil {
 		return isHandeled, err
