@@ -1,11 +1,14 @@
-package rofler
+package toprofler
 
 import (
 	"context"
 	"fmt"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
 )
+
+const commandName = "top"
 
 type TopRofler struct {
 	messenger messenger
@@ -13,7 +16,7 @@ type TopRofler struct {
 }
 
 type messenger interface {
-	SendMessage(ctx context.Context, chatId int64, text string) error
+	SendMessage(chatId int64, text string) error
 }
 
 type postStorage interface {
@@ -33,32 +36,37 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 		return err
 	}
 
-	roflerScores := map[string]int{}
-	for _, p := range posts {
-		roflerScores[p.RoflerUserName] += len(p.Reactions)
-	}
+	roflerScores := countScores(posts)
 
-	maxUserName, max := "", 0
-	for username, score := range roflerScores {
-		if max < score {
-			max = score
-			maxUserName = username
-		}
-	}
-	if maxUserName == "" {
-		return nil
-	}
-	err = h.messenger.SendMessage(ctx, message.Chat.ID, formatTopRofler(maxUserName, max))
+	listMeassge := formatListMessage(roflerScores)
+
+	err = h.messenger.SendMessage(message.Chat.ID, listMeassge)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+func formatListMessage(roflerScores map[string]int) string {
+	listMeassge := ""
+	for name, score := range roflerScores {
+		listMeassge += formatTopRofler(name, score)
+	}
+	return listMeassge
+}
+
+func countScores(posts []storage.Post) map[string]int {
+	roflerScores := map[string]int{}
+	for _, p := range posts {
+		roflerScores[p.RoflerUserName] += len(p.Reactions)
+	}
+	return roflerScores
+}
+
 func (h *TopRofler) ShouldRun(message *tgbotapi.Message) bool {
-	return message.IsCommand() && message.Command() == "top"
+	return message.IsCommand() && message.Command() == commandName
 }
 
 func formatTopRofler(username string, score int) string {
-	return fmt.Sprintf("\U0001F451 <b>@%s</b>\n<b>Likes:</b> %d", username, score)
+	return fmt.Sprintf("\U0001F451 <b>@%s</b> <b>Likes:</b> %d", username, score)
 }

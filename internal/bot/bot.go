@@ -3,7 +3,6 @@ package bot
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	_ "embed"
@@ -84,30 +83,6 @@ func (b *Bot) GetUpdate(req *http.Request) (*tgbotapi.Update, error) {
 	}
 
 	return update, nil
-}
-
-// AK TODO remove after migration to a more abstract wrapper
-func (b *Bot) PostTopRofler(chatId int64, userName string, roflCount int) error {
-	// AK TODO fetch rofler
-	// AK TODO get user id
-	// AK TODO fetch profile pic by Id
-	// AK TODO apply watermark to image
-	//data := []byte("leleks")
-
-	//fb := tgbotapi.FileBytes{Name: "topRofler.jpg", Bytes: data}
-	//v := tgbotapi.NewPhoto(chatId, fb)
-
-	//v.Caption = fmt.Sprintf("\U0001F451 <b>@%s</b>\n<b>Likes:</b> %d", userName, roflCount)
-	v := tgbotapi.NewMessage(chatId, fmt.Sprintf("\U0001F451 <b>@%s</b>\n<b>Likes:</b> %d", userName, roflCount))
-	v.ParseMode = tgbotapi.ModeHTML
-
-	_, err := b.api.Send(v)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (b *Bot) PostReplyWithText(chatId int64, replyToMessageId int, caption string) error {

@@ -2,9 +2,10 @@ package command
 
 import (
 	"context"
+	"sync"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
-	"sync"
 )
 
 type command interface {
@@ -65,6 +66,7 @@ func (r *Runner) Run(ctx context.Context, message *tgbotapi.Message) error {
 func (r *Runner) run(ctx context.Context, message *tgbotapi.Message) error {
 	for _, cmd := range r.commands {
 		if cmd.ShouldRun(message) {
+			log.Infof("Handled by: %T", cmd)
 			return cmd.Handle(ctx, message)
 		}
 	}

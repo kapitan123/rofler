@@ -1,12 +1,13 @@
-package rofler
+package toprofler
 
 import (
 	"context"
+	"testing"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 type mockPostsStorage struct {
@@ -22,11 +23,11 @@ func (s *mockPostsStorage) GetAll(_ context.Context) ([]storage.Post, error) {
 }
 
 type mockMessenger struct {
-	sendMessage func(ctx context.Context, chatId int64, message string) error
+	sendMessage func(chatId int64, message string) error
 }
 
-func (m *mockMessenger) SendMessage(ctx context.Context, chatId int64, text string) error {
-	return m.sendMessage(ctx, chatId, text)
+func (m *mockMessenger) SendMessage(chatId int64, text string) error {
+	return m.sendMessage(chatId, text)
 }
 
 func TestTopRofler_Handle(t *testing.T) {
@@ -37,7 +38,7 @@ func TestTopRofler_Handle(t *testing.T) {
 			{RoflerUserName: "Klim"},
 		}
 		s := &mockPostsStorage{posts: posts}
-		m := &mockMessenger{sendMessage: func(ctx context.Context, chatId int64, message string) error {
+		m := &mockMessenger{sendMessage: func(chatId int64, message string) error {
 			assert.Equal(t, chatId, int64(228))
 			assert.Equal(t, message, formatTopRofler("Gleb", 5))
 			return nil
@@ -49,7 +50,7 @@ func TestTopRofler_Handle(t *testing.T) {
 
 	t.Run("should not send message if there are no posts", func(t *testing.T) {
 		s := &mockPostsStorage{posts: []storage.Post{}}
-		m := &mockMessenger{sendMessage: func(ctx context.Context, chatId int64, message string) error {
+		m := &mockMessenger{sendMessage: func(chatId int64, message string) error {
 			assert.Fail(t, "should not send message")
 			return nil
 		}}

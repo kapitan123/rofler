@@ -24,7 +24,6 @@ type BotCommandHandler interface {
 // Creates a map of handlers. Key is the command text, value is a handler.
 func InitCommands(b *bot.Bot, ps *posts.PostsStorage) map[string]BotCommandHandler {
 	commands := make(map[string]BotCommandHandler)
-	command1 := NewPostTopRoflerCommand(b, ps)
 	commands[command1.GetCommandText()] = command1
 
 	log.Infof("Commands registered %+T\n", commands)

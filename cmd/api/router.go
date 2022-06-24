@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/command"
@@ -17,20 +18,29 @@ func setupRouter(r *mux.Router, runner *command.Runner) {
 	//r.HandleFunc("/chat/gayoftheday", app.getTopRoflerHandler).Methods("POST")
 }
 
+// Intentionally swallows all exception so messages are not resend
+// AK TODO send messages to a dead message quee
 func messageHandler(runner *command.Runner) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var update tgbotapi.Update
 		err := json.NewDecoder(r.Body).Decode(&update)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			log.Error("Failed to decode the callback message.")
+			w.WriteHeader(http.StatusOK)
 			return
 		}
+
+		logContent(update.Message)
+
 		err = runner.Run(r.Context(), update.Message)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
+			log.Error("Failed trying to invoke a command.")
 		}
-		w.WriteHeader(http.StatusNoContent)
-		return
+		w.WriteHeader(http.StatusOK)
 	}
+}
+
+func logContent(update *tgbotapi.Message) {
+	ujs, _ := json.Marshal(update)
+	log.Info("Callback content:", string(ujs))
 }
