@@ -102,7 +102,8 @@ func (b *Messenger) Delete(chatId int64, messageId int) error {
 // Tags original poster and tiktok video info in description.
 // remove unneeded depemdamcoes
 // AK TODO rewrite without custom structure???
-func (b *Messenger) RepostConvertedVideo(tp *bot.SourceVideoPost) error {
+// separate this model from the extracted model
+func (b *Messenger) SendTrackableVideo(tp *bot.SourceVideoPost) error {
 	// Filename is id of the video
 	fb := tgbotapi.FileBytes{Name: tp.VideoData.Id, Bytes: tp.VideoData.Payload}
 
