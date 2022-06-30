@@ -24,9 +24,10 @@ type postStorage interface {
 	Upsert(ctx context.Context, p storage.Post) error
 }
 
-func New(messenger messenger) *RecordReaction {
+func New(messenger messenger, storage postStorage) *RecordReaction {
 	return &RecordReaction{
 		messenger: messenger,
+		storage:   storage,
 	}
 }
 

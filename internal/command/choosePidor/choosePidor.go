@@ -1,4 +1,4 @@
-package recordBotPostReaction
+package choosePidor
 
 import (
 	"context"
@@ -29,9 +29,10 @@ type pidorStorage interface {
 	CreatePidor(ctx context.Context, p storage.Pidor) error
 }
 
-func New(messenger messenger) *ChoosePidor {
+func New(messenger messenger, storage pidorStorage) *ChoosePidor {
 	return &ChoosePidor{
 		messenger: messenger,
+		storage:   storage,
 	}
 }
 
@@ -45,7 +46,7 @@ func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
 
 	if found {
 		err = h.messenger.SendText(m.Chat.ID, "Pidor is still "+pidor.UserName)
-		return nil
+		return err
 	}
 
 	names, err := h.messenger.GetAdminUserNamess(m.Chat.ID)

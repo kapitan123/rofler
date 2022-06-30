@@ -19,18 +19,19 @@ type ReplaceLinkWithMessage struct {
 
 type messenger interface {
 	ReplyWithText(chatId int64, messageId int, text string) error
-	RepostConvertedVideo(tp *bot.SourceVideoPost) error
+	SendTrackableVideo(tp *bot.SourceVideoPost) error
 }
 
 type postStorage interface {
 	GetById(ctx context.Context, videoId string) (storage.Post, bool, error)
-	Upsert(ctx context.Context, p storage.Post) error
-	Delete(chatId int64, messageId int) error
+	UpsertPost(ctx context.Context, p storage.Post) error
+	DeletePost(chatId int64, messageId int) error
 }
 
-func New(messenger messenger) *ReplaceLinkWithMessage {
+func New(messenger messenger, storage postStorage) *ReplaceLinkWithMessage {
 	return &ReplaceLinkWithMessage{
 		messenger: messenger,
+		storage:   storage,
 	}
 }
 
@@ -55,14 +56,14 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 	log.Info("Trying to post to telegram: ", svp)
 
 	// AK TODO refactor to not use a custom structure?
-	err = h.messenger.RepostConvertedVideo(svp)
+	err = h.messenger.SendTrackableVideo(svp)
 
 	if err != nil {
 		return err
 	}
 
 	// we don't really care if if has failed and it makes integration tests a lot easier
-	_ = h.storage.Delete(svp.ChatId, svp.OriginalMessageId)
+	_ = h.storage.DeletePost(svp.ChatId, svp.OriginalMessageId)
 
 	newPost := storage.Post{
 		VideoId:        svp.VideoData.Id,
@@ -74,7 +75,7 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 		PostedOn:       time.Now(),
 	}
 
-	err = h.storage.Upsert(ctx, newPost)
+	err = h.storage.UpsertPost(ctx, newPost)
 
 	return err
 }

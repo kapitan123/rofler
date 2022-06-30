@@ -10,6 +10,9 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/command"
+	"github.com/kapitan123/telegrofler/internal/command/recordBotPostReaction"
+	"github.com/kapitan123/telegrofler/internal/command/recordReaction"
+	"github.com/kapitan123/telegrofler/internal/command/replaceLinkWithMessage"
 	"github.com/kapitan123/telegrofler/internal/command/replyTo300"
 	"github.com/kapitan123/telegrofler/internal/command/replyToNo"
 	"github.com/kapitan123/telegrofler/internal/command/replyToYes"
@@ -50,6 +53,9 @@ func main() {
 		replyToNo.New(m),
 		replyTo300.New(m),
 		replyToYes.New(m),
+		recordBotPostReaction.New(m, s),
+		recordReaction.New(m, s),
+		replaceLinkWithMessage.New(m, s),
 	)
 
 	log.WithField("addr", config.ServerPort).Info("Starting server on :%d", config.ServerPort)

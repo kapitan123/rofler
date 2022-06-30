@@ -23,7 +23,7 @@ type ReplyToNo struct {
 
 type messenger interface {
 	ReplyWithImg(chatId int64, replyToMessageId int, img []byte, imgName string, caption string) error
-	GetCurrentUserProfilePic(userId int64) ([]byte, error)
+	GetUserCurrentProfilePic(userId int64) ([]byte, error)
 }
 
 func New(messenger messenger) *ReplyToNo {
@@ -33,7 +33,7 @@ func New(messenger messenger) *ReplyToNo {
 }
 
 func (h *ReplyToNo) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	ppic, _ := h.messenger.GetCurrentUserProfilePic(m.From.ID)
+	ppic, _ := h.messenger.GetUserCurrentProfilePic(m.From.ID)
 
 	markedPic, err := watermark.Apply(ppic, pidormarkPicture)
 	if err != nil {

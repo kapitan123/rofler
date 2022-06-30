@@ -136,7 +136,7 @@ func (b *Messenger) SendTrackableVideo(tp *bot.SourceVideoPost) error {
 	return err
 }
 
-func (b *Messenger) GetAdminUserNamess(chatId int64) ([]string, error) {
+func (b *Messenger) GetAdminUserNames(chatId int64) ([]string, error) {
 	req := tgbotapi.ChatAdministratorsConfig{
 		ChatConfig: tgbotapi.ChatConfig{
 			ChatID:             chatId,
