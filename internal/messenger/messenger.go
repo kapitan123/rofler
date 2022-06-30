@@ -37,6 +37,23 @@ func (m *Messenger) ReplyWithText(chatId int64, replyToMessageId int, caption st
 	return nil
 }
 
+// AK TODO merge innternal calls to reduce dupliction
+func (m *Messenger) SendImg(chatId int64, img []byte, imgName string, caption string) error {
+	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: img})
+
+	if caption != "" {
+		msg.Caption = caption
+	}
+
+	_, err := m.api.Send(msg)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img []byte, imgName string, caption string) error {
 	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: img})
 	msg.ReplyToMessageID = replyToMessageId
@@ -54,7 +71,7 @@ func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img []byte,
 	return nil
 }
 
-func (m *Messenger) GetCurrentUserProfilePic(userId int64) ([]byte, error) {
+func (m *Messenger) GetUserCurrentProfilePic(userId int64) ([]byte, error) {
 	ppicReq := tgbotapi.UserProfilePhotosConfig{
 		UserID: userId,
 		Offset: 0,
@@ -117,4 +134,26 @@ func (b *Messenger) SendTrackableVideo(tp *bot.SourceVideoPost) error {
 	_, err := b.api.Send(v)
 
 	return err
+}
+
+func (b *Messenger) GetAdminUserNamess(chatId int64) ([]string, error) {
+	req := tgbotapi.ChatAdministratorsConfig{
+		ChatConfig: tgbotapi.ChatConfig{
+			ChatID:             chatId,
+			SuperGroupUsername: ""}, // AK TODO wtf is this parameter?
+	}
+
+	admins, err := b.api.GetChatAdministrators(req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	userNames := make([]string, len(admins))
+
+	for _, admin := range admins {
+		userNames = append(userNames, admin.User.UserName)
+	}
+
+	return userNames, nil
 }
