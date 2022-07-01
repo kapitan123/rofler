@@ -60,7 +60,7 @@ func (s *Storage) GetAll(ctx context.Context) ([]Post, error) {
 	return posts, nil
 }
 
-func (s *Storage) Upsert(ctx context.Context, p Post) error {
+func (s *Storage) UpsertPost(ctx context.Context, p Post) error {
 	doc := s.client.Collection(postsCollection).Doc(p.VideoId)
 	_, err := doc.Set(ctx, p)
 

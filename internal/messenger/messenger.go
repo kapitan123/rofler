@@ -3,8 +3,7 @@ package messenger
 import (
 	_ "embed"
 	"errors"
-
-	"github.com/kapitan123/telegrofler/internal/bot"
+	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/source"
@@ -120,20 +119,28 @@ func (b *Messenger) Delete(chatId int64, messageId int) error {
 // remove unneeded depemdamcoes
 // AK TODO rewrite without custom structure???
 // separate this model from the extracted model
-func (b *Messenger) SendTrackableVideo(tp *bot.SourceVideoPost) error {
+type VideoData struct {
+	Id      string
+	Title   string
+	Payload []byte
+}
+
+func (b *Messenger) SendTrackableVideo(chatId int64, linktToUserName string, trackToken string, title string, payload []byte) error {
 	// Filename is id of the video
-	fb := tgbotapi.FileBytes{Name: tp.VideoData.Id, Bytes: tp.VideoData.Payload}
+	fb := tgbotapi.FileBytes{Name: trackToken, Bytes: payload}
 
-	v := tgbotapi.NewVideo(tp.ChatId, fb)
+	v := tgbotapi.NewVideo(chatId, fb)
 
-	// AK TODO does it work with no duration?
-	//v.Duration = tp.VideoData.Duration
-	v.Caption = tp.GetCaption()
+	v.Caption = GetTrackableCaption(linktToUserName, title)
 	v.ParseMode = tgbotapi.ModeHTML
 
 	_, err := b.api.Send(v)
 
 	return err
+}
+
+func GetTrackableCaption(linktToUserName string, title string) string {
+	return fmt.Sprintf("<b>Rofler:</b> 🔥@%s🔥\n<b>Title</b>: %s", linktToUserName, title)
 }
 
 func (b *Messenger) GetAdminUserNames(chatId int64) ([]string, error) {

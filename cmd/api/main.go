@@ -47,6 +47,8 @@ func main() {
 		log.WithError(err).Fatal("Failed to create bot api")
 	}
 
+	// AK TODO move bot and other shit to app
+	// otherwise we need to create multiple instances of bot and storage to handle scheduler
 	m := messenger.New(botapi)
 	commandRunner := command.NewRunner(config.WorkersCount,
 		toprofler.New(m, s),

@@ -23,7 +23,7 @@ type messenger interface {
 
 type postStorage interface {
 	GetById(ctx context.Context, videoId string) (storage.Post, bool, error)
-	Upsert(ctx context.Context, p storage.Post) error
+	UpsertPost(ctx context.Context, p storage.Post) error
 }
 
 func New(messenger messenger, storage postStorage) *RecordBotPostReaction {
@@ -54,7 +54,7 @@ func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message)
 	}
 
 	exPost.AddReaction(details.Sender, details.Text, details.MessageId)
-	h.storage.Upsert(ctx, exPost)
+	h.storage.UpsertPost(ctx, exPost)
 	return nil
 }
 

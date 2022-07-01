@@ -4,8 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/kapitan123/telegrofler/internal/bot"
-	"github.com/kapitan123/telegrofler/internal/source/sourceFactory"
+	"github.com/kapitan123/telegrofler/internal/command/replaceLinkWithMessage/source/sourceFactory"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
@@ -19,13 +18,13 @@ type ReplaceLinkWithMessage struct {
 
 type messenger interface {
 	ReplyWithText(chatId int64, messageId int, text string) error
-	SendTrackableVideo(tp *bot.SourceVideoPost) error
+	SendTrackableVideo(chatId int64, linktToUserName string, trackToken string, title string, payload []byte) error
+	Delete(chatId int64, messageId int) error
 }
 
 type postStorage interface {
 	GetById(ctx context.Context, videoId string) (storage.Post, bool, error)
 	UpsertPost(ctx context.Context, p storage.Post) error
-	DeletePost(chatId int64, messageId int) error
 }
 
 func New(messenger messenger, storage postStorage) *ReplaceLinkWithMessage {
@@ -37,39 +36,33 @@ func New(messenger messenger, storage postStorage) *ReplaceLinkWithMessage {
 
 func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	// AK TODO extract for moking
+	// video downloads are specific to this handler, so ex
 	extract, _ := sourceFactory.TryGetExtractor(m.Text)
 
-	svp := convertToSourceVideoPost(m)
+	url, chatId, sender := m.Text, m.Chat.ID, m.From.UserName
 
-	log.Info("Url was found in a callback message: ", svp.Url)
+	log.Info("Url was found in a callback message: ", url)
 
-	evi, err := extract(svp.Url)
+	evi, err := extract(url)
 
 	if err != nil {
 		return err
 	}
 
-	svp.VideoData.Payload = evi.Payload
-	svp.VideoData.Title = evi.Title
-	svp.VideoData.Id = evi.Id
-
-	log.Info("Trying to post to telegram: ", svp)
-
-	// AK TODO refactor to not use a custom structure?
-	err = h.messenger.SendTrackableVideo(svp)
+	err = h.messenger.SendTrackableVideo(chatId, sender, evi.Id, evi.Title, evi.Payload)
 
 	if err != nil {
 		return err
 	}
 
 	// we don't really care if if has failed and it makes integration tests a lot easier
-	_ = h.storage.DeletePost(svp.ChatId, svp.OriginalMessageId)
+	_ = h.messenger.Delete(chatId, m.MessageID)
 
 	newPost := storage.Post{
-		VideoId:        svp.VideoData.Id,
+		VideoId:        evi.Id,
 		Source:         evi.Type,
-		RoflerUserName: svp.Sender,
-		Url:            svp.Url,
+		RoflerUserName: sender,
+		Url:            url,
 		Reactions:      []storage.Reaction{},
 		KeyWords:       []string{},
 		PostedOn:       time.Now(),
@@ -82,18 +75,7 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 
 func (h *ReplaceLinkWithMessage) ShouldRun(m *tgbotapi.Message) bool {
 	// AK TODO extract for moking
+	// separate extractor and cheking of it existance
 	_, found := sourceFactory.TryGetExtractor(m.Text)
 	return found
-}
-
-// Handles incoming chat messages.
-// Tries to extract a TikTok video url from the message if no url was found returns nil
-// Handles only mobile format
-func convertToSourceVideoPost(m *tgbotapi.Message) *bot.SourceVideoPost {
-	return &bot.SourceVideoPost{
-		Sender:            m.From.UserName,
-		ChatId:            m.Chat.ID,
-		Url:               m.Text,
-		OriginalMessageId: m.MessageID,
-	}
 }
