@@ -33,9 +33,8 @@ func New(messenger messenger, storage postStorage) *RecordReaction {
 func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	mediaReply := extractUserMediaReaction(m)
 
-	log.Infof("Reaction was found for %s sent by %s", mediaReply.VideoId, mediaReply.Details.Sender)
+	log.Infof("Reaction was found for %s sent by %s", mediaReply.VideoId, mediaReply.Sender)
 
-	details := mediaReply.Details
 	exPost, found, err := h.storage.GetById(ctx, mediaReply.VideoId)
 
 	if err != nil {
@@ -56,7 +55,7 @@ func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error 
 		}
 	}
 
-	exPost.AddReaction(details.Sender, details.Text, details.MessageId)
+	exPost.AddReaction(mediaReply.Sender, mediaReply.Text, mediaReply.MessageId)
 	h.storage.UpsertPost(ctx, exPost)
 
 	return nil
@@ -75,12 +74,10 @@ func (h *RecordReaction) ShouldRun(m *tgbotapi.Message) bool {
 func extractUserMediaReaction(upd *tgbotapi.Message) ReplyToMediaPost {
 	rtm := upd.ReplyToMessage
 	vr := ReplyToMediaPost{
-		VideoId: rtm.Video.FileID,
-		Details: Details{
-			Sender:    upd.From.UserName,
-			MessageId: rtm.MessageID,
-			Text:      upd.Text,
-		},
+		VideoId:   rtm.Video.FileID,
+		Sender:    upd.From.UserName,
+		MessageId: rtm.MessageID,
+		Text:      upd.Text,
 	}
 
 	return vr
@@ -88,11 +85,7 @@ func extractUserMediaReaction(upd *tgbotapi.Message) ReplyToMediaPost {
 
 type (
 	ReplyToMediaPost struct {
-		VideoId string
-		Details Details
-	}
-
-	Details struct {
+		VideoId   string
 		MessageId int // RepllyToMessage.ID not the update.Message.ID
 		Sender    string
 		Text      string

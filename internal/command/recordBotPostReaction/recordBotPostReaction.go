@@ -26,11 +26,7 @@ type postStorage interface {
 
 type (
 	ReplyToMediaPost struct {
-		VideoId string
-		Details Details
-	}
-
-	Details struct {
+		VideoId   string
 		MessageId int // RepllyToMessage.ID not the update.Message.ID
 		Sender    string
 		Text      string
@@ -48,7 +44,6 @@ func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message)
 	// AK TODO parsing the message twice rename package to parser
 	reply := extractVideoRepostReaction(m)
 
-	details := reply.Details
 	exPost, found, err := h.storage.GetById(ctx, reply.VideoId)
 
 	// in this case we don't record reaction as all bot posts should be saved already
@@ -60,7 +55,7 @@ func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message)
 		return err
 	}
 
-	exPost.AddReaction(details.Sender, details.Text, details.MessageId)
+	exPost.AddReaction(reply.Sender, reply.Text, reply.MessageId)
 	h.storage.UpsertPost(ctx, exPost)
 	return nil
 }
@@ -74,12 +69,10 @@ func extractVideoRepostReaction(upd *tgbotapi.Message) ReplyToMediaPost {
 	sender := upd.From.UserName
 
 	reply := ReplyToMediaPost{
-		VideoId: rtm.Video.FileName,
-		Details: Details{
-			Sender:    sender,
-			Text:      upd.Text,
-			MessageId: upd.MessageID,
-		},
+		VideoId:   rtm.Video.FileName,
+		Sender:    sender,
+		Text:      upd.Text,
+		MessageId: upd.MessageID,
 	}
 
 	return reply
