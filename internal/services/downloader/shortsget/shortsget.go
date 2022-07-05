@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kapitan123/telegrofler/internal/source"
+	"github.com/kapitan123/telegrofler/internal/services/downloader"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 	sourcePrefix = "https://youtube.com/shorts"
 )
 
-func ExtractVideoFromUrl(youtubeUrl string) (*source.ExtrctedVideoItem, error) {
+func ExtractVideoFromUrl(youtubeUrl string) (*downloader.ExtrctedVideoItem, error) {
 	// AK TODO make requests in parallel
 	vInfo, err := getVideoInfo(youtubeUrl)
 	if err != nil {
@@ -25,12 +25,12 @@ func ExtractVideoFromUrl(youtubeUrl string) (*source.ExtrctedVideoItem, error) {
 
 	queryParam := "download?videoURL=" + youtubeUrl + "&itag=18&format=mp4"
 
-	b, err := source.DownloadBytesFromUrl(sourceLink + queryParam)
+	b, err := downloader.DownloadBytesFromUrl(sourceLink + queryParam)
 	if err != nil {
 		return nil, err
 	}
 
-	lti := &source.ExtrctedVideoItem{
+	lti := &downloader.ExtrctedVideoItem{
 		Id:      vInfo.VideoId,
 		Payload: b,
 		Title:   vInfo.Title,

@@ -5,8 +5,6 @@ import (
 	_ "embed"
 	"regexp"
 
-	"github.com/kapitan123/telegrofler/internal/watermark"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -18,7 +16,12 @@ const pidorText = "Пидора ответ."
 var pidormarkPicture []byte
 
 type ReplyToNo struct {
-	messenger messenger
+	messenger   messenger
+	watermarker watermarker
+}
+
+type watermarker interface {
+	Apply(bakground []byte, foreground []byte) ([]byte, error)
 }
 
 type messenger interface {
@@ -26,16 +29,17 @@ type messenger interface {
 	GetUserCurrentProfilePic(userId int64) ([]byte, error)
 }
 
-func New(messenger messenger) *ReplyToNo {
+func New(messenger messenger, watermarker watermarker) *ReplyToNo {
 	return &ReplyToNo{
-		messenger: messenger,
+		messenger:   messenger,
+		watermarker: watermarker,
 	}
 }
 
 func (h *ReplyToNo) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	ppic, _ := h.messenger.GetUserCurrentProfilePic(m.From.ID)
 
-	markedPic, err := watermark.Apply(ppic, pidormarkPicture)
+	markedPic, err := h.watermarker.Apply(ppic, pidormarkPicture)
 	if err != nil {
 		return err
 	}

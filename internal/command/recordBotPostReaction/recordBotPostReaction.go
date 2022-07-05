@@ -5,9 +5,7 @@ import (
 	"regexp"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/storage"
-	log "github.com/sirupsen/logrus"
 )
 
 const posterMaker = `🔥@(.*?)🔥`
@@ -26,6 +24,19 @@ type postStorage interface {
 	UpsertPost(ctx context.Context, p storage.Post) error
 }
 
+type (
+	ReplyToMediaPost struct {
+		VideoId string
+		Details Details
+	}
+
+	Details struct {
+		MessageId int // RepllyToMessage.ID not the update.Message.ID
+		Sender    string
+		Text      string
+	}
+)
+
 func New(messenger messenger, storage postStorage) *RecordBotPostReaction {
 	return &RecordBotPostReaction{
 		messenger: messenger,
@@ -35,11 +46,7 @@ func New(messenger messenger, storage postStorage) *RecordBotPostReaction {
 
 func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	// AK TODO parsing the message twice rename package to parser
-	reply, err := tryExtractVideoRepostReaction(m)
-
-	if err != nil {
-		return err
-	}
+	reply := extractVideoRepostReaction(m)
 
 	details := reply.Details
 	exPost, found, err := h.storage.GetById(ctx, reply.VideoId)
@@ -59,26 +66,30 @@ func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message)
 }
 
 func (h *RecordBotPostReaction) ShouldRun(m *tgbotapi.Message) bool {
-	mediaReply, err := tryExtractVideoRepostReaction(m)
-
-	if err != nil {
-		log.WithError(err).Error("Reaction extraction has failed")
-		return false
-	}
-
-	if mediaReply.Details.Sender == "" {
-		return false
-	}
-
-	return true
+	return containsVideoRepostReaction(m)
 }
 
-func tryExtractVideoRepostReaction(upd *tgbotapi.Message) (bot.ReplyToMediaPost, error) {
-	vr := bot.ReplyToMediaPost{}
+func extractVideoRepostReaction(upd *tgbotapi.Message) ReplyToMediaPost {
+	rtm := upd.ReplyToMessage
+	sender := upd.From.UserName
+
+	reply := ReplyToMediaPost{
+		VideoId: rtm.Video.FileName,
+		Details: Details{
+			Sender:    sender,
+			Text:      upd.Text,
+			MessageId: upd.MessageID,
+		},
+	}
+
+	return reply
+}
+
+func containsVideoRepostReaction(upd *tgbotapi.Message) bool {
 	rtm := upd.ReplyToMessage
 
 	if rtm == nil || rtm.From.UserName != "TelegroflBot" || rtm.Video == nil {
-		return vr, nil
+		return false
 	}
 
 	r := regexp.MustCompile(posterMaker)
@@ -87,17 +98,8 @@ func tryExtractVideoRepostReaction(upd *tgbotapi.Message) (bot.ReplyToMediaPost,
 	sender := upd.From.UserName
 	// if the user reference his own post it is not a reaction. Can be moved outside the scope
 	if sender == poster {
-		return vr, nil
+		return false
 	}
 
-	reply := bot.ReplyToMediaPost{
-		VideoId: rtm.Video.FileName,
-		Details: bot.Details{
-			Sender:    sender,
-			Text:      upd.Text,
-			MessageId: upd.MessageID,
-		},
-	}
-
-	return reply, nil
+	return true
 }

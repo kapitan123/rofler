@@ -1,4 +1,4 @@
-package watermark
+package watermarker
 
 import (
 	"bytes"
@@ -11,8 +11,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Watermark operates with bytes
-func Apply(bakground []byte, foreground []byte) ([]byte, error) {
+type Watermarker struct {
+}
+
+func New() *Watermarker {
+	return &Watermarker{}
+}
+
+func (s *Watermarker) Apply(bakground []byte, foreground []byte) ([]byte, error) {
 	defer logDuration(time.Now())
 
 	bgImg, _, err := image.Decode(bytes.NewReader(bakground))

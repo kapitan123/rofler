@@ -2,6 +2,7 @@ package choosePidor
 
 import (
 	"context"
+	_ "embed"
 	"math/rand"
 	"time"
 
@@ -13,6 +14,8 @@ import (
 //go:embed pidormark.png
 var pidormarkPicture []byte
 
+const commandName = "choosePidor"
+
 type ChoosePidor struct {
 	messenger messenger
 	storage   pidorStorage
@@ -21,7 +24,7 @@ type ChoosePidor struct {
 type messenger interface {
 	SendText(chatId int64, text string) error
 	SendImg(chatId int64, img []byte, imgName string, caption string) error
-	GetAdminUserNamess(chatId int64) ([]string, error)
+	GetAdminUserNames(chatId int64) ([]string, error)
 }
 
 type pidorStorage interface {
@@ -37,6 +40,7 @@ func New(messenger messenger, storage pidorStorage) *ChoosePidor {
 }
 
 func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
+	// AK TODO extract to interface
 	now := time.Now()
 	pidor, found, err := h.storage.GetForDate(ctx, now)
 
@@ -49,7 +53,7 @@ func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
 		return err
 	}
 
-	names, err := h.messenger.GetAdminUserNamess(m.Chat.ID)
+	names, err := h.messenger.GetAdminUserNames(m.Chat.ID)
 
 	if err != nil {
 		return err
@@ -67,4 +71,8 @@ func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
 
 func chooseRandom(names []string) string {
 	return names[rand.Intn(len(names)-1)]
+}
+
+func (h *ChoosePidor) ShouldRun(message *tgbotapi.Message) bool {
+	return message.IsCommand() && message.Command() == commandName
 }

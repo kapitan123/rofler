@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/internal/source"
+	"github.com/kapitan123/telegrofler/internal/services/downloader"
 )
 
 type Messenger struct {
@@ -97,7 +97,7 @@ func (m *Messenger) GetUserCurrentProfilePic(userId int64) ([]byte, error) {
 	downloadLink := ppic.Link(m.api.Token)
 
 	// AK TODO this crap is super slow
-	return source.DownloadBytesFromUrl(downloadLink)
+	return downloader.DownloadBytesFromUrl(downloadLink)
 }
 
 func (b *Messenger) Delete(chatId int64, messageId int) error {

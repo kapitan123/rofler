@@ -10,6 +10,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/command"
+	"github.com/kapitan123/telegrofler/internal/command/choosePidor"
 	"github.com/kapitan123/telegrofler/internal/command/recordBotPostReaction"
 	"github.com/kapitan123/telegrofler/internal/command/recordReaction"
 	"github.com/kapitan123/telegrofler/internal/command/replaceLinkWithMessage"
@@ -18,13 +19,14 @@ import (
 	"github.com/kapitan123/telegrofler/internal/command/replyToYes"
 	"github.com/kapitan123/telegrofler/internal/command/toprofler"
 	"github.com/kapitan123/telegrofler/internal/messenger"
+	"github.com/kapitan123/telegrofler/internal/services/watermarker"
 	"github.com/kapitan123/telegrofler/internal/storage"
+
+	//"github.com/kapitan123/telegrofler/internal/watermarker"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/kapitan123/telegrofler/config"
 )
-
-const workers = 1
 
 func main() {
 	flag.Parse()
@@ -50,20 +52,22 @@ func main() {
 	// AK TODO move bot and other shit to app
 	// otherwise we need to create multiple instances of bot and storage to handle scheduler
 	m := messenger.New(botapi)
+	w := watermarker.New()
 	commandRunner := command.NewRunner(config.WorkersCount,
-		toprofler.New(m, s),
-		replyToNo.New(m),
-		replyTo300.New(m),
-		replyToYes.New(m),
+		choosePidor.New(m, s),
 		recordBotPostReaction.New(m, s),
 		recordReaction.New(m, s),
 		replaceLinkWithMessage.New(m, s),
+		replyTo300.New(m),
+		replyToNo.New(m, w),
+		replyToYes.New(m),
+		toprofler.New(m, s),
 	)
 
 	log.WithField("addr", config.ServerPort).Info("Starting server on :%d", config.ServerPort)
 
 	router := mux.NewRouter()
-	setupRouter(router, commandRunner)
+	setupRouter(router, commandRunner, choosePidor.New(m, s))
 
 	srv := &http.Server{
 		Handler: router,

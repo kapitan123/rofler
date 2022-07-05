@@ -5,7 +5,6 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/internal/bot"
 	"github.com/kapitan123/telegrofler/internal/storage"
 	log "github.com/sirupsen/logrus"
 )
@@ -32,7 +31,10 @@ func New(messenger messenger, storage postStorage) *RecordReaction {
 }
 
 func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	mediaReply, _ := extractUserMediaReaction(m)
+	mediaReply := extractUserMediaReaction(m)
+
+	log.Infof("Reaction was found for %s sent by %s", mediaReply.VideoId, mediaReply.Details.Sender)
+
 	details := mediaReply.Details
 	exPost, found, err := h.storage.GetById(ctx, mediaReply.VideoId)
 
@@ -63,38 +65,36 @@ func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error 
 func (h *RecordReaction) ShouldRun(m *tgbotapi.Message) bool {
 	rtm := m.ReplyToMessage
 
-	if rtm == nil || rtm.Video == nil {
+	if rtm == nil || rtm.Video == nil || m.From.UserName == "" {
 		return false
 	}
-
-	mediaRepy, err := extractUserMediaReaction(m)
-	details := mediaRepy.Details
-	if err != nil {
-		log.WithError(err).Error("Couldn't extract media reaction")
-		return false
-	}
-
-	// AK TODO should actually return nil
-	if details.Sender == "" {
-		return false
-	}
-
-	log.Infof("Reaction was found for %s sent by %s", mediaRepy.VideoId, details.Sender)
 
 	return true
 }
 
-// AK TODO add sucess parameter remove it from bot add it as an extemsion
-func extractUserMediaReaction(upd *tgbotapi.Message) (bot.ReplyToMediaPost, error) {
+func extractUserMediaReaction(upd *tgbotapi.Message) ReplyToMediaPost {
 	rtm := upd.ReplyToMessage
-	vr := bot.ReplyToMediaPost{
+	vr := ReplyToMediaPost{
 		VideoId: rtm.Video.FileID,
-		Details: bot.Details{
+		Details: Details{
 			Sender:    upd.From.UserName,
 			MessageId: rtm.MessageID,
 			Text:      upd.Text,
 		},
 	}
 
-	return vr, nil
+	return vr
 }
+
+type (
+	ReplyToMediaPost struct {
+		VideoId string
+		Details Details
+	}
+
+	Details struct {
+		MessageId int // RepllyToMessage.ID not the update.Message.ID
+		Sender    string
+		Text      string
+	}
+)

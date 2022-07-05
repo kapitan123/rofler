@@ -9,13 +9,14 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/command"
+	"github.com/kapitan123/telegrofler/internal/command/choosePidor"
 )
 
 // AK TODO we just can't pass all stuff here, we still need an abstraction to group configuration
-func setupRouter(r *mux.Router, runner *command.Runner) {
+// temp solution with direct handler function
+func setupRouter(r *mux.Router, runner *command.Runner, pdr *choosePidor.ChoosePidor) {
 	r.HandleFunc("/callback", messageHandler(runner)).Methods("POST")
-	//r.HandleFunc("/chat/rofler/top/{week}", app.getTopRoflerHandler).Methods("POST")
-	r.HandleFunc("/chat/gayoftheday", runChoosePidorCommand()).Methods("PUT")
+	r.HandleFunc("/chat/gayoftheday", choosePidorHandler(pdr)).Methods("PUT")
 }
 
 // Intentionally swallows all exception so messages are not resend
@@ -40,16 +41,14 @@ func messageHandler(runner *command.Runner) http.HandlerFunc {
 	}
 }
 
-func choosePidorHandler() http.HandlerFunc {
+func choosePidorHandler(pdr *choosePidor.ChoosePidor) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		logContent(update.Message)
-
-		err = runner.Run(r.Context(), update.Message)
-		if err != nil {
-			log.Error("Failed trying to invoke a command.")
-		}
-		w.WriteHeader(http.StatusOK)
+		// pdr.Handle(r.Context())
+		// err = runner.Run(r.Context(), update.Message)
+		// if err != nil {
+		// 	log.Error("Failed trying to invoke a command.")
+		// }
+		// w.WriteHeader(http.StatusOK)
 	}
 }
 

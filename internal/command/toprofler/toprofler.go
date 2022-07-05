@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/kapitan123/telegrofler/helpers/sortedmap"
 	"github.com/kapitan123/telegrofler/internal/storage"
 )
 
@@ -38,7 +39,8 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 
 	roflerScores := countScores(posts)
 
-	listMeassge := formatListMessage(roflerScores)
+	sortedRoflerScores := sortedmap.Sort(roflerScores)
+	listMeassge := formatListMessage(sortedRoflerScores)
 
 	err = h.messenger.SendText(message.Chat.ID, listMeassge)
 	if err != nil {
@@ -47,10 +49,10 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 	return nil
 }
 
-func formatListMessage(roflerScores map[string]int) string {
+func formatListMessage(roflerScores sortedmap.PairList) string {
 	listMeassge := ""
-	for name, score := range roflerScores {
-		listMeassge += formatTopRofler(name, score)
+	for _, pair := range roflerScores {
+		listMeassge += formatTopRofler(pair.Key, pair.Value)
 	}
 	return listMeassge
 }

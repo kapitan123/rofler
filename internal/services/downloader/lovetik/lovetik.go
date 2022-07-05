@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/kapitan123/telegrofler/internal/source"
+	"github.com/kapitan123/telegrofler/internal/services/downloader"
 )
 
 const (
@@ -21,7 +21,7 @@ const (
 	mobilePrefixRegex = `https:\/\/[a-zA-Z]{2}\.tiktok\.com\/`
 )
 
-func ExtractVideoFromUrl(tikUrl string) (*source.ExtrctedVideoItem, error) {
+func ExtractVideoFromUrl(tikUrl string) (*downloader.ExtrctedVideoItem, error) {
 	escapedUrl := url.QueryEscape(tikUrl)
 	jsonStr := []byte("query=" + escapedUrl)
 	resp, err := http.Post(sourceLink, contentType, bytes.NewBuffer(jsonStr))
@@ -47,13 +47,13 @@ func ExtractVideoFromUrl(tikUrl string) (*source.ExtrctedVideoItem, error) {
 		}
 
 		log.Print("Found no watermark video: ", l.DownloadAddr)
-		b, err := source.DownloadBytesFromUrl(l.DownloadAddr)
+		b, err := downloader.DownloadBytesFromUrl(l.DownloadAddr)
 
 		if err != nil {
 			return nil, err
 		}
 
-		lti := &source.ExtrctedVideoItem{
+		lti := &downloader.ExtrctedVideoItem{
 			Id:      sr.Vid,
 			Payload: b,
 			Title:   sr.Desc,
