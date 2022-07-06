@@ -71,9 +71,16 @@ func (h *RecordReaction) ShouldRun(m *tgbotapi.Message) bool {
 	return true
 }
 
-func extractUserMediaReaction(upd *tgbotapi.Message) ReplyToMediaPost {
+type replyToMediaPost struct {
+	VideoId   string
+	MessageId int // RepllyToMessage.ID not the update.Message.ID
+	Sender    string
+	Text      string
+}
+
+func extractUserMediaReaction(upd *tgbotapi.Message) replyToMediaPost {
 	rtm := upd.ReplyToMessage
-	vr := ReplyToMediaPost{
+	vr := replyToMediaPost{
 		VideoId:   rtm.Video.FileID,
 		Sender:    upd.From.UserName,
 		MessageId: rtm.MessageID,
@@ -82,12 +89,3 @@ func extractUserMediaReaction(upd *tgbotapi.Message) ReplyToMediaPost {
 
 	return vr
 }
-
-type (
-	ReplyToMediaPost struct {
-		VideoId   string
-		MessageId int // RepllyToMessage.ID not the update.Message.ID
-		Sender    string
-		Text      string
-	}
-)

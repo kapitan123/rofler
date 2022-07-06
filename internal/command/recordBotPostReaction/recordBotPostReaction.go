@@ -24,15 +24,6 @@ type postStorage interface {
 	UpsertPost(ctx context.Context, p storage.Post) error
 }
 
-type (
-	ReplyToMediaPost struct {
-		VideoId   string
-		MessageId int // RepllyToMessage.ID not the update.Message.ID
-		Sender    string
-		Text      string
-	}
-)
-
 func New(messenger messenger, storage postStorage) *RecordBotPostReaction {
 	return &RecordBotPostReaction{
 		messenger: messenger,
@@ -64,11 +55,18 @@ func (h *RecordBotPostReaction) ShouldRun(m *tgbotapi.Message) bool {
 	return containsVideoRepostReaction(m)
 }
 
-func extractVideoRepostReaction(upd *tgbotapi.Message) ReplyToMediaPost {
+type replyToMediaPost struct {
+	VideoId   string
+	MessageId int // RepllyToMessage.ID not the update.Message.ID
+	Sender    string
+	Text      string
+}
+
+func extractVideoRepostReaction(upd *tgbotapi.Message) replyToMediaPost {
 	rtm := upd.ReplyToMessage
 	sender := upd.From.UserName
 
-	reply := ReplyToMediaPost{
+	reply := replyToMediaPost{
 		VideoId:   rtm.Video.FileName,
 		Sender:    sender,
 		Text:      upd.Text,
