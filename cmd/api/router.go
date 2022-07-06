@@ -19,7 +19,6 @@ func setupRouter(r *mux.Router, runner *command.Runner, pdr *choosePidor.ChooseP
 	r.HandleFunc("/chat/{chatid}/pidoroftheday", choosePidorHandler(pdr)).Methods("POST")
 }
 
-// Intentionally swallows all exception so messages are not resend
 // AK TODO send messages to a dead message quee
 func messageHandler(runner *command.Runner) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +26,8 @@ func messageHandler(runner *command.Runner) http.HandlerFunc {
 		err := json.NewDecoder(r.Body).Decode(&update)
 		if err != nil {
 			log.Error("Failed to decode the callback message.")
-			w.WriteHeader(http.StatusOK)
+
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
@@ -37,6 +37,7 @@ func messageHandler(runner *command.Runner) http.HandlerFunc {
 		if err != nil {
 			log.Error("Failed trying to invoke a command.")
 		}
+		// Intentionally swallows all exception so messages are not resend
 		w.WriteHeader(http.StatusOK)
 	}
 }
