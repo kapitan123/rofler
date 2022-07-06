@@ -87,10 +87,7 @@ func containsVideoRepostReaction(upd *tgbotapi.Message) bool {
 	poster := r.FindStringSubmatch(rtm.Caption)[1]
 
 	sender := upd.From.UserName
-	// if the user reference his own post it is not a reaction. Can be moved outside the scope
-	if sender == poster {
-		return false
-	}
 
-	return true
+	// if the user reference his own post it is not a reaction.
+	return sender != poster
 }

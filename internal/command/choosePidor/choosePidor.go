@@ -20,6 +20,7 @@ type ChoosePidor struct {
 	messenger   messenger
 	storage     pidorStorage
 	watermarker watermarker
+	systemclock systemclock
 }
 
 type (
@@ -38,27 +39,31 @@ type (
 		GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (storage.Pidor, bool, error)
 		CreatePidor(ctx context.Context, chatid int64, username string, date time.Time) error
 	}
+
+	systemclock interface {
+		CurrentDate() time.Time
+	}
 )
 
-func New(messenger messenger, storage pidorStorage, watermarker watermarker) *ChoosePidor {
+func New(messenger messenger, storage pidorStorage, watermarker watermarker, systemclock systemclock) *ChoosePidor {
 	return &ChoosePidor{
 		messenger:   messenger,
 		storage:     storage,
 		watermarker: watermarker,
+		systemclock: systemclock,
 	}
 }
 
 func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	// AK TODO extract to interface
-	now := time.Now()
-	pidor, found, err := h.storage.GetPidorForDate(ctx, m.Chat.ID, now)
+	currDate := h.systemclock.CurrentDate()
+	pidor, found, err := h.storage.GetPidorForDate(ctx, m.Chat.ID, currDate)
 
 	if err != nil {
 		return err
 	}
 
 	if found {
-		err = h.messenger.SendText(m.Chat.ID, "Pidor is still "+pidor.UserName)
+		err = h.messenger.SendText(m.Chat.ID, pidor.UserName+" is still sucking juicy cocks")
 		return err
 	}
 
@@ -70,7 +75,7 @@ func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
 
 	todayPidorName := chooseRandom(names)
 
-	err = h.storage.CreatePidor(ctx, m.Chat.ID, todayPidorName, now)
+	err = h.storage.CreatePidor(ctx, m.Chat.ID, todayPidorName, currDate)
 	if err != nil {
 		return err
 	}

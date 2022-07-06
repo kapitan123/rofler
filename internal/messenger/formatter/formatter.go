@@ -13,7 +13,7 @@ func New() *Formatter {
 	return &Formatter{}
 }
 
-func (h *Formatter) FormatAsDescendingList(m map[string]int, format string) string {
+func (f *Formatter) FormatAsDescendingList(m map[string]int, format string) string {
 	listMeassge := ""
 
 	sm := sortedmap.Sort(m)

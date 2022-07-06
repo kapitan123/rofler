@@ -17,7 +17,7 @@ type ExtrctedVideoItem struct {
 	Type    string
 }
 
-// AK TODO extract to a separate downloader package
+// AK TODO make it injectable, requires refactoring of sources
 func DownloadBytesFromUrl(dUrl string) ([]byte, error) {
 	log.Info("Start downloading ", time.Now())
 	defer log.Info("Finish downloading ", time.Now())

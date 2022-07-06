@@ -21,6 +21,7 @@ import (
 	"github.com/kapitan123/telegrofler/internal/command/toprofler"
 	"github.com/kapitan123/telegrofler/internal/messenger"
 	"github.com/kapitan123/telegrofler/internal/messenger/formatter"
+	"github.com/kapitan123/telegrofler/internal/services/systemclock"
 	"github.com/kapitan123/telegrofler/internal/services/watermarker"
 	"github.com/kapitan123/telegrofler/internal/storage"
 	log "github.com/sirupsen/logrus"
@@ -54,9 +55,10 @@ func main() {
 	m := messenger.New(botapi)
 	w := watermarker.New()
 	f := formatter.New()
+	sc := systemclock.New()
 
 	commandRunner := command.NewRunner(config.WorkersCount,
-		choosePidor.New(m, s, w),
+		choosePidor.New(m, s, w, sc),
 		recordBotPostReaction.New(m, s),
 		recordReaction.New(m, s),
 		replaceLinkWithMessage.New(m, s),

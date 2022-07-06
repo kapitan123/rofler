@@ -18,7 +18,7 @@ func New() *Watermarker {
 	return &Watermarker{}
 }
 
-func (s *Watermarker) Apply(bakground []byte, foreground []byte) ([]byte, error) {
+func (w *Watermarker) Apply(bakground []byte, foreground []byte) ([]byte, error) {
 	defer logDuration(time.Now())
 
 	bgImg, _, err := image.Decode(bytes.NewReader(bakground))
