@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	"google.golang.org/api/iterator"
 )
 
@@ -38,30 +39,42 @@ func (s *Storage) GetAllPidors(ctx context.Context) ([]Pidor, error) {
 
 func (s *Storage) GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (Pidor, bool, error) {
 	var p Pidor
-	// AK TODO add filter for result fetch and not an ID based on date
-	doc := s.client.Collection(pidorsCollection).Doc(roundToDateOnlyString(p.ChosenOn))
-	snap, err := doc.Get(ctx)
+	dateOnly := getOnlyDate(p.ChosenOn)
 
-	if err != nil {
-		return p, false, nil
+	// the index is built for this specific order of fields
+	query := s.client.Collection(pidorsCollection).Where("chosen_on", "==", dateOnly).Where("chat_id", "==", chatid).Limit(1)
+	iter := query.Documents(ctx)
+
+	for {
+		snap, err := iter.Next()
+		if err == iterator.Done {
+			return p, false, nil
+		}
+		if err != nil {
+			return p, false, err
+		}
+		if err := snap.DataTo(&p); err != nil {
+			return p, false, err
+		}
 	}
-
-	if err := snap.DataTo(&p); err != nil {
-		return p, false, err
-	}
-
-	return p, true, nil
 }
 
-func (s *Storage) CreatePidor(ctx context.Context, p Pidor) error {
-	// AK TODO add filter for result fetch
-	doc := s.client.Collection(pidorsCollection).Doc(roundToDateOnlyString(p.ChosenOn))
+func (s *Storage) CreatePidor(ctx context.Context, chatid int64, username string, date time.Time) error {
+	uuid := uuid.New()
+
+	p := &Pidor{
+		ChosenOn: getOnlyDate(date),
+		UserName: username,
+		ChatId:   chatid,
+	}
+
+	doc := s.client.Collection(pidorsCollection).Doc(uuid.String())
 	_, err := doc.Create(ctx, p)
 
 	return err
 }
 
-func roundToDateOnlyString(date time.Time) string {
-	// AK TODO should be converted to UTC date only
-	return date.Format("yyyy-MM-d")
+func getOnlyDate(t time.Time) time.Time {
+	d := (24 * time.Hour)
+	return t.Truncate(d)
 }
