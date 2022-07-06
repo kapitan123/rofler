@@ -16,7 +16,7 @@ import (
 // temp solution with direct handler function
 func setupRouter(r *mux.Router, runner *command.Runner, pdr *choosePidor.ChoosePidor) {
 	r.HandleFunc("/callback", messageHandler(runner)).Methods("POST")
-	r.HandleFunc("/chat/gayoftheday", choosePidorHandler(pdr)).Methods("PUT")
+	r.HandleFunc("/chat/{chatid}/pidoroftheday", choosePidorHandler(pdr)).Methods("POST")
 }
 
 // Intentionally swallows all exception so messages are not resend
