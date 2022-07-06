@@ -19,7 +19,7 @@ type messenger interface {
 }
 
 type postStorage interface {
-	GetById(ctx context.Context, videoId string) (storage.Post, bool, error)
+	GetPostById(ctx context.Context, videoId string) (storage.Post, bool, error)
 	UpsertPost(ctx context.Context, p storage.Post) error
 }
 
@@ -35,7 +35,7 @@ func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error 
 
 	log.Infof("Reaction was found for %s sent by %s", mediaReply.VideoId, mediaReply.Sender)
 
-	exPost, found, err := h.storage.GetById(ctx, mediaReply.VideoId)
+	exPost, found, err := h.storage.GetPostById(ctx, mediaReply.VideoId)
 
 	if err != nil {
 		return err

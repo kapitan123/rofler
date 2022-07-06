@@ -15,7 +15,7 @@ type mockPostsStorage struct {
 	err   error
 }
 
-func (s *mockPostsStorage) GetAll(_ context.Context) ([]storage.Post, error) {
+func (s *mockPostsStorage) GetAllPosts(_ context.Context) ([]storage.Post, error) {
 	if s.err != nil {
 		return nil, s.err
 	}

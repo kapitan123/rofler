@@ -40,7 +40,7 @@ func (p *Post) AddReaction(sender, text string, messageid int) {
 
 const postsCollection = "posts"
 
-func (s *Storage) GetAll(ctx context.Context) ([]Post, error) {
+func (s *Storage) GetAllPosts(ctx context.Context) ([]Post, error) {
 	docs := s.client.Collection(postsCollection).Documents(ctx)
 	var posts []Post
 	for {
@@ -67,7 +67,7 @@ func (s *Storage) UpsertPost(ctx context.Context, p Post) error {
 	return err
 }
 
-func (s *Storage) GetById(ctx context.Context, videoId string) (Post, bool, error) {
+func (s *Storage) GetPostById(ctx context.Context, videoId string) (Post, bool, error) {
 	var p Post
 	doc := s.client.Collection(postsCollection).Doc(videoId)
 	snap, err := doc.Get(ctx)
@@ -83,7 +83,7 @@ func (s *Storage) GetById(ctx context.Context, videoId string) (Post, bool, erro
 	return p, true, nil
 }
 
-func (s *Storage) Create(ctx context.Context, p Post) error {
+func (s *Storage) CreatePost(ctx context.Context, p Post) error {
 	doc := s.client.Collection(postsCollection).Doc(p.VideoId)
 	_, err := doc.Create(ctx, p)
 

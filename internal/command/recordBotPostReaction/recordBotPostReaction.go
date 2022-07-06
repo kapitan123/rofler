@@ -20,7 +20,7 @@ type messenger interface {
 }
 
 type postStorage interface {
-	GetById(ctx context.Context, videoId string) (storage.Post, bool, error)
+	GetPostById(ctx context.Context, videoId string) (storage.Post, bool, error)
 	UpsertPost(ctx context.Context, p storage.Post) error
 }
 
@@ -44,7 +44,7 @@ func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message)
 	// AK TODO parsing the message twice rename package to parser
 	reply := extractVideoRepostReaction(m)
 
-	exPost, found, err := h.storage.GetById(ctx, reply.VideoId)
+	exPost, found, err := h.storage.GetPostById(ctx, reply.VideoId)
 
 	// in this case we don't record reaction as all bot posts should be saved already
 	if !found {

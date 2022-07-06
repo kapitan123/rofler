@@ -34,8 +34,8 @@ type messenger interface {
 }
 
 type pidorStorage interface {
-	GetForDate(ctx context.Context, chatid int64, date time.Time) (storage.Pidor, bool, error)
-	CreatePidor(ctx context.Context, chatid int64, p storage.Pidor) error
+	GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (storage.Pidor, bool, error)
+	CreatePidor(ctx context.Context, p storage.Pidor) error
 }
 
 func New(messenger messenger, storage pidorStorage, watermarker watermarker) *ChoosePidor {
@@ -49,7 +49,7 @@ func New(messenger messenger, storage pidorStorage, watermarker watermarker) *Ch
 func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	// AK TODO extract to interface
 	now := time.Now()
-	pidor, found, err := h.storage.GetForDate(ctx, m.Chat.ID, now)
+	pidor, found, err := h.storage.GetPidorForDate(ctx, m.Chat.ID, now)
 
 	if err != nil {
 		return err

@@ -36,7 +36,7 @@ func (s *Storage) GetAllPidors(ctx context.Context) ([]Pidor, error) {
 	return pidors, nil
 }
 
-func (s *Storage) GetForDate(ctx context.Context, chatid int64, date time.Time) (Pidor, bool, error) {
+func (s *Storage) GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (Pidor, bool, error) {
 	var p Pidor
 	// AK TODO add filter for result fetch and not an ID based on date
 	doc := s.client.Collection(pidorsCollection).Doc(roundToDateOnlyString(p.ChosenOn))
@@ -53,7 +53,7 @@ func (s *Storage) GetForDate(ctx context.Context, chatid int64, date time.Time) 
 	return p, true, nil
 }
 
-func (s *Storage) CreatePidor(ctx context.Context, chatid int64, p Pidor) error {
+func (s *Storage) CreatePidor(ctx context.Context, p Pidor) error {
 	// AK TODO add filter for result fetch
 	doc := s.client.Collection(pidorsCollection).Doc(roundToDateOnlyString(p.ChosenOn))
 	_, err := doc.Create(ctx, p)

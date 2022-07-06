@@ -21,7 +21,7 @@ type messenger interface {
 }
 
 type postStorage interface {
-	GetAll(ctx context.Context) ([]storage.Post, error)
+	GetAllPosts(ctx context.Context) ([]storage.Post, error)
 }
 
 func New(messenger messenger, storage postStorage) *TopRofler {
@@ -32,7 +32,7 @@ func New(messenger messenger, storage postStorage) *TopRofler {
 }
 
 func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error {
-	posts, err := h.storage.GetAll(ctx)
+	posts, err := h.storage.GetAllPosts(ctx)
 	if err != nil {
 		return err
 	}

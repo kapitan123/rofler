@@ -23,7 +23,6 @@ type messenger interface {
 }
 
 type postStorage interface {
-	GetById(ctx context.Context, videoId string) (storage.Post, bool, error)
 	UpsertPost(ctx context.Context, p storage.Post) error
 }
 
