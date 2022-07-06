@@ -10,6 +10,7 @@ import (
 type Pidor struct {
 	ChosenOn time.Time `firestore:"chosen_on"`
 	UserName string    `firestore:"user_name"`
+	ChatId   int64     `firestore:"chat_id"`
 }
 
 const pidorsCollection = "pidors"
@@ -35,9 +36,9 @@ func (s *Storage) GetAllPidors(ctx context.Context) ([]Pidor, error) {
 	return pidors, nil
 }
 
-func (s *Storage) GetForDate(ctx context.Context, date time.Time) (Pidor, bool, error) {
+func (s *Storage) GetForDate(ctx context.Context, chatid int64, date time.Time) (Pidor, bool, error) {
 	var p Pidor
-
+	// AK TODO add filter for result fetch and not an ID based on date
 	doc := s.client.Collection(pidorsCollection).Doc(roundToDateOnlyString(p.ChosenOn))
 	snap, err := doc.Get(ctx)
 
@@ -52,7 +53,8 @@ func (s *Storage) GetForDate(ctx context.Context, date time.Time) (Pidor, bool, 
 	return p, true, nil
 }
 
-func (s *Storage) CreatePidor(ctx context.Context, p Pidor) error {
+func (s *Storage) CreatePidor(ctx context.Context, chatid int64, p Pidor) error {
+	// AK TODO add filter for result fetch
 	doc := s.client.Collection(pidorsCollection).Doc(roundToDateOnlyString(p.ChosenOn))
 	_, err := doc.Create(ctx, p)
 
@@ -60,5 +62,6 @@ func (s *Storage) CreatePidor(ctx context.Context, p Pidor) error {
 }
 
 func roundToDateOnlyString(date time.Time) string {
+	// AK TODO should be converted to UTC date only
 	return date.Format("yyyy-MM-d")
 }
