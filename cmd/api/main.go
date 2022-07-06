@@ -17,6 +17,7 @@ import (
 	"github.com/kapitan123/telegrofler/internal/command/replyTo300"
 	"github.com/kapitan123/telegrofler/internal/command/replyToNo"
 	"github.com/kapitan123/telegrofler/internal/command/replyToYes"
+	"github.com/kapitan123/telegrofler/internal/command/toppidor"
 	"github.com/kapitan123/telegrofler/internal/command/toprofler"
 	"github.com/kapitan123/telegrofler/internal/messenger"
 	"github.com/kapitan123/telegrofler/internal/services/watermarker"
@@ -60,6 +61,7 @@ func main() {
 		replyToNo.New(m, w),
 		replyToYes.New(m),
 		toprofler.New(m, s),
+		toppidor.New(m, s),
 	)
 
 	log.WithField("addr", config.ServerPort).Info("Starting server on :%d", config.ServerPort)

@@ -1,4 +1,4 @@
-package toprofler
+package toppidor
 
 import (
 	"context"
@@ -9,9 +9,9 @@ import (
 	"github.com/kapitan123/telegrofler/internal/storage"
 )
 
-const commandName = "toprofler"
+const commandName = "toppidor"
 
-type TopRofler struct {
+type TopPidor struct {
 	messenger messenger
 	storage   postStorage
 }
@@ -21,23 +21,23 @@ type messenger interface {
 }
 
 type postStorage interface {
-	GetAllPosts(ctx context.Context) ([]storage.Post, error)
+	GetAllPidors(ctx context.Context) ([]storage.Pidor, error)
 }
 
-func New(messenger messenger, storage postStorage) *TopRofler {
-	return &TopRofler{
+func New(messenger messenger, storage postStorage) *TopPidor {
+	return &TopPidor{
 		messenger: messenger,
 		storage:   storage,
 	}
 }
 
-func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error {
-	posts, err := h.storage.GetAllPosts(ctx)
+func (h *TopPidor) Handle(ctx context.Context, message *tgbotapi.Message) error {
+	pidors, err := h.storage.GetAllPidors(ctx)
 	if err != nil {
 		return err
 	}
 
-	roflerScores := countScores(posts)
+	roflerScores := countScores(pidors)
 
 	sortedRoflerScores := sortedmap.Sort(roflerScores)
 	listMeassge := formatListMessage(sortedRoflerScores)
@@ -49,6 +49,7 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 	return nil
 }
 
+// AK TODO shoud be extracted to a list helper
 func formatListMessage(roflerScores sortedmap.PairList) string {
 	listMeassge := ""
 	for _, pair := range roflerScores {
@@ -57,18 +58,18 @@ func formatListMessage(roflerScores sortedmap.PairList) string {
 	return listMeassge
 }
 
-func countScores(posts []storage.Post) map[string]int {
+func countScores(posts []storage.Pidor) map[string]int {
 	roflerScores := map[string]int{}
 	for _, p := range posts {
-		roflerScores[p.RoflerUserName] += len(p.Reactions)
+		roflerScores[p.UserName] += 1
 	}
 	return roflerScores
 }
 
-func (h *TopRofler) ShouldRun(message *tgbotapi.Message) bool {
+func (h *TopPidor) ShouldRun(message *tgbotapi.Message) bool {
 	return message.IsCommand() && message.Command() == commandName
 }
 
 func formatTopRofler(username string, score int) string {
-	return fmt.Sprintf("🤡 <b>%s</b> <b>Likes:</b> %d", username, score)
+	return fmt.Sprintf("🐓 <b>%s</b> <b>was pidor:</b> %d times ⚣⚣", username, score)
 }
