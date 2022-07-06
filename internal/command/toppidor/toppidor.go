@@ -2,10 +2,8 @@ package toppidor
 
 import (
 	"context"
-	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/helpers/sortedmap"
 	"github.com/kapitan123/telegrofler/internal/storage"
 )
 
@@ -14,6 +12,11 @@ const commandName = "toppidor"
 type TopPidor struct {
 	messenger messenger
 	storage   postStorage
+	formatter formatter
+}
+
+type formatter interface {
+	FormatAsDescendingList(map[string]int, string) string
 }
 
 type messenger interface {
@@ -24,10 +27,11 @@ type postStorage interface {
 	GetAllPidors(ctx context.Context) ([]storage.Pidor, error)
 }
 
-func New(messenger messenger, storage postStorage) *TopPidor {
+func New(messenger messenger, storage postStorage, formatter formatter) *TopPidor {
 	return &TopPidor{
 		messenger: messenger,
 		storage:   storage,
+		formatter: formatter,
 	}
 }
 
@@ -37,25 +41,15 @@ func (h *TopPidor) Handle(ctx context.Context, message *tgbotapi.Message) error 
 		return err
 	}
 
-	roflerScores := countScores(pidors)
+	pidorScores := countScores(pidors)
 
-	sortedRoflerScores := sortedmap.Sort(roflerScores)
-	listMeassge := formatListMessage(sortedRoflerScores)
+	listMeassge := h.formatter.FormatAsDescendingList(pidorScores, "🐓 <b>%s</b> <b>was pidor:</b> %d times ⚣⚣")
 
 	err = h.messenger.SendText(message.Chat.ID, listMeassge)
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-// AK TODO shoud be extracted to a list helper
-func formatListMessage(roflerScores sortedmap.PairList) string {
-	listMeassge := ""
-	for _, pair := range roflerScores {
-		listMeassge += formatTopRofler(pair.Key, pair.Value)
-	}
-	return listMeassge
 }
 
 func countScores(posts []storage.Pidor) map[string]int {
@@ -68,8 +62,4 @@ func countScores(posts []storage.Pidor) map[string]int {
 
 func (h *TopPidor) ShouldRun(message *tgbotapi.Message) bool {
 	return message.IsCommand() && message.Command() == commandName
-}
-
-func formatTopRofler(username string, score int) string {
-	return fmt.Sprintf("🐓 <b>%s</b> <b>was pidor:</b> %d times ⚣⚣", username, score)
 }

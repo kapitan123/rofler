@@ -20,6 +20,7 @@ import (
 	"github.com/kapitan123/telegrofler/internal/command/toppidor"
 	"github.com/kapitan123/telegrofler/internal/command/toprofler"
 	"github.com/kapitan123/telegrofler/internal/messenger"
+	"github.com/kapitan123/telegrofler/internal/messenger/formatter"
 	"github.com/kapitan123/telegrofler/internal/services/watermarker"
 	"github.com/kapitan123/telegrofler/internal/storage"
 	log "github.com/sirupsen/logrus"
@@ -52,6 +53,8 @@ func main() {
 	// otherwise we need to create multiple instances of bot and storage to handle scheduler
 	m := messenger.New(botapi)
 	w := watermarker.New()
+	f := formatter.New()
+
 	commandRunner := command.NewRunner(config.WorkersCount,
 		choosePidor.New(m, s, w),
 		recordBotPostReaction.New(m, s),
@@ -60,8 +63,8 @@ func main() {
 		replyTo300.New(m),
 		replyToNo.New(m, w),
 		replyToYes.New(m),
-		toprofler.New(m, s),
-		toppidor.New(m, s),
+		toprofler.New(m, s, f),
+		toppidor.New(m, s, f),
 	)
 
 	log.WithField("addr", config.ServerPort).Info("Starting server on :%d", config.ServerPort)
