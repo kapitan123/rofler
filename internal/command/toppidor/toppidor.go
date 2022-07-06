@@ -15,17 +15,19 @@ type TopPidor struct {
 	formatter formatter
 }
 
-type formatter interface {
-	FormatAsDescendingList(map[string]int, string) string
-}
+type (
+	formatter interface {
+		FormatAsDescendingList(map[string]int, string) string
+	}
 
-type messenger interface {
-	SendText(chatId int64, text string) error
-}
+	messenger interface {
+		SendText(chatId int64, text string) error
+	}
 
-type postStorage interface {
-	GetAllPidors(ctx context.Context) ([]storage.Pidor, error)
-}
+	postStorage interface {
+		GetAllPidors(ctx context.Context) ([]storage.Pidor, error)
+	}
+)
 
 func New(messenger messenger, storage postStorage, formatter formatter) *TopPidor {
 	return &TopPidor{

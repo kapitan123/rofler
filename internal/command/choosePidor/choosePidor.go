@@ -22,21 +22,23 @@ type ChoosePidor struct {
 	watermarker watermarker
 }
 
-type watermarker interface {
-	Apply(bakground []byte, foreground []byte) ([]byte, error)
-}
+type (
+	watermarker interface {
+		Apply(bakground []byte, foreground []byte) ([]byte, error)
+	}
 
-type messenger interface {
-	SendText(chatId int64, text string) error
-	SendImg(chatId int64, img []byte, imgName string, caption string) error
-	GetAdminUserNames(chatId int64) ([]string, error)
-	GetUserCurrentProfilePic(userId int64) ([]byte, error)
-}
+	messenger interface {
+		SendText(chatId int64, text string) error
+		SendImg(chatId int64, img []byte, imgName string, caption string) error
+		GetAdminUserNames(chatId int64) ([]string, error)
+		GetUserCurrentProfilePic(userId int64) ([]byte, error)
+	}
 
-type pidorStorage interface {
-	GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (storage.Pidor, bool, error)
-	CreatePidor(ctx context.Context, chatid int64, username string, date time.Time) error
-}
+	pidorStorage interface {
+		GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (storage.Pidor, bool, error)
+		CreatePidor(ctx context.Context, chatid int64, username string, date time.Time) error
+	}
+)
 
 func New(messenger messenger, storage pidorStorage, watermarker watermarker) *ChoosePidor {
 	return &ChoosePidor{
