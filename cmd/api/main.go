@@ -73,7 +73,7 @@ func main() {
 
 	router := mux.NewRouter()
 	// AK TODO pass args through app?
-	setupRouter(router, commandRunner, choosePidor.New(m, s, w))
+	setupRouter(router, commandRunner, choosePidor.New(m, s, w, sc))
 
 	srv := &http.Server{
 		Handler: router,
