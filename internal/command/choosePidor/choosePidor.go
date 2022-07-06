@@ -38,10 +38,11 @@ type pidorStorage interface {
 	CreatePidor(ctx context.Context, p storage.Pidor) error
 }
 
-func New(messenger messenger, storage pidorStorage) *ChoosePidor {
+func New(messenger messenger, storage pidorStorage, watermarker watermarker) *ChoosePidor {
 	return &ChoosePidor{
-		messenger: messenger,
-		storage:   storage,
+		messenger:   messenger,
+		storage:     storage,
+		watermarker: watermarker,
 	}
 }
 

@@ -21,8 +21,6 @@ import (
 	"github.com/kapitan123/telegrofler/internal/messenger"
 	"github.com/kapitan123/telegrofler/internal/services/watermarker"
 	"github.com/kapitan123/telegrofler/internal/storage"
-
-	//"github.com/kapitan123/telegrofler/internal/watermarker"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/kapitan123/telegrofler/config"
@@ -67,7 +65,8 @@ func main() {
 	log.WithField("addr", config.ServerPort).Info("Starting server on :%d", config.ServerPort)
 
 	router := mux.NewRouter()
-	setupRouter(router, commandRunner, choosePidor.New(m, s))
+	// AK TODO pass args through app?
+	setupRouter(router, commandRunner, choosePidor.New(m, s, w))
 
 	srv := &http.Server{
 		Handler: router,
