@@ -17,14 +17,20 @@ var pidormarkPicture []byte
 const commandName = "choosePidor"
 
 type ChoosePidor struct {
-	messenger messenger
-	storage   pidorStorage
+	messenger   messenger
+	storage     pidorStorage
+	watermarker watermarker
+}
+
+type watermarker interface {
+	Apply(bakground []byte, foreground []byte) ([]byte, error)
 }
 
 type messenger interface {
 	SendText(chatId int64, text string) error
 	SendImg(chatId int64, img []byte, imgName string, caption string) error
 	GetAdminUserNames(chatId int64) ([]string, error)
+	GetUserCurrentProfilePic(userId int64) ([]byte, error)
 }
 
 type pidorStorage interface {
@@ -66,7 +72,14 @@ func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
 		return err
 	}
 
-	return h.messenger.SendImg(m.Chat.ID, pidormarkPicture, "pidor.png", "Pidor of the day is "+todayPidorName)
+	ppic, _ := h.messenger.GetUserCurrentProfilePic(m.From.ID)
+
+	markedPic, err := h.watermarker.Apply(ppic, pidormarkPicture)
+	if err != nil {
+		return err
+	}
+
+	return h.messenger.SendImg(m.Chat.ID, markedPic, "pidor.png", "Pidor of the day is "+todayPidorName)
 }
 
 func chooseRandom(names []string) string {

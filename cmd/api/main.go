@@ -54,7 +54,7 @@ func main() {
 	m := messenger.New(botapi)
 	w := watermarker.New()
 	commandRunner := command.NewRunner(config.WorkersCount,
-		choosePidor.New(m, s),
+		choosePidor.New(m, s, w),
 		recordBotPostReaction.New(m, s),
 		recordReaction.New(m, s),
 		replaceLinkWithMessage.New(m, s),
