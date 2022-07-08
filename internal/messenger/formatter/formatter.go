@@ -3,7 +3,7 @@ package formatter
 import (
 	"fmt"
 
-	"github.com/kapitan123/telegrofler/helpers/sortedmap"
+	"github.com/kapitan123/telegrofler/internal/sortedmap"
 )
 
 // AK TODO makes sense to remove this struct
