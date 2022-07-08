@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kapitan123/telegrofler/internal/services/downloader"
+	"github.com/kapitan123/telegrofler/internal/contentLoader"
 )
 
 const (
@@ -16,8 +16,14 @@ const (
 	sourcePrefix = "https://youtube.com/shorts"
 )
 
-func ExtractVideoFromUrl(youtubeUrl string) (*downloader.ExtrctedVideoItem, error) {
-	// AK TODO make requests in parallel
+type Shortsget struct {
+}
+
+func New() *Shortsget {
+	return &Shortsget{}
+}
+
+func (s *Shortsget) ExtractVideoMeta(youtubeUrl string) (*contentLoader.VideoMeta, error) {
 	vInfo, err := getVideoInfo(youtubeUrl)
 	if err != nil {
 		return nil, err
@@ -25,17 +31,13 @@ func ExtractVideoFromUrl(youtubeUrl string) (*downloader.ExtrctedVideoItem, erro
 
 	queryParam := "download?videoURL=" + youtubeUrl + "&itag=18&format=mp4"
 
-	b, err := downloader.DownloadBytesFromUrl(sourceLink + queryParam)
-	if err != nil {
-		return nil, err
+	lti := &contentLoader.VideoMeta{
+		Id:          vInfo.VideoId,
+		DownloadUrl: sourceLink + queryParam,
+		Title:       vInfo.Title,
+		Type:        sourceType,
 	}
 
-	lti := &downloader.ExtrctedVideoItem{
-		Id:      vInfo.VideoId,
-		Payload: b,
-		Title:   vInfo.Title,
-		Type:    sourceType,
-	}
 	return lti, nil
 }
 
@@ -59,6 +61,6 @@ func getVideoInfo(escapedUrl string) (*VideoDetails, error) {
 	return &vidResp.VideoDetails, nil
 }
 
-func IsMatchingUrl(text string) bool {
+func (s *Shortsget) IsServingUrl(text string) bool {
 	return strings.HasPrefix(text, sourcePrefix)
 }

@@ -8,6 +8,8 @@ import (
 
 	"cloud.google.com/go/firestore"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/command"
 	"github.com/kapitan123/telegrofler/internal/command/choosePidor"
@@ -19,12 +21,14 @@ import (
 	"github.com/kapitan123/telegrofler/internal/command/replyToYes"
 	"github.com/kapitan123/telegrofler/internal/command/toppidor"
 	"github.com/kapitan123/telegrofler/internal/command/toprofler"
+	"github.com/kapitan123/telegrofler/internal/contentLoader"
+	"github.com/kapitan123/telegrofler/internal/contentLoader/lovetik"
+	"github.com/kapitan123/telegrofler/internal/contentLoader/shortsget"
 	"github.com/kapitan123/telegrofler/internal/messenger"
 	"github.com/kapitan123/telegrofler/internal/messenger/formatter"
-	"github.com/kapitan123/telegrofler/internal/services/systemclock"
-	"github.com/kapitan123/telegrofler/internal/services/watermarker"
 	"github.com/kapitan123/telegrofler/internal/storage"
-	log "github.com/sirupsen/logrus"
+	"github.com/kapitan123/telegrofler/internal/systemclock"
+	"github.com/kapitan123/telegrofler/internal/watermarker"
 
 	"github.com/kapitan123/telegrofler/config"
 )
@@ -52,7 +56,8 @@ func main() {
 
 	// AK TODO move bot and other shit to app
 	// otherwise we need to create multiple instances of bot and storage to handle scheduler
-	m := messenger.New(botapi)
+	d := contentLoader.New(shortsget.New(), lovetik.New())
+	m := messenger.New(botapi, d)
 	w := watermarker.New()
 	f := formatter.New()
 	sc := systemclock.New()
@@ -61,7 +66,7 @@ func main() {
 		choosePidor.New(m, s, w, sc),
 		recordBotPostReaction.New(m, s),
 		recordReaction.New(m, s),
-		replaceLinkWithMessage.New(m, s),
+		replaceLinkWithMessage.New(m, s, d),
 		replyTo300.New(m),
 		replyToNo.New(m, w),
 		replyToYes.New(m),

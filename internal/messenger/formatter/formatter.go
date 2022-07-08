@@ -6,6 +6,7 @@ import (
 	"github.com/kapitan123/telegrofler/helpers/sortedmap"
 )
 
+// AK TODO makes sense to remove this struct
 type Formatter struct {
 }
 

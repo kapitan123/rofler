@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/kapitan123/telegrofler/internal/services/downloader"
+	"github.com/kapitan123/telegrofler/internal/contentLoader"
 )
 
 const (
@@ -21,7 +21,14 @@ const (
 	mobilePrefixRegex = `https:\/\/[a-zA-Z]{2}\.tiktok\.com\/`
 )
 
-func ExtractVideoFromUrl(tikUrl string) (*downloader.ExtrctedVideoItem, error) {
+type Lovetik struct {
+}
+
+func New() *Lovetik {
+	return &Lovetik{}
+}
+
+func (s *Lovetik) ExtractVideoMeta(tikUrl string) (*contentLoader.VideoMeta, error) {
 	escapedUrl := url.QueryEscape(tikUrl)
 	jsonStr := []byte("query=" + escapedUrl)
 	resp, err := http.Post(sourceLink, contentType, bytes.NewBuffer(jsonStr))
@@ -47,25 +54,21 @@ func ExtractVideoFromUrl(tikUrl string) (*downloader.ExtrctedVideoItem, error) {
 		}
 
 		log.Print("Found no watermark video: ", l.DownloadAddr)
-		b, err := downloader.DownloadBytesFromUrl(l.DownloadAddr)
 
-		if err != nil {
-			return nil, err
+		meta := &contentLoader.VideoMeta{
+			Id:          sr.Vid,
+			DownloadUrl: l.DownloadAddr,
+			Title:       sr.Desc,
+			Type:        sourceType,
 		}
 
-		lti := &downloader.ExtrctedVideoItem{
-			Id:      sr.Vid,
-			Payload: b,
-			Title:   sr.Desc,
-			Type:    sourceType,
-		}
-		return lti, nil
+		return meta, nil
 	}
 
-	return nil, nil
+	return nil, fmt.Errorf("Metadata could not be parsed. Probably the format of it was changed.")
 }
 
-func IsMatchingUrl(text string) bool {
+func (s *Lovetik) IsServingUrl(text string) bool {
 	r := regexp.MustCompile(mobilePrefixRegex)
 	return r.MatchString(text)
 }

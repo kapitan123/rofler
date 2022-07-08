@@ -4,6 +4,7 @@ type Response struct {
 	VideoDetails VideoDetails `json:"videoDetails"`
 	Formats      []Format     `json:"formats"`
 }
+
 type VideoDetails struct {
 	Title   string `json:"title"`
 	VideoId string `json:"videoId"`

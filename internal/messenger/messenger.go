@@ -6,14 +6,18 @@ import (
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/internal/services/downloader"
 )
 
 type Messenger struct {
-	api *tgbotapi.BotAPI
+	api        *tgbotapi.BotAPI
+	downloader downloader
 }
 
-func New(api *tgbotapi.BotAPI) *Messenger {
+type downloader interface {
+	DownloadContent(dUrl string) ([]byte, error)
+}
+
+func New(api *tgbotapi.BotAPI, downloader downloader) *Messenger {
 	return &Messenger{api: api}
 }
 
@@ -97,7 +101,7 @@ func (m *Messenger) GetUserCurrentProfilePic(userId int64) ([]byte, error) {
 	downloadLink := ppic.Link(m.api.Token)
 
 	// AK TODO this crap is super slow
-	return downloader.DownloadBytesFromUrl(downloadLink)
+	return m.downloader.DownloadContent(downloadLink)
 }
 
 func (b *Messenger) Delete(chatId int64, messageId int) error {

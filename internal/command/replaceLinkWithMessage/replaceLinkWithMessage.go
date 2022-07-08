@@ -4,16 +4,17 @@ import (
 	"context"
 	"time"
 
-	"github.com/kapitan123/telegrofler/internal/services/downloader/sourceFactory"
+	"github.com/kapitan123/telegrofler/internal/contentLoader"
+	"github.com/kapitan123/telegrofler/internal/storage"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/internal/storage"
 	log "github.com/sirupsen/logrus"
 )
 
 type ReplaceLinkWithMessage struct {
-	messenger messenger
-	storage   postStorage
+	messenger  messenger
+	storage    postStorage
+	downloader downloader
 }
 
 type messenger interface {
@@ -26,29 +27,38 @@ type postStorage interface {
 	UpsertPost(ctx context.Context, p storage.Post) error
 }
 
-func New(messenger messenger, storage postStorage) *ReplaceLinkWithMessage {
+type downloader interface {
+	DownloadContent(dUrl string) ([]byte, error)
+	ExtractVideoMeta(url string) (*contentLoader.VideoMeta, error)
+	CanExtractVideoMeta(url string) bool
+}
+
+func New(messenger messenger, storage postStorage, downloader downloader) *ReplaceLinkWithMessage {
 	return &ReplaceLinkWithMessage{
-		messenger: messenger,
-		storage:   storage,
+		messenger:  messenger,
+		storage:    storage,
+		downloader: downloader,
 	}
 }
 
 func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	// AK TODO extract for moking
-	// video downloads are specific to this handler, so ex
-	extract, _ := sourceFactory.TryGetExtractor(m.Text)
-
 	url, chatId, sender := m.Text, m.Chat.ID, m.From.UserName
 
-	log.Info("Url was found in a callback message: ", url)
-
-	evi, err := extract(url)
+	meta, err := h.downloader.ExtractVideoMeta(url)
 
 	if err != nil {
 		return err
 	}
 
-	err = h.messenger.SendTrackableVideo(chatId, sender, evi.Id, evi.Title, evi.Payload)
+	log.Info("Url was found in a callback message: ", url)
+
+	content, err := h.downloader.DownloadContent(url)
+
+	if err != nil {
+		return err
+	}
+
+	err = h.messenger.SendTrackableVideo(chatId, sender, meta.Id, meta.Title, content)
 
 	if err != nil {
 		return err
@@ -58,8 +68,8 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 	_ = h.messenger.Delete(chatId, m.MessageID)
 
 	newPost := storage.Post{
-		VideoId:        evi.Id,
-		Source:         evi.Type,
+		VideoId:        meta.Id,
+		Source:         meta.Type,
 		RoflerUserName: sender,
 		Url:            url,
 		Reactions:      []storage.Reaction{},
@@ -73,8 +83,5 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 }
 
 func (h *ReplaceLinkWithMessage) ShouldRun(m *tgbotapi.Message) bool {
-	// AK TODO extract for moking
-	// separate extractor and cheking of it existance
-	_, found := sourceFactory.TryGetExtractor(m.Text)
-	return found
+	return h.downloader.CanExtractVideoMeta(m.Text)
 }
