@@ -4,8 +4,8 @@ import (
 	"context"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/kapitan123/telegrofler/internal/messenger/format"
 	"github.com/kapitan123/telegrofler/internal/storage"
-	"github.com/kapitan123/telegrofler/internal/messenger/formatter"
 )
 
 const commandName = "toppidor"
@@ -16,10 +16,6 @@ type TopPidor struct {
 }
 
 type (
-	formatter interface {
-		FormatAsDescendingList(map[string]int, string) string
-	}
-
 	messenger interface {
 		SendText(chatId int64, text string) error
 	}

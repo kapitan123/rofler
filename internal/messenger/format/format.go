@@ -6,6 +6,7 @@ import (
 	"github.com/kapitan123/telegrofler/internal/sortedmap"
 )
 
+// AK TODO this is not really apparent that format is a formattable string using two arguments
 func AsDescendingList(m map[string]int, format string) string {
 	listMeassge := ""
 
@@ -18,5 +19,5 @@ func AsDescendingList(m map[string]int, format string) string {
 }
 
 func formatLine(format string, username string, score int) string {
-	return fmt.Sprintf(format, username, score)
+	return fmt.Sprintf(format, username, score) + "\n"
 }
