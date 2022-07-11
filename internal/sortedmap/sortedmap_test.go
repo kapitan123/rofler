@@ -2,26 +2,22 @@ package sortedmap
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSortedMap_Sort(t *testing.T) {
-	for _, test := range []struct {
-		nonSorted map[string]int
-		expected PairList
-	}{
-	{
-		nonSorted: map[string]int{
+	expected := DescendingPairList{Pair{Key: "r3", Value: 3}, Pair{Key: "r2", Value: 2}, Pair{Key: "r1", Value: 1}, Pair{Key: "r0", Value: 0}}
+	testCases := []map[string]int{
+		{"r0": 0, "r1": 1, "r2": 2, "r3": 3},
+		{"r3": 3, "r2": 2, "r1": 1, "r0": 0},
+		{"r0": 0, "r2": 2, "r3": 3, "r1": 1},
 	}
-	} {
-	t.Run("Should sort map in descending order", func(t *testing.T) {
-		sorted:= Sort(test.nonSorted)
-		date := c.CurrentDate()
-		now := time.Now()
 
-		assert.Equal(t, 0, date.Minute())
-	})
-}
+	for _, tc := range testCases {
+		t.Run("Should sort map in descending order", func(t *testing.T) {
+			actual := Sort(tc)
+			assert.Equal(t, expected, actual, "Wasn't sorted correctly")
+		})
+	}
 }

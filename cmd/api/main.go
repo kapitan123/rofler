@@ -25,7 +25,6 @@ import (
 	"github.com/kapitan123/telegrofler/internal/contentLoader/lovetik"
 	"github.com/kapitan123/telegrofler/internal/contentLoader/shortsget"
 	"github.com/kapitan123/telegrofler/internal/messenger"
-	"github.com/kapitan123/telegrofler/internal/messenger/formatter"
 	"github.com/kapitan123/telegrofler/internal/storage"
 	"github.com/kapitan123/telegrofler/internal/systemclock"
 	"github.com/kapitan123/telegrofler/internal/watermarker"
@@ -59,7 +58,6 @@ func main() {
 	d := contentLoader.New(shortsget.New(), lovetik.New())
 	m := messenger.New(botapi, d)
 	w := watermarker.New()
-	f := formatter.New()
 	sc := systemclock.New()
 
 	commandRunner := command.NewRunner(config.WorkersCount,
@@ -70,8 +68,8 @@ func main() {
 		replyTo300.New(m),
 		replyToNo.New(m, w),
 		replyToYes.New(m),
-		toprofler.New(m, s, f),
-		toppidor.New(m, s, f),
+		toprofler.New(m, s),
+		toppidor.New(m, s),
 	)
 
 	log.WithField("addr", config.ServerPort).Info("Starting server on :%d", config.ServerPort)

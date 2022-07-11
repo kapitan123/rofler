@@ -5,6 +5,7 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
+	"github.com/kapitan123/telegrofler/internal/messenger/formatter"
 )
 
 const commandName = "toppidor"
@@ -12,7 +13,6 @@ const commandName = "toppidor"
 type TopPidor struct {
 	messenger messenger
 	storage   postStorage
-	formatter formatter
 }
 
 type (
@@ -29,11 +29,10 @@ type (
 	}
 )
 
-func New(messenger messenger, storage postStorage, formatter formatter) *TopPidor {
+func New(messenger messenger, storage postStorage) *TopPidor {
 	return &TopPidor{
 		messenger: messenger,
 		storage:   storage,
-		formatter: formatter,
 	}
 }
 
@@ -45,7 +44,7 @@ func (h *TopPidor) Handle(ctx context.Context, message *tgbotapi.Message) error 
 
 	pidorScores := countScores(pidors)
 
-	listMeassge := h.formatter.FormatAsDescendingList(pidorScores, "🐓 <b>%s</b> <b>was pidor:</b> %d times ⚣⚣")
+	listMeassge := format.AsDescendingList(pidorScores, "🐓 <b>%s</b> <b>was pidor:</b> %d times ⚣⚣")
 
 	err = h.messenger.SendText(message.Chat.ID, listMeassge)
 	if err != nil {

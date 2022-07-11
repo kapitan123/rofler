@@ -5,6 +5,7 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
+	"github.com/kapitan123/telegrofler/internal/messenger/formatter"
 )
 
 const commandName = "toprofler"
@@ -12,7 +13,6 @@ const commandName = "toprofler"
 type TopRofler struct {
 	messenger messenger
 	storage   postStorage
-	formatter formatter
 }
 
 type formatter interface {
@@ -27,11 +27,10 @@ type postStorage interface {
 	GetAllPosts(ctx context.Context) ([]storage.Post, error)
 }
 
-func New(messenger messenger, storage postStorage, formatter formatter) *TopRofler {
+func New(messenger messenger, storage postStorage) *TopRofler {
 	return &TopRofler{
 		messenger: messenger,
 		storage:   storage,
-		formatter: formatter,
 	}
 }
 
@@ -43,7 +42,7 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 
 	roflerScores := countScores(posts)
 
-	listMeassge := h.formatter.FormatAsDescendingList(roflerScores, "🤡 <b>%s</b> <b>Likes:</b> %d")
+	listMeassge := format.AsDescendingList(roflerScores, "🤡 <b>%s</b> <b>Likes:</b> %d")
 
 	err = h.messenger.SendText(message.Chat.ID, listMeassge)
 	if err != nil {
