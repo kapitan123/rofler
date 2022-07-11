@@ -13,10 +13,10 @@ func TestSystemClock_CurrentDate(t *testing.T) {
 		date := c.CurrentDate()
 		now := time.Now() // the chance of false negative is really low
 
-		assert.Equal(t, 0, date.Hour())
-		assert.Equal(t, 0, date.Minute())
-		assert.Equal(t, 0, date.Second())
-		assert.Equal(t, 0, date.Nanosecond())
+		assert.Equal(t, 0, date.Hour(), "hour should be 0")
+		assert.Equal(t, 0, date.Minute(), "minute should be 0")
+		assert.Equal(t, 0, date.Second(), "second should be 0")
+		assert.Equal(t, 0, date.Nanosecond(), "nanosecond should be 0")
 
 		assert.Equal(t, now.Year(), date.Year())
 		assert.Equal(t, now.Month(), date.Month())
