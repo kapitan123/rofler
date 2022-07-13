@@ -1,17 +1,20 @@
 {
 	"info": {
-		"_postman_id": "42eb8faa-36b8-425a-95c5-37754b4ed342",
-		"name": "Payments",
+		"_postman_id": "a4fda903-dd9b-4528-afcd-c2557c9b3935",
+		"name": "telegrofler",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "BankProxy.API",
+			"name": "api",
 			"item": [
 				{
-					"name": "TrustyBankTransaction success",
+					"name": "get all posts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -23,30 +26,31 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost/bank-proxy-api/api/v1/IntegrationEvent/PaymentStatusChangedToReadyForExternalTransaction",
+							"raw": "http://localhost:9001/stats/posts",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
+							"port": "9001",
 							"path": [
-								"bank-proxy-api",
-								"api",
-								"v1",
-								"IntegrationEvent",
-								"PaymentStatusChangedToReadyForExternalTransaction"
+								"stats",
+								"posts"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "TrustyBankTransaction noMoney",
+					"name": "download tiktok",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"paymentId\": \"90b7e820-cdc3-401f-bb21-81ccee36f009\",\r\n    \"amount\": {\r\n        \"amount\": 100,\r\n        \"currencyCode\": \"USD\"\r\n    },\r\n    \"cardDetails\": {\r\n        \"number\": \"5555555555554444\",\r\n        \"holderName\": \"Test Testov\",\r\n        \"expiration\": \"2026-08-01T07:00:00+00:00\",\r\n        \"cvv\": \"111\"\r\n    },\r\n    \"CreationDate\": \"2022-03-25T12:53:49\",\r\n    \"message\": \"\"\r\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -54,17 +58,20 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost/bank-proxy-api/api/v1/IntegrationEvent/PaymentStatusChangedToReadyForExternalTransaction",
+							"raw": "http://localhost:9001/download?url=https%3A%2F%2Fvm.tiktok.com%2FZSdM14SCd",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
+							"port": "9001",
 							"path": [
-								"bank-proxy-api",
-								"api",
-								"v1",
-								"IntegrationEvent",
-								"PaymentStatusChangedToReadyForExternalTransaction"
+								"download"
+							],
+							"query": [
+								{
+									"key": "url",
+									"value": "https%3A%2F%2Fvm.tiktok.com%2FZSdM14SCd"
+								}
 							]
 						}
 					},
@@ -73,50 +80,23 @@
 			]
 		},
 		{
-			"name": "Paymetns.API",
+			"name": "test chat",
 			"item": [
 				{
-					"name": "Get Payment Details",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "X-MERCHANT-KEY",
-								"value": "34f25424-088c-482a-a75e-8ccbbecf8112",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "http://localhost/api/v1/payments/90b7e820-cdc3-401f-bb21-81ccee36f009/details",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"path": [
-								"api",
-								"v1",
-								"payments",
-								"90b7e820-cdc3-401f-bb21-81ccee36f009",
-								"details"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Submit payment",
+					"name": "dummy",
 					"request": {
 						"method": "POST",
 						"header": [
 							{
-								"key": "X-MERCHANT-KEY",
-								"value": "34f25424-088c-482a-a75e-8ccbbecf8112",
-								"type": "text"
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"message\": \"\",\r\n    \"sum\": {\r\n        \"amount\": 100,\r\n        \"currencyCode\": \"USD\"\r\n    },\r\n    \"cardDetails\": {\r\n        \"number\": \"5555555555554444\",\r\n        \"holderName\": \"Test Testov\",\r\n        \"expiration\": \"2026-08-01T00:00:00-07:00\",\r\n        \"cvv\": \"111\"\r\n    }\r\n}",
+							"raw": "{\r\n\t\"update_id\": 289090253,\r\n\t\"message\": {\r\n\t\t\"message_id\": 192562,\r\n\t\t\"from\": {\r\n\t\t\t\"id\": 397014607,\r\n\t\t\t\"first_name\": \"Алексей\",\r\n\t\t\t\"username\": \"yayaker\"\r\n\t\t},\r\n\t\t\"date\": 1651495935,\r\n\t\t\"chat\": {\r\n\t\t\t\"id\": -1001201899231,\r\n\t\t\t\"type\": \"supergroup\",\r\n\t\t\t\"title\": \"Элитка телеграмма\",\r\n\t\t\t\"photo\": null,\r\n\t\t\t\"location\": null\r\n\t\t},\r\n\t\t\"text\": \"Нет\",\r\n\t\t\"message_auto_delete_timer_changed\": null,\r\n\t\t\"proximity_alert_triggered\": null,\r\n\t\t\"voice_chat_scheduled\": null,\r\n\t\t\"voice_chat_started\": null,\r\n\t\t\"voice_chat_ended\": null,\r\n\t\t\"voice_chat_participants_invited\": null\r\n\t},\r\n\t\"my_chat_member\": null,\r\n\t\"chat_member\": null,\r\n\t\"chat_join_request\": null\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -124,35 +104,33 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost/api/v1/payments/submit",
+							"raw": "http://localhost:9001/callback",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
+							"port": "9001",
 							"path": [
-								"api",
-								"v1",
-								"payments",
-								"submit"
+								"callback"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Submit blacklisted card",
+					"name": "post tiktok",
 					"request": {
 						"method": "POST",
 						"header": [
 							{
-								"key": "X-MERCHANT-KEY",
-								"value": "34f25424-088c-482a-a75e-8ccbbecf8112",
+								"key": "",
+								"value": "",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"message\": \"blackList\",\r\n    \"sum\": {\r\n        \"amount\": 100,\r\n        \"currencyCode\": \"USD\"\r\n    },\r\n    \"cardDetails\": {\r\n        \"number\": \"5555555555554444\",\r\n        \"holderName\": \"Test Testov\",\r\n        \"expiration\": \"2026-08-01T00:00:00-07:00\",\r\n        \"cvv\": \"111\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"update_id\": 10000,\r\n    \"message\": {\r\n        \"date\": 1441645532,\r\n        \"chat\": {\r\n            \"last_name\": \"Test Lastname\",\r\n            \"id\": -664632531,\r\n            \"first_name\": \"Test\",\r\n            \"username\": \"Test\"\r\n        },\r\n        \"message_id\": 1365,\r\n        \"from\": {\r\n            \"last_name\": \"Test Lastname\",\r\n            \"id\": 1111111,\r\n            \"first_name\": \"Test\",\r\n            \"username\": \"tester\"\r\n        },\r\n        \"text\": \"https://vm.tiktok.com/ZSdM14SCd\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -160,35 +138,33 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost/api/v1/payments/submit",
+							"raw": "http://localhost:9001/callback",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
+							"port": "9001",
 							"path": [
-								"api",
-								"v1",
-								"payments",
-								"submit"
+								"callback"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Submit non authorized merchant",
+					"name": "post youtube",
 					"request": {
 						"method": "POST",
 						"header": [
 							{
-								"key": "X-MERCHANT-KEY",
-								"value": "8271c4ee-cb94-4877-a3f7-7382d41d9918",
+								"key": "",
+								"value": "",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"message\": \"\",\r\n    \"sum\": {\r\n        \"amount\": 100,\r\n        \"currencyCode\": \"USD\"\r\n    },\r\n    \"cardDetails\": {\r\n        \"number\": \"5555555555554444\",\r\n        \"holderName\": \"Test Testov\",\r\n        \"expiration\": \"2026-08-01T00:00:00-07:00\",\r\n        \"cvv\": \"111\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"update_id\": 10000,\r\n    \"message\": {\r\n        \"date\": 1441645532,\r\n        \"chat\": {\r\n            \"last_name\": \"Test Lastname\",\r\n            \"id\": -664632531,\r\n            \"first_name\": \"Test\",\r\n            \"username\": \"Test\"\r\n        },\r\n        \"message_id\": 1365,\r\n        \"from\": {\r\n            \"last_name\": \"Test Lastname\",\r\n            \"id\": 1111111,\r\n            \"first_name\": \"Test\",\r\n            \"username\": \"tester\"\r\n        },\r\n        \"text\": \"https://youtube.com/shorts/DvjyXh1mE8k?feature=share\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -196,16 +172,187 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost/api/v1/payments/submit",
+							"raw": "http://localhost:9001/callback",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
+							"port": "9001",
 							"path": [
-								"api",
-								"v1",
-								"payments",
-								"submit"
+								"callback"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post 300",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"update_id\": 10000,\r\n    \"message\": {\r\n        \"date\": 1441645532,\r\n        \"chat\": {\r\n            \"last_name\": \"Test Lastname\",\r\n            \"id\": -664632531,\r\n            \"first_name\": \"Test\",\r\n            \"username\": \"Test\"\r\n        },\r\n        \"message_id\": 1365,\r\n        \"from\": {\r\n            \"last_name\": \"Test Lastname\",\r\n            \"id\": 1111111,\r\n            \"first_name\": \"Test\",\r\n            \"username\": \"tester\"\r\n        },\r\n        \"text\": \"chek it 300\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9001/callback",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9001",
+							"path": [
+								"callback"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post no",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"update_id\": 10000,\r\n    \"message\": {\r\n        \"date\": 1441645532,\r\n        \"chat\": {\r\n            \"last_name\": \"Test Lastname\",\r\n            \"id\": -664632531,\r\n            \"first_name\": \"Test\",\r\n            \"username\": \"Test\"\r\n        },\r\n        \"message_id\": 206,\r\n        \"from\": {\r\n            \"last_name\": \"Test Lastname\",\r\n            \"id\": 250382870,\r\n            \"first_name\": \"Test\",\r\n            \"username\": \"tester\"\r\n        },\r\n        \"text\": \"Net\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9001/callback",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9001",
+							"path": [
+								"callback"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reply to bot's post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"update_id\": 289087644,\r\n\t\"message\": {\r\n\t\t\"message_id\": 60,\r\n\t\t\"from\": {\r\n\t\t\t\"id\": 250382870,\r\n\t\t\t\"first_name\": \"Andrey\",\r\n\t\t\t\"last_name\": \"Barmaley\",\r\n\t\t\t\"username\": \"maypoldruha2\",\r\n\t\t\t\"language_code\": \"en\"\r\n\t\t},\r\n\t\t\"date\": 1650728307,\r\n\t\t\"chat\": {\r\n\t\t\t\"id\": -664632531,\r\n\t\t\t\"type\": \"group\",\r\n\t\t\t\"title\": \"TEST_BOT_GROUP\",\r\n\t\t\t\"photo\": null,\r\n\t\t\t\"location\": null\r\n\t\t},\r\n\t\t\"reply_to_message\": {\r\n\t\t\t\"message_id\": 57,\r\n\t\t\t\"from\": {\r\n\t\t\t\t\"id\": 5144696466,\r\n\t\t\t\t\"is_bot\": true,\r\n\t\t\t\t\"first_name\": \"telegrofl\",\r\n\t\t\t\t\"username\": \"TelegroflBot\"\r\n\t\t\t},\r\n\t\t\t\"date\": 1650726319,\r\n\t\t\t\"chat\": {\r\n\t\t\t\t\"id\": -664632531,\r\n\t\t\t\t\"type\": \"group\",\r\n\t\t\t\t\"title\": \"TEST_BOT_GROUP\",\r\n\t\t\t\t\"photo\": null,\r\n\t\t\t\t\"location\": null\r\n\t\t\t},\r\n\t\t\t\"video\": {\r\n\t\t\t\t\"file_id\": \"BAACAgIAAxkDAAM5YmQVr4iHgjF8y-9v6EbHbrNf3XgAAlMWAAKXGiBLQJJHewElINEkBA\",\r\n\t\t\t\t\"file_unique_id\": \"AgADUxYAApcaIEs\",\r\n\t\t\t\t\"width\": 540,\r\n\t\t\t\t\"height\": 960,\r\n\t\t\t\t\"duration\": 21,\r\n\t\t\t\t\"thumb\": {\r\n\t\t\t\t\t\"file_id\": \"AAMCAgADGQMAAzliZBWviIeCMXzL72_oRsdus1_deAACUxYAApcaIEtAkkd7ASUg0QEAB20AAyQE\",\r\n\t\t\t\t\t\"file_unique_id\": \"AQADUxYAApcaIEty\",\r\n\t\t\t\t\t\"width\": 180,\r\n\t\t\t\t\t\"height\": 320,\r\n\t\t\t\t\t\"file_size\": 8037\r\n\t\t\t\t},\r\n\t\t\t\t\"file_name\": \"7077663756402035973\",\r\n\t\t\t\t\"mime_type\": \"video/mp4\",\r\n\t\t\t\t\"file_size\": 2361671\r\n\t\t\t},\r\n\t\t\t\"caption\": \"Rofler: 🔥@maypoldruha🔥\\\\nTitle: couldn’t hear you\",\r\n\t\t\t\"caption_entities\": [\r\n\t\t\t\t{\r\n\t\t\t\t\t\"type\": \"bold\",\r\n\t\t\t\t\t\"offset\": 0,\r\n\t\t\t\t\t\"length\": 7\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\t\"type\": \"mention\",\r\n\t\t\t\t\t\"offset\": 10,\r\n\t\t\t\t\t\"length\": 12\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\t\"type\": \"bold\",\r\n\t\t\t\t\t\"offset\": 25,\r\n\t\t\t\t\t\"length\": 5\r\n\t\t\t\t}\r\n\t\t\t],\r\n\t\t\t\"message_auto_delete_timer_changed\": null,\r\n\t\t\t\"proximity_alert_triggered\": null,\r\n\t\t\t\"voice_chat_scheduled\": null,\r\n\t\t\t\"voice_chat_started\": null,\r\n\t\t\t\"voice_chat_ended\": null,\r\n\t\t\t\"voice_chat_participants_invited\": null\r\n\t\t},\r\n\t\t\"text\": \"lol suka\",\r\n\t\t\"message_auto_delete_timer_changed\": null,\r\n\t\t\"proximity_alert_triggered\": null,\r\n\t\t\"voice_chat_scheduled\": null,\r\n\t\t\"voice_chat_started\": null,\r\n\t\t\"voice_chat_ended\": null,\r\n\t\t\"voice_chat_participants_invited\": null\r\n\t},\r\n\t\"my_chat_member\": null,\r\n\t\"chat_member\": null,\r\n\t\"chat_join_request\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9001/callback",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9001",
+							"path": [
+								"callback"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reply to user content",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"update_id\": 289088596,\r\n\t\"message\": {\r\n\t\t\"message_id\": 76,\r\n\t\t\"from\": {\r\n\t\t\t\"id\": 250382870,\r\n\t\t\t\"first_name\": \"Andrey\",\r\n\t\t\t\"last_name\": \"Barmaley\",\r\n\t\t\t\"username\": \"tester\",\r\n\t\t\t\"language_code\": \"en\"\r\n\t\t},\r\n\t\t\"date\": 1650998203,\r\n\t\t\"chat\": {\r\n\t\t\t\"id\": -664632531,\r\n\t\t\t\"type\": \"group\",\r\n\t\t\t\"title\": \"TEST_BOT_GROUP\",\r\n\t\t\t\"photo\": null,\r\n\t\t\t\"location\": null\r\n\t\t},\r\n\t\t\"reply_to_message\": {\r\n\t\t\t\"message_id\": 75,\r\n\t\t\t\"from\": {\r\n\t\t\t\t\"id\": 250382870,\r\n\t\t\t\t\"first_name\": \"Andrey\",\r\n\t\t\t\t\"last_name\": \"Barmaley\",\r\n\t\t\t\t\"username\": \"maypoldruha\",\r\n\t\t\t\t\"language_code\": \"en\"\r\n\t\t\t},\r\n\t\t\t\"date\": 1650998102,\r\n\t\t\t\"chat\": {\r\n\t\t\t\t\"id\": -664632531,\r\n\t\t\t\t\"type\": \"group\",\r\n\t\t\t\t\"title\": \"TEST_BOT_GROUP\",\r\n\t\t\t\t\"photo\": null,\r\n\t\t\t\t\"location\": null\r\n\t\t\t},\r\n\t\t\t\"forward_from_chat\": {\r\n\t\t\t\t\"id\": -1001009232144,\r\n\t\t\t\t\"type\": \"channel\",\r\n\t\t\t\t\"title\": \"Двач\",\r\n\t\t\t\t\"username\": \"dvachannel\",\r\n\t\t\t\t\"photo\": null,\r\n\t\t\t\t\"location\": null\r\n\t\t\t},\r\n\t\t\t\"forward_from_message_id\": 90546,\r\n\t\t\t\"forward_date\": 1650981771,\r\n\t\t\t\"video\": {\r\n\t\t\t\t\"file_id\": \"BAACAgIAAxkBAANLYmg7VpnMjLxRGICAPxsBdIfd95oAAroYAAK670FLj79xc1qpNNIkBA\",\r\n\t\t\t\t\"file_unique_id\": \"AgADuhgAArrvQUs\",\r\n\t\t\t\t\"width\": 540,\r\n\t\t\t\t\"height\": 960,\r\n\t\t\t\t\"duration\": 59,\r\n\t\t\t\t\"thumb\": {\r\n\t\t\t\t\t\"file_id\": \"AAMCAgADGQEAA0tiaDtWmcyMvFEYgIA_GwF0h933mgACuhgAArrvQUuPv3FzWqk00gEAB20AAyQE\",\r\n\t\t\t\t\t\"file_unique_id\": \"AQADuhgAArrvQUty\",\r\n\t\t\t\t\t\"width\": 180,\r\n\t\t\t\t\t\"height\": 320,\r\n\t\t\t\t\t\"file_size\": 16845\r\n\t\t\t\t},\r\n\t\t\t\t\"file_name\": \"@dvachannel ⚡ Двач.mp4\",\r\n\t\t\t\t\"mime_type\": \"video/mp4\",\r\n\t\t\t\t\"file_size\": 9866017\r\n\t\t\t},\r\n\t\t\t\"caption\": \"Тикток расплескался\",\r\n\t\t\t\"message_auto_delete_timer_changed\": null,\r\n\t\t\t\"proximity_alert_triggered\": null,\r\n\t\t\t\"voice_chat_scheduled\": null,\r\n\t\t\t\"voice_chat_started\": null,\r\n\t\t\t\"voice_chat_ended\": null,\r\n\t\t\t\"voice_chat_participants_invited\": null\r\n\t\t},\r\n\t\t\"text\": \"lol\",\r\n\t\t\"message_auto_delete_timer_changed\": null,\r\n\t\t\"proximity_alert_triggered\": null,\r\n\t\t\"voice_chat_scheduled\": null,\r\n\t\t\"voice_chat_started\": null,\r\n\t\t\"voice_chat_ended\": null,\r\n\t\t\"voice_chat_participants_invited\": null\r\n\t},\r\n\t\"my_chat_member\": null,\r\n\t\"chat_member\": null,\r\n\t\"chat_join_request\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9001/callback",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9001",
+							"path": [
+								"callback"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "top command",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"update_id\": 289087645,\r\n\t\"message\": {\r\n\t\t\"message_id\": 61,\r\n\t\t\"from\": {\r\n\t\t\t\"id\": 250382870,\r\n\t\t\t\"first_name\": \"Andrey\",\r\n\t\t\t\"last_name\": \"Barmaley\",\r\n\t\t\t\"username\": \"maypoldruha\",\r\n\t\t\t\"language_code\": \"en\"\r\n\t\t},\r\n\t\t\"date\": 1650729184,\r\n\t\t\"chat\": {\r\n\t\t\t\"id\": -664632531,\r\n\t\t\t\"type\": \"group\",\r\n\t\t\t\"title\": \"TEST_BOT_GROUP\",\r\n\t\t\t\"photo\": null,\r\n\t\t\t\"location\": null\r\n\t\t},\r\n\t\t\"text\": \"/top@TelegroflBot\",\r\n\t\t\"entities\": [\r\n\t\t\t{\r\n\t\t\t\t\"type\": \"bot_command\",\r\n\t\t\t\t\"offset\": 0,\r\n\t\t\t\t\"length\": 17\r\n\t\t\t}\r\n\t\t],\r\n\t\t\"message_auto_delete_timer_changed\": null,\r\n\t\t\"proximity_alert_triggered\": null,\r\n\t\t\"voice_chat_scheduled\": null,\r\n\t\t\"voice_chat_started\": null,\r\n\t\t\"voice_chat_ended\": null,\r\n\t\t\"voice_chat_participants_invited\": null\r\n\t},\r\n\t\"my_chat_member\": null,\r\n\t\"chat_member\": null,\r\n\t\"chat_join_request\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9001/callback",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9001",
+							"path": [
+								"callback"
 							]
 						}
 					},

@@ -8,17 +8,29 @@ import (
 
 	"cloud.google.com/go/firestore"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/internal/command"
-	"github.com/kapitan123/telegrofler/internal/command/rofler"
+	"github.com/kapitan123/telegrofler/internal/command/choosePidor"
+	"github.com/kapitan123/telegrofler/internal/command/recordBotPostReaction"
+	"github.com/kapitan123/telegrofler/internal/command/recordReaction"
+	"github.com/kapitan123/telegrofler/internal/command/replaceLinkWithMessage"
+	"github.com/kapitan123/telegrofler/internal/command/replyTo300"
+	"github.com/kapitan123/telegrofler/internal/command/replyToNo"
+	"github.com/kapitan123/telegrofler/internal/command/replyToYes"
+	"github.com/kapitan123/telegrofler/internal/command/toppidor"
+	"github.com/kapitan123/telegrofler/internal/command/toprofler"
+	"github.com/kapitan123/telegrofler/internal/contentLoader"
+	"github.com/kapitan123/telegrofler/internal/contentLoader/lovetik"
+	"github.com/kapitan123/telegrofler/internal/contentLoader/shortsget"
 	"github.com/kapitan123/telegrofler/internal/messenger"
 	"github.com/kapitan123/telegrofler/internal/storage"
-	log "github.com/sirupsen/logrus"
+	"github.com/kapitan123/telegrofler/internal/systemclock"
+	"github.com/kapitan123/telegrofler/internal/watermarker"
 
 	"github.com/kapitan123/telegrofler/config"
 )
-
-const workers = 1
 
 func main() {
 	flag.Parse()
@@ -40,15 +52,31 @@ func main() {
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create bot api")
 	}
-	m := messenger.New(botapi)
+
+	// AK TODO move bot and other shit to app
+	// otherwise we need to create multiple instances of bot and storage to handle scheduler
+	d := contentLoader.New(shortsget.New(), lovetik.New())
+	m := messenger.New(botapi, d)
+	w := watermarker.New()
+	sc := systemclock.New()
+
 	commandRunner := command.NewRunner(config.WorkersCount,
-		rofler.New(m, s),
+		choosePidor.New(m, s, w, sc),
+		recordBotPostReaction.New(m, s),
+		recordReaction.New(m, s),
+		replaceLinkWithMessage.New(m, s, d),
+		replyTo300.New(m),
+		replyToNo.New(m, w),
+		replyToYes.New(m),
+		toprofler.New(m, s),
+		toppidor.New(m, s),
 	)
 
 	log.WithField("addr", config.ServerPort).Info("Starting server on :%d", config.ServerPort)
 
 	router := mux.NewRouter()
-	setupRouter(router, commandRunner)
+	// AK TODO pass args through app?
+	setupRouter(router, commandRunner, choosePidor.New(m, s, w, sc))
 
 	srv := &http.Server{
 		Handler: router,
