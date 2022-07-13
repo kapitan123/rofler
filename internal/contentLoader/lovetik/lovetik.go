@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -37,6 +38,8 @@ func (s *Lovetik) ExtractVideoMeta(tikUrl string) (*contentLoader.VideoMeta, err
 	}
 
 	defer resp.Body.Close()
+
+	io.ReadAll(resp.Body)
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
