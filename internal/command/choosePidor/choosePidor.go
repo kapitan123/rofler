@@ -80,9 +80,14 @@ func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
 		return err
 	}
 
-	ppic, _ := h.messenger.GetUserCurrentProfilePic(m.From.ID)
+	ppic, err := h.messenger.GetUserCurrentProfilePic(m.From.ID)
+
+	if err != nil {
+		return err
+	}
 
 	markedPic, err := h.watermarker.Apply(ppic, pidormarkPicture)
+
 	if err != nil {
 		return err
 	}
@@ -91,7 +96,7 @@ func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
 }
 
 func chooseRandom(names []string) string {
-	return names[rand.Intn(len(names)-1)]
+	return names[rand.Intn(len(names))]
 }
 
 func (h *ChoosePidor) ShouldRun(message *tgbotapi.Message) bool {

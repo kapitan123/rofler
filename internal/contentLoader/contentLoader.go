@@ -23,12 +23,18 @@ type VideoMetaExtractor interface {
 
 type ContentLoader struct {
 	extractors []VideoMetaExtractor
+	client     *http.Client
 }
 
 // register sources here and remove factory
 func New(extractors ...VideoMetaExtractor) *ContentLoader {
+	client := &http.Client{
+		Timeout: 50 * time.Second,
+	}
+
 	return &ContentLoader{
 		extractors: extractors,
+		client:     client,
 	}
 }
 
@@ -41,12 +47,7 @@ func (d *ContentLoader) DownloadContent(dUrl string) ([]byte, error) {
 	//TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // <--- Problem
 	//}
 
-	// AK TODO not sure if the client is reausable
-	client := &http.Client{
-		Timeout: 50 * time.Second,
-	}
-
-	resp, err := client.Get(dUrl)
+	resp, err := d.client.Get(dUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +55,7 @@ func (d *ContentLoader) DownloadContent(dUrl string) ([]byte, error) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("the request has failde with statuscode %d. Data: %s", resp.StatusCode, body)
 	}
 

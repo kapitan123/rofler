@@ -43,7 +43,7 @@ func (s *Lovetik) ExtractVideoMeta(tikUrl string) (*contentLoader.VideoMeta, err
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("the request has failde with statuscode %d. Data: %s", resp.StatusCode, body)
 	}
 

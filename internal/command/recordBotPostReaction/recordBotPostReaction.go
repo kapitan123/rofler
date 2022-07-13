@@ -8,7 +8,7 @@ import (
 	"github.com/kapitan123/telegrofler/internal/storage"
 )
 
-const posterMaker = `🔥@(.*?)🔥`
+var posterMakerRegExp = regexp.MustCompile(`🔥@(.*?)🔥`)
 
 type RecordBotPostReaction struct {
 	messenger messenger
@@ -37,13 +37,13 @@ func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message)
 
 	exPost, found, err := h.storage.GetPostById(ctx, reply.VideoId)
 
+	if err != nil {
+		return err
+	}
+
 	// in this case we don't record reaction as all bot posts should be saved already
 	if !found {
 		return nil
-	}
-
-	if err != nil {
-		return err
 	}
 
 	exPost.AddReaction(reply.Sender, reply.Text, reply.MessageId)
@@ -83,8 +83,7 @@ func containsVideoRepostReaction(upd *tgbotapi.Message) bool {
 		return false
 	}
 
-	r := regexp.MustCompile(posterMaker)
-	poster := r.FindStringSubmatch(rtm.Caption)[1]
+	poster := posterMakerRegExp.FindStringSubmatch(rtm.Caption)[1]
 
 	sender := upd.From.UserName
 
