@@ -38,7 +38,7 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 
 	roflerScores := countScores(posts)
 
-	listMeassge := format.AsDescendingList(roflerScores, "🤡 <b>%s</b> <b>Likes:</b> %d")
+	listMeassge := format.AsDescendingList(roflerScores, "🤡 <b>%s</b>: %d")
 
 	err = h.messenger.SendText(message.Chat.ID, listMeassge)
 	if err != nil {

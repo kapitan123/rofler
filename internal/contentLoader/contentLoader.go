@@ -2,7 +2,7 @@ package contentLoader
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -26,8 +26,11 @@ type ContentLoader struct {
 	client     *http.Client
 }
 
-// register sources here and remove factory
 func New(extractors ...VideoMetaExtractor) *ContentLoader {
+	// AK TODO temp solutions
+	//tr := &http.Transport{
+	//TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // <--- Problem
+	//}
 	client := &http.Client{
 		Timeout: 50 * time.Second,
 	}
@@ -39,21 +42,23 @@ func New(extractors ...VideoMetaExtractor) *ContentLoader {
 }
 
 // AK TODO make it injectable, requires refactoring of sources
+// AK TODO should have context for termination
 func (d *ContentLoader) DownloadContent(dUrl string) ([]byte, error) {
 	log.Info("Start downloading ", time.Now())
 	defer log.Info("Finish downloading ", time.Now())
-	// AK TODO temp solutions
-	//tr := &http.Transport{
-	//TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // <--- Problem
-	//}
 
 	resp, err := d.client.Get(dUrl)
 	if err != nil {
 		return nil, err
 	}
+
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("the request has failde with statuscode %d. Data: %s", resp.StatusCode, body)

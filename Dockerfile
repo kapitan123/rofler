@@ -15,7 +15,6 @@ RUN go mod download
 # Copy Go source files
 COPY config/ ./config/
 COPY cmd/ ./cmd/
-COPY pkg/ ./pkg/
 COPY internal/ ./internal/
 
 RUN GOOS=linux \

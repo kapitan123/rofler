@@ -57,6 +57,13 @@ func (s *Storage) GetAllPosts(ctx context.Context) ([]Post, error) {
 		}
 		posts = append(posts, post)
 	}
+
+	for _, p := range posts {
+		if p.RoflerUserName == "" {
+			p.RoflerUserName = "unknown"
+		}
+	}
+
 	return posts, nil
 }
 

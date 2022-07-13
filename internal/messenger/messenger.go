@@ -18,11 +18,17 @@ type downloader interface {
 }
 
 func New(api *tgbotapi.BotAPI, downloader downloader) *Messenger {
-	return &Messenger{api: api}
+	return &Messenger{
+		api:        api,
+		downloader: downloader,
+	}
 }
 
 func (m *Messenger) SendText(chatID int64, text string) error {
 	msg := tgbotapi.NewMessage(chatID, text)
+
+	msg.ParseMode = tgbotapi.ModeHTML
+
 	_, err := m.api.Send(msg)
 	return err
 }

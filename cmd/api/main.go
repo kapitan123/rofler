@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"net/http"
 
@@ -33,7 +32,6 @@ import (
 )
 
 func main() {
-	flag.Parse()
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 	client, err := firestore.NewClient(ctx, config.ProjectId)
@@ -77,6 +75,8 @@ func main() {
 	router := mux.NewRouter()
 	// AK TODO pass args through app?
 	setupRouter(router, commandRunner, choosePidor.New(m, s, w, sc))
+
+	commandRunner.Start(ctx)
 
 	srv := &http.Server{
 		Handler: router,

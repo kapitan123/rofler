@@ -52,7 +52,7 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 
 	log.Info("Url was found in a callback message: ", url)
 
-	content, err := h.downloader.DownloadContent(url)
+	content, err := h.downloader.DownloadContent(meta.DownloadUrl)
 
 	if err != nil {
 		return err
