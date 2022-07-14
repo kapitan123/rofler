@@ -26,7 +26,7 @@ func messageHandler(runner *command.Runner) http.HandlerFunc {
 		var update tgbotapi.Update
 		err := json.NewDecoder(r.Body).Decode(&update)
 		if err != nil {
-			log.Error("Failed to decode the callback message.")
+			log.WithError(err).Error("Failed to decode the callback message.")
 
 			w.WriteHeader(http.StatusBadRequest)
 			return
@@ -36,7 +36,7 @@ func messageHandler(runner *command.Runner) http.HandlerFunc {
 
 		err = runner.Run(r.Context(), update.Message)
 		if err != nil {
-			log.Error("Failed trying to invoke a command.")
+			log.WithError(err).Error("Failed trying to invoke a command.")
 		}
 		// Intentionally swallows all exception so messages are not resend
 		w.WriteHeader(http.StatusOK)
@@ -49,7 +49,7 @@ func choosePidorHandler(pdr *choosePidor.ChoosePidor) http.HandlerFunc {
 
 		chatId, err := strconv.ParseInt(chatarg, 10, 64)
 		if err != nil {
-			log.Error("Failed trying to invoke a command.", err)
+			log.WithError(err).Error("Failed trying to invoke a command.", err)
 			w.WriteHeader(http.StatusBadRequest)
 		}
 

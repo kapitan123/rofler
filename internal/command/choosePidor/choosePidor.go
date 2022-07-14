@@ -8,11 +8,15 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
+	log "github.com/sirupsen/logrus"
 )
 
 // AK TODO remove duplicate embedding
 //go:embed pidormark.png
 var pidormarkPicture []byte
+
+//go:embed tinfoil.jpg
+var tinfoilPicture []byte
 
 const commandName = "choosePidor"
 
@@ -87,7 +91,8 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 	ppic, err := h.messenger.GetUserCurrentProfilePic(chosenOne.User.ID)
 
 	if err != nil {
-		return err
+		log.WithError(err).Error("failed to generate user profile pic")
+		return h.messenger.SendImg(chatId, tinfoilPicture, "tinfoil.png", "Скрытный пидор дня у нас "+chosenOne.User.UserName)
 	}
 
 	markedPic, err := h.watermarker.Apply(ppic, pidormarkPicture)
@@ -100,7 +105,7 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 }
 
 func chooseRandom(memebers []tgbotapi.ChatMember) tgbotapi.ChatMember {
-	return memebers[rand.Intn(len(memebers))]
+	return memebers[rand.Intn(len(memebers)-1)]
 }
 
 func (h *ChoosePidor) ShouldRun(message *tgbotapi.Message) bool {

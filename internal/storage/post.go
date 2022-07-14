@@ -59,8 +59,9 @@ func (s *Storage) GetAllPosts(ctx context.Context) ([]Post, error) {
 	}
 
 	for _, p := range posts {
-		if p.RoflerUserName == "" {
+		if p.RoflerUserName == "" || p.RoflerUserName == "tester" {
 			p.RoflerUserName = "unknown"
+			s.client.Collection(postsCollection).Doc(p.VideoId).Delete(ctx)
 		}
 	}
 
