@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"regexp"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/kapitan123/telegrofler/internal/contentLoader"
 )
@@ -59,7 +60,7 @@ func (s *Lovetik) ExtractVideoMeta(tikUrl string) (*contentLoader.VideoMeta, err
 			continue
 		}
 
-		log.Print("Found no watermark video: ", l.DownloadAddr)
+		log.Infof("found video with no watermark: ", l.DownloadAddr)
 
 		meta := &contentLoader.VideoMeta{
 			Id:          sr.Vid,

@@ -153,24 +153,27 @@ func GetTrackableCaption(linktToUserName string, title string) string {
 	return fmt.Sprintf("<b>Rofler:</b> 🔥@%s🔥\n<b>Title</b>: %s", linktToUserName, title)
 }
 
-func (b *Messenger) GetAdminUserNames(chatId int64) ([]string, error) {
+// AK we can abstract away ChatMember. But all the commands already has a dependency on tgBotApi.
+func (b *Messenger) GetChatAdmins(chatId int64) ([]tgbotapi.ChatMember, error) {
 	req := tgbotapi.ChatAdministratorsConfig{
 		ChatConfig: tgbotapi.ChatConfig{
 			ChatID:             chatId,
 			SuperGroupUsername: ""}, // AK TODO wtf is this parameter?
 	}
 
+	// doc claims that there will be no bots in results but it is not true
 	admins, err := b.api.GetChatAdministrators(req)
 
 	if err != nil {
 		return nil, err
 	}
 
-	userNames := make([]string, len(admins))
-
-	for _, admin := range admins {
-		userNames = append(userNames, admin.User.UserName)
+	noBots := make([]tgbotapi.ChatMember, 0)
+	for _, a := range admins {
+		if !a.User.IsBot {
+			noBots = append(noBots, a)
+		}
 	}
 
-	return userNames, nil
+	return noBots, nil
 }

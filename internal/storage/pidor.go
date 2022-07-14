@@ -12,6 +12,7 @@ type Pidor struct {
 	ChosenOn time.Time `firestore:"chosen_on"`
 	UserName string    `firestore:"user_name"`
 	ChatId   int64     `firestore:"chat_id"`
+	UserId   int64     `firestore:"user_id"`
 }
 
 const pidorsCollection = "pidors"
@@ -39,33 +40,34 @@ func (s *Storage) GetAllPidors(ctx context.Context) ([]Pidor, error) {
 
 func (s *Storage) GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (Pidor, bool, error) {
 	var p Pidor
-	dateOnly := getOnlyDate(p.ChosenOn)
 
 	// the index is built for this specific order of fields
-	query := s.client.Collection(pidorsCollection).Where("chosen_on", "==", dateOnly).Where("chat_id", "==", chatid).Limit(1)
+	query := s.client.Collection(pidorsCollection).Where("chosen_on", ">=", getStartOfTheDay(date)).Where("chosen_on", "<", getEndOfTheDay(date))
+	query = query.Where("chat_id", "==", chatid).Limit(1)
 	iter := query.Documents(ctx)
 
-	for {
-		snap, err := iter.Next()
-		if err == iterator.Done {
-			return p, false, nil
-		}
-		if err != nil {
-			return p, false, err
-		}
-		if err := snap.DataTo(&p); err != nil {
-			return p, false, err
-		}
+	snap, err := iter.Next()
+	if err == iterator.Done {
+		return p, false, nil
 	}
+	if err != nil {
+		return p, false, err
+	}
+	if err := snap.DataTo(&p); err != nil {
+		return p, false, err
+	}
+	return p, true, nil
+
 }
 
-func (s *Storage) CreatePidor(ctx context.Context, chatid int64, username string, date time.Time) error {
+func (s *Storage) CreatePidor(ctx context.Context, chatid int64, username string, userid int64, date time.Time) error {
 	uuid := uuid.New()
 
 	p := &Pidor{
-		ChosenOn: getOnlyDate(date),
+		ChosenOn: date,
 		UserName: username,
 		ChatId:   chatid,
+		UserId:   userid,
 	}
 
 	doc := s.client.Collection(pidorsCollection).Doc(uuid.String())
@@ -74,7 +76,15 @@ func (s *Storage) CreatePidor(ctx context.Context, chatid int64, username string
 	return err
 }
 
-func getOnlyDate(t time.Time) time.Time {
-	d := (24 * time.Hour)
-	return t.Truncate(d)
+func getStartOfTheDay(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+}
+
+func getEndOfTheDay(t time.Time) time.Time {
+	oneDay := 24 * time.Hour
+
+	rounded := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+	rounded = rounded.Add(oneDay)
+
+	return rounded
 }

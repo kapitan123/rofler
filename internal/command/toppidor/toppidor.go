@@ -40,7 +40,7 @@ func (h *TopPidor) Handle(ctx context.Context, message *tgbotapi.Message) error 
 
 	pidorScores := countScores(pidors)
 
-	listMeassge := format.AsDescendingList(pidorScores, "🐓 <b>%s</b> <b>was pidor:</b> %d times ⚣⚣")
+	listMeassge := format.AsDescendingList(pidorScores, "🐓 <b>%s:</b> %d ⚣⚣")
 
 	err = h.messenger.SendText(message.Chat.ID, listMeassge)
 	if err != nil {

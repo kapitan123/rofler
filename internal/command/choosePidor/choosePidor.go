@@ -31,17 +31,17 @@ type (
 	messenger interface {
 		SendText(chatId int64, text string) error
 		SendImg(chatId int64, img []byte, imgName string, caption string) error
-		GetAdminUserNames(chatId int64) ([]string, error)
+		GetChatAdmins(chatId int64) ([]tgbotapi.ChatMember, error)
 		GetUserCurrentProfilePic(userId int64) ([]byte, error)
 	}
 
 	pidorStorage interface {
 		GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (storage.Pidor, bool, error)
-		CreatePidor(ctx context.Context, chatid int64, username string, date time.Time) error
+		CreatePidor(ctx context.Context, chatid int64, username string, userId int64, date time.Time) error
 	}
 
 	systemclock interface {
-		CurrentDate() time.Time
+		Now() time.Time
 	}
 )
 
@@ -55,32 +55,36 @@ func New(messenger messenger, storage pidorStorage, watermarker watermarker, sys
 }
 
 func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	currDate := h.systemclock.CurrentDate()
-	pidor, found, err := h.storage.GetPidorForDate(ctx, m.Chat.ID, currDate)
+	return h.ChoosePidor(ctx, m.Chat.ID)
+}
+
+func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
+	currDate := h.systemclock.Now()
+	pidor, found, err := h.storage.GetPidorForDate(ctx, chatId, currDate)
 
 	if err != nil {
 		return err
 	}
 
 	if found {
-		err = h.messenger.SendText(m.Chat.ID, pidor.UserName+" is still sucking juicy cocks")
+		err = h.messenger.SendText(chatId, pidor.UserName+" is still sucking juicy cocks")
 		return err
 	}
 
-	names, err := h.messenger.GetAdminUserNames(m.Chat.ID)
+	admins, err := h.messenger.GetChatAdmins(chatId)
 
 	if err != nil {
 		return err
 	}
 
-	todayPidorName := chooseRandom(names)
+	chosenOne := chooseRandom(admins)
 
-	err = h.storage.CreatePidor(ctx, m.Chat.ID, todayPidorName, currDate)
+	err = h.storage.CreatePidor(ctx, chatId, chosenOne.User.UserName, chosenOne.User.ID, currDate)
 	if err != nil {
 		return err
 	}
 
-	ppic, err := h.messenger.GetUserCurrentProfilePic(m.From.ID)
+	ppic, err := h.messenger.GetUserCurrentProfilePic(chosenOne.User.ID)
 
 	if err != nil {
 		return err
@@ -92,11 +96,11 @@ func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
 		return err
 	}
 
-	return h.messenger.SendImg(m.Chat.ID, markedPic, "pidor.png", "Pidor of the day is "+todayPidorName)
+	return h.messenger.SendImg(chatId, markedPic, "pidor.png", "Pidor of the day is "+chosenOne.User.UserName)
 }
 
-func chooseRandom(names []string) string {
-	return names[rand.Intn(len(names))]
+func chooseRandom(memebers []tgbotapi.ChatMember) tgbotapi.ChatMember {
+	return memebers[rand.Intn(len(memebers))]
 }
 
 func (h *ChoosePidor) ShouldRun(message *tgbotapi.Message) bool {

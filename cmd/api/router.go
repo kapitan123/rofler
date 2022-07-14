@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -44,12 +45,21 @@ func messageHandler(runner *command.Runner) http.HandlerFunc {
 
 func choosePidorHandler(pdr *choosePidor.ChoosePidor) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// pdr.Handle(r.Context())
-		// err = runner.Run(r.Context(), update.Message)
-		// if err != nil {
-		// 	log.Error("Failed trying to invoke a command.")
-		// }
-		// w.WriteHeader(http.StatusOK)
+		chatarg := mux.Vars(r)["chatid"]
+
+		chatId, err := strconv.ParseInt(chatarg, 10, 64)
+		if err != nil {
+			log.Error("Failed trying to invoke a command.", err)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+
+		err = pdr.ChoosePidor(r.Context(), chatId)
+
+		if err != nil {
+			log.Error("Failed trying to invoke a command.", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
