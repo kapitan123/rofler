@@ -92,7 +92,7 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 
 	if err != nil {
 		log.WithError(err).Error("failed to generate user profile pic")
-		return h.messenger.SendImg(chatId, tinfoilPicture, "tinfoil.png", "Скрытный пидор дня у нас "+chosenOne.User.UserName)
+		return h.messenger.SendImg(chatId, tinfoilPicture, "tinfoil.png", "Скрытный пидор дня у нас @"+chosenOne.User.UserName)
 	}
 
 	markedPic, err := h.watermarker.Apply(ppic, pidormarkPicture)
