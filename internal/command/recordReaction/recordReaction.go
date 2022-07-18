@@ -2,11 +2,11 @@ package recordReaction
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
-	log "github.com/sirupsen/logrus"
 )
 
 type RecordReaction struct {
@@ -35,29 +35,32 @@ func New(messenger messenger, storage postStorage) *RecordReaction {
 func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	mediaReply := extractUserMediaReaction(m)
 
-	log.Infof("Reaction was found for %s sent by %s", mediaReply.VideoId, mediaReply.Sender)
-
 	exPost, found, err := h.storage.GetPostById(ctx, mediaReply.VideoId)
 
 	if err != nil {
 		return err
 	}
 
-	rtm := m.ReplyToMessage
+	from := m.ReplyToMessage.From
 
 	if !found {
 		reactions := make([]storage.Reaction, 0)
+		roflerRef := storage.UserRef{
+			Id:          from.ID,
+			DisplayName: fmt.Sprintf("%s %s", from.FirstName, from.LastName),
+		}
+
 		exPost = storage.Post{
-			VideoId:        mediaReply.VideoId,
-			Source:         "misc",
-			RoflerUserName: rtm.From.UserName,
-			Url:            "",
-			Reactions:      reactions,
-			PostedOn:       time.Now(),
+			VideoId:   mediaReply.VideoId,
+			Source:    "misc",
+			UserRef:   roflerRef,
+			Url:       "",
+			Reactions: reactions,
+			PostedOn:  time.Now(),
 		}
 	}
 
-	exPost.AddReaction(mediaReply.Sender, mediaReply.Text, mediaReply.ToMessageId)
+	exPost.AddReaction(mediaReply.ReactorRef, mediaReply.Text, mediaReply.ToMessageId)
 	h.storage.UpsertPost(ctx, exPost)
 
 	return nil
@@ -76,15 +79,18 @@ func (h *RecordReaction) ShouldRun(m *tgbotapi.Message) bool {
 type replyToMediaPost struct {
 	VideoId     string
 	ToMessageId int // RepllyToMessage.ID not the update.Message.ID
-	Sender      string
+	ReactorRef  storage.UserRef
 	Text        string
 }
 
 func extractUserMediaReaction(upd *tgbotapi.Message) replyToMediaPost {
 	rtm := upd.ReplyToMessage
 	vr := replyToMediaPost{
-		VideoId:     rtm.Video.FileID,
-		Sender:      upd.From.UserName,
+		VideoId: rtm.Video.FileID,
+		ReactorRef: storage.UserRef{
+			Id:          rtm.From.ID,
+			DisplayName: fmt.Sprintf("%s %s", upd.From.FirstName, upd.From.LastName),
+		},
 		ToMessageId: rtm.MessageID,
 		Text:        upd.Text,
 	}

@@ -2,9 +2,11 @@ package replaceLinkWithMessage
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/kapitan123/telegrofler/internal/contentLoader"
+	"github.com/kapitan123/telegrofler/internal/messenger/format"
 	"github.com/kapitan123/telegrofler/internal/storage"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -19,7 +21,7 @@ type ReplaceLinkWithMessage struct {
 
 type messenger interface {
 	ReplyWithText(chatId int64, messageId int, text string) error
-	SendTrackableVideo(chatId int64, linktToUserName string, trackToken string, title string, payload []byte) error
+	SendVideo(chatId int64, trackToken string, caption string, payload []byte) error
 	Delete(chatId int64, messageId int) error
 }
 
@@ -42,7 +44,8 @@ func New(messenger messenger, storage postStorage, downloader downloader) *Repla
 }
 
 func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	url, chatId, senderName, senderId := m.Text, m.Chat.ID, m.From.UserName, m.From.ID
+	url, chatId, senderId := m.Text, m.Chat.ID, m.From.ID
+	senderName := fmt.Sprintf("%s %s", m.From.FirstName, m.From.LastName)
 
 	meta, err := h.downloader.ExtractVideoMeta(url)
 
@@ -58,7 +61,10 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 		return err
 	}
 
-	err = h.messenger.SendTrackableVideo(chatId, senderName, meta.Id, meta.Title, content)
+	mention := format.AsUserMention(senderId, senderName)
+	caption := fmt.Sprintf("<b>Rofler:</b> 🔥@%s🔥\n<b>Title</b>: %s", mention, meta.Title)
+
+	err = h.messenger.SendVideo(chatId, meta.Id, caption, content)
 
 	if err != nil {
 		return err
@@ -68,14 +74,11 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 	_ = h.messenger.Delete(chatId, m.MessageID)
 
 	newPost := storage.Post{
-		VideoId:        meta.Id,
-		Source:         meta.Type,
-		RoflerUserName: senderName,
-		RoflerId:       senderId,
-		Url:            url,
-		Reactions:      []storage.Reaction{},
-		KeyWords:       []string{},
-		PostedOn:       time.Now(),
+		VideoId:   meta.Id,
+		Source:    meta.Type,
+		Url:       url,
+		Reactions: []storage.Reaction{},
+		PostedOn:  time.Now(),
 	}
 
 	err = h.storage.UpsertPost(ctx, newPost)

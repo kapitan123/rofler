@@ -18,6 +18,7 @@ type TopRofl struct {
 type messenger interface {
 	ReplyWithText(chatId int64, replyToMessageId int, caption string) error
 	SendText(chatId int64, text string) error
+	GetChatAdmins(chatId int64) ([]tgbotapi.ChatMember, error)
 }
 
 type postStorage interface {

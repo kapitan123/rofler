@@ -2,13 +2,11 @@ package recordBotPostReaction
 
 import (
 	"context"
-	"regexp"
+	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
 )
-
-var posterMakerRegExp = regexp.MustCompile(`🔥@(.*?)🔥`)
 
 type RecordBotPostReaction struct {
 	messenger messenger
@@ -34,7 +32,6 @@ func New(messenger messenger, storage postStorage) *RecordBotPostReaction {
 }
 
 func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	// AK TODO parsing the message twice rename package to parser
 	reply := extractVideoRepostReaction(m)
 
 	exPost, found, err := h.storage.GetPostById(ctx, reply.VideoId)
@@ -48,7 +45,7 @@ func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message)
 		return nil
 	}
 
-	exPost.AddReaction(reply.Sender, reply.Text, reply.ToMessageId)
+	exPost.AddReaction(reply.ReactorRef, reply.Text, reply.ToMessageId)
 	h.storage.UpsertPost(ctx, exPost)
 	return nil
 }
@@ -60,17 +57,18 @@ func (h *RecordBotPostReaction) ShouldRun(m *tgbotapi.Message) bool {
 type replyToMediaPost struct {
 	VideoId     string
 	ToMessageId int // RepllyToMessage.ID not the update.Message.ID
-	Sender      string
+	ReactorRef  storage.UserRef
 	Text        string
 }
 
 func extractVideoRepostReaction(upd *tgbotapi.Message) replyToMediaPost {
 	rtm := upd.ReplyToMessage
-	sender := upd.From.UserName
-
 	reply := replyToMediaPost{
-		VideoId:     rtm.Video.FileName,
-		Sender:      sender,
+		VideoId: rtm.Video.FileName,
+		ReactorRef: storage.UserRef{
+			Id:          rtm.From.ID,
+			DisplayName: fmt.Sprintf("%s %s", upd.From.FirstName, upd.From.LastName),
+		},
 		Text:        upd.Text,
 		ToMessageId: rtm.MessageID,
 	}
@@ -85,10 +83,11 @@ func containsVideoRepostReaction(upd *tgbotapi.Message) bool {
 		return false
 	}
 
-	poster := posterMakerRegExp.FindStringSubmatch(rtm.Caption)[1]
-
-	sender := upd.From.UserName
+	// monitored bot posts has exactly one mention
+	if len(rtm.Entities) == 0 {
+		return false
+	}
 
 	// if the user reference his own post it is not a reaction.
-	return sender != poster
+	return upd.From.ID != rtm.Entities[0].User.ID
 }

@@ -12,31 +12,30 @@ import (
 // Video post stats for future important analytics
 type (
 	Post struct {
-		VideoId        string     `firestore:"video_id"`
-		Source         string     `firestore:"source"`
-		RoflerUserName string     `firestore:"rofler_user_name"`
-		RoflerId       int64      `firestore:"rofler_Id"`
-		Url            string     `firestore:"url"`
-		Reactions      []Reaction `firestore:"reactions"`
-		KeyWords       []string   `firestore:"key_words"`
-		PostedOn       time.Time  `firestore:"posted_on"`
-		ChatId         int64      `firestore:"chat_id"`
+		VideoId   string     `firestore:"video_id"`
+		Source    string     `firestore:"source"`
+		Url       string     `firestore:"url"`
+		Reactions []Reaction `firestore:"reactions"`
+		PostedOn  time.Time  `firestore:"posted_on"`
+		ChatId    int64      `firestore:"chat_id"`
+		UserRef   UserRef    `firestore:"user_ref"`
 	}
 
 	Reaction struct {
-		MessageId int       `firestore:"message_id"` // RepllyToMessage.ID not the update.Message.ID
-		Sender    string    `firestore:"sender"`
-		Text      string    `firestore:"text"`
-		PostedOn  time.Time `firestore:"posted_on"`
+		MessageId      int       `firestore:"message_id"` // RepllyToMessage.ID not the update.Message.ID
+		Sender         string    `firestore:"sender"`     // AK TODO migrate - to user ref
+		Text           string    `firestore:"text"`
+		PostedOn       time.Time `firestore:"posted_on"`
+		ReactorUserRef UserRef   `firestore:"reactor_user_ref"`
 	}
 )
 
-func (p *Post) AddReaction(sender, text string, messageid int) {
+func (p *Post) AddReaction(reactor UserRef, text string, messageid int) {
 	reaction := Reaction{
-		Sender:    sender,
-		Text:      text,
-		MessageId: messageid,
-		PostedOn:  time.Now(),
+		ReactorUserRef: reactor,
+		Text:           text,
+		MessageId:      messageid,
+		PostedOn:       time.Now(),
 	}
 
 	p.Reactions = append(p.Reactions, reaction)
@@ -46,6 +45,12 @@ const postsCollection = "posts"
 
 func (s *Storage) GetAllPosts(ctx context.Context) ([]Post, error) {
 	iter := s.client.Collection(postsCollection).Documents(ctx)
+	return takeAll[Post](iter)
+}
+
+func (s *Storage) GetChatPosts(ctx context.Context, chatid int64) ([]Post, error) {
+	query := s.client.Collection(postsCollection).Where("chat_id", "==", chatid)
+	iter := query.Documents(ctx)
 	return takeAll[Post](iter)
 }
 

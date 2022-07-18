@@ -20,7 +20,7 @@ type messenger interface {
 }
 
 type postStorage interface {
-	GetAllPosts(ctx context.Context) ([]storage.Post, error)
+	GetChatPosts(ctx context.Context, chatId int64) ([]storage.Post, error)
 }
 
 func New(messenger messenger, storage postStorage) *TopRofler {
@@ -31,7 +31,7 @@ func New(messenger messenger, storage postStorage) *TopRofler {
 }
 
 func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error {
-	posts, err := h.storage.GetAllPosts(ctx)
+	posts, err := h.storage.GetChatPosts(ctx, message.Chat.ID)
 	if err != nil {
 		return err
 	}
@@ -48,11 +48,16 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 }
 
 func countScores(posts []storage.Post) map[string]int {
-	roflerScores := map[string]int{}
+	roflerScores := map[storage.UserRef]int{}
 	for _, p := range posts {
-		roflerScores[p.RoflerUserName] += len(p.Reactions)
+		roflerScores[p.UserRef] += len(p.Reactions)
 	}
-	return roflerScores
+
+	names := map[string]int{}
+	for k, v := range roflerScores {
+		names[k.DisplayName] = v
+	}
+	return names
 }
 
 func (h *TopRofler) ShouldRun(message *tgbotapi.Message) bool {

@@ -3,7 +3,6 @@ package messenger
 import (
 	_ "embed"
 	"errors"
-	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -36,6 +35,7 @@ func (m *Messenger) SendText(chatID int64, text string) error {
 func (m *Messenger) ReplyWithText(chatId int64, replyToMessageId int, caption string) error {
 	msg := tgbotapi.NewMessage(chatId, caption)
 	msg.ReplyToMessageID = replyToMessageId
+	msg.ParseMode = tgbotapi.ModeHTML
 
 	_, err := m.api.Send(msg)
 
@@ -49,7 +49,7 @@ func (m *Messenger) ReplyWithText(chatId int64, replyToMessageId int, caption st
 // AK TODO merge innternal calls to reduce dupliction
 func (m *Messenger) SendImg(chatId int64, img []byte, imgName string, caption string) error {
 	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: img})
-
+	msg.ParseMode = tgbotapi.ModeHTML
 	if caption != "" {
 		msg.Caption = caption
 	}
@@ -66,6 +66,7 @@ func (m *Messenger) SendImg(chatId int64, img []byte, imgName string, caption st
 func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img []byte, imgName string, caption string) error {
 	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: img})
 	msg.ReplyToMessageID = replyToMessageId
+	msg.ParseMode = tgbotapi.ModeHTML
 
 	if caption != "" {
 		msg.Caption = caption
@@ -135,22 +136,18 @@ type VideoData struct {
 	Payload []byte
 }
 
-func (b *Messenger) SendTrackableVideo(chatId int64, linktToUserName string, trackToken string, title string, payload []byte) error {
+func (b *Messenger) SendVideo(chatId int64, videoId string, caption string, payload []byte) error {
 	// Filename is id of the video
-	fb := tgbotapi.FileBytes{Name: trackToken, Bytes: payload}
+	fb := tgbotapi.FileBytes{Name: videoId, Bytes: payload}
 
 	v := tgbotapi.NewVideo(chatId, fb)
 
-	v.Caption = GetTrackableCaption(linktToUserName, title)
+	v.Caption = caption
 	v.ParseMode = tgbotapi.ModeHTML
 
 	_, err := b.api.Send(v)
 
 	return err
-}
-
-func GetTrackableCaption(linktToUserName string, title string) string {
-	return fmt.Sprintf("<b>Rofler:</b> 🔥@%s🔥\n<b>Title</b>: %s", linktToUserName, title)
 }
 
 // AK we can abstract away ChatMember. But all the commands already has a dependency on tgBotApi.

@@ -10,9 +10,7 @@ import (
 
 type Pidor struct {
 	ChosenOn time.Time `firestore:"chosen_on"`
-	UserName string    `firestore:"user_name"` // AK TODO migrate
 	ChatId   int64     `firestore:"chat_id"`
-	UserId   int64     `firestore:"user_id"` // AK TODO migrate
 	UserRef  UserRef   `firestore:"user_ref"`
 }
 
@@ -28,11 +26,6 @@ func (s *Storage) GetAllPidors(ctx context.Context) ([]Pidor, error) {
 func (s *Storage) GetChatPidors(ctx context.Context, chatid int64) ([]Pidor, error) {
 	query := s.client.Collection(pidorsCollection).Where("chat_id", "==", chatid)
 	iter := query.Documents(ctx)
-	pidors, _ := takeAll[Pidor](iter)
-
-	for _, p := range pidors {
-		p.UserRef = UserRef{Id: p.UserId, DisplayName: p.UserName}
-	}
 
 	return takeAll[Pidor](iter)
 }
