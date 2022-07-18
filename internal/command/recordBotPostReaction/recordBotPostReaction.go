@@ -15,14 +15,16 @@ type RecordBotPostReaction struct {
 	storage   postStorage
 }
 
-type messenger interface {
-	ReplyWithText(chatId int64, messageId int, text string) error
-}
+type (
+	messenger interface {
+		ReplyWithText(chatId int64, messageId int, text string) error
+	}
 
-type postStorage interface {
-	GetPostById(ctx context.Context, videoId string) (storage.Post, bool, error)
-	UpsertPost(ctx context.Context, p storage.Post) error
-}
+	postStorage interface {
+		GetPostById(ctx context.Context, videoId string) (storage.Post, bool, error)
+		UpsertPost(ctx context.Context, p storage.Post) error
+	}
+)
 
 func New(messenger messenger, storage postStorage) *RecordBotPostReaction {
 	return &RecordBotPostReaction{

@@ -21,7 +21,7 @@ type (
 	}
 
 	postStorage interface {
-		GetAllPidors(ctx context.Context) ([]storage.Pidor, error)
+		GetChatPidors(ctx context.Context, chatId int64) ([]storage.Pidor, error)
 	}
 )
 
@@ -33,7 +33,7 @@ func New(messenger messenger, storage postStorage) *TopPidor {
 }
 
 func (h *TopPidor) Handle(ctx context.Context, message *tgbotapi.Message) error {
-	pidors, err := h.storage.GetAllPidors(ctx)
+	pidors, err := h.storage.GetChatPidors(ctx, message.Chat.ID)
 	if err != nil {
 		return err
 	}

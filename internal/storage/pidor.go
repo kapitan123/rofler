@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/google/uuid"
 	"google.golang.org/api/iterator"
 )
@@ -19,23 +20,16 @@ const pidorsCollection = "pidors"
 
 // AK TODO maybe split the packages?
 func (s *Storage) GetAllPidors(ctx context.Context) ([]Pidor, error) {
-	docs := s.client.Collection(pidorsCollection).Documents(ctx)
-	var pidors []Pidor
-	for {
-		doc, err := docs.Next()
-		if err != nil {
-			if err == iterator.Done {
-				break
-			}
-			return nil, err
-		}
-		var p Pidor
-		if err := doc.DataTo(&p); err != nil {
-			return nil, err
-		}
-		pidors = append(pidors, p)
-	}
-	return pidors, nil
+	iter := s.client.Collection(pidorsCollection).Documents(ctx)
+
+	return takeAll(iter)
+}
+
+func (s *Storage) GetChatPidors(ctx context.Context, chatid int64) ([]Pidor, error) {
+	query := s.client.Collection(pidorsCollection).Where("chat_id", "==", chatid)
+	iter := query.Documents(ctx)
+
+	return takeAll(iter)
 }
 
 func (s *Storage) GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (Pidor, bool, error) {
@@ -87,4 +81,23 @@ func getEndOfTheDay(t time.Time) time.Time {
 	rounded = rounded.Add(oneDay)
 
 	return rounded
+}
+
+func takeAll(iter *firestore.DocumentIterator) ([]Pidor, error) {
+	var pidors []Pidor
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		var p Pidor
+		if err := doc.DataTo(&p); err != nil {
+			return nil, err
+		}
+		pidors = append(pidors, p)
+	}
+	return pidors, nil
 }
