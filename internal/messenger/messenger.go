@@ -177,3 +177,9 @@ func (b *Messenger) GetChatAdmins(chatId int64) ([]tgbotapi.ChatMember, error) {
 
 	return noBots, nil
 }
+
+type UserRef struct {
+	Id        string
+	UserName  string
+	UserTitle string
+}

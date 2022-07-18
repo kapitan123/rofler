@@ -42,7 +42,7 @@ func New(messenger messenger, storage postStorage, downloader downloader) *Repla
 }
 
 func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	url, chatId, sender := m.Text, m.Chat.ID, m.From.UserName
+	url, chatId, senderName, senderId := m.Text, m.Chat.ID, m.From.UserName, m.From.ID
 
 	meta, err := h.downloader.ExtractVideoMeta(url)
 
@@ -58,7 +58,7 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 		return err
 	}
 
-	err = h.messenger.SendTrackableVideo(chatId, sender, meta.Id, meta.Title, content)
+	err = h.messenger.SendTrackableVideo(chatId, senderName, meta.Id, meta.Title, content)
 
 	if err != nil {
 		return err
@@ -70,7 +70,8 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 	newPost := storage.Post{
 		VideoId:        meta.Id,
 		Source:         meta.Type,
-		RoflerUserName: sender,
+		RoflerUserName: senderName,
+		RoflerId:       senderId,
 		Url:            url,
 		Reactions:      []storage.Reaction{},
 		KeyWords:       []string{},

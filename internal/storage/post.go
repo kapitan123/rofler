@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"google.golang.org/api/iterator"
+
+	"cloud.google.com/go/firestore"
 )
 
 // Video post stats for future important analytics
@@ -13,10 +15,12 @@ type (
 		VideoId        string     `firestore:"video_id"`
 		Source         string     `firestore:"source"`
 		RoflerUserName string     `firestore:"rofler_user_name"`
+		RoflerId       int64      `firestore:"rofler_Id"`
 		Url            string     `firestore:"url"`
 		Reactions      []Reaction `firestore:"reactions"`
 		KeyWords       []string   `firestore:"key_words"`
 		PostedOn       time.Time  `firestore:"posted_on"`
+		ChatId         int64      `firestore:"chat_id"`
 	}
 
 	Reaction struct {
@@ -41,31 +45,16 @@ func (p *Post) AddReaction(sender, text string, messageid int) {
 const postsCollection = "posts"
 
 func (s *Storage) GetAllPosts(ctx context.Context) ([]Post, error) {
-	docs := s.client.Collection(postsCollection).Documents(ctx)
-	var posts []Post
-	for {
-		doc, err := docs.Next()
-		if err != nil {
-			if err == iterator.Done {
-				break
-			}
-			return nil, err
-		}
-		var post Post
-		if err := doc.DataTo(&post); err != nil {
-			return nil, err
-		}
-		posts = append(posts, post)
-	}
+	iter := s.client.Collection(postsCollection).Documents(ctx)
+	return takeAll[Post](iter)
+}
 
-	for _, p := range posts {
-		if p.RoflerUserName == "" || p.RoflerUserName == "tester" {
-			p.RoflerUserName = "unknown"
-			s.client.Collection(postsCollection).Doc(p.VideoId).Delete(ctx)
-		}
-	}
+func (s *Storage) GetLastWeekPosts(ctx context.Context) ([]Post, error) {
+	query := s.client.Collection(postsCollection).Where("posted_on", ">", time.Now().AddDate(0, 0, -7))
 
-	return posts, nil
+	iter := query.Documents(ctx)
+
+	return takeAll[Post](iter)
 }
 
 func (s *Storage) UpsertPost(ctx context.Context, p Post) error {
@@ -96,4 +85,23 @@ func (s *Storage) CreatePost(ctx context.Context, p Post) error {
 	_, err := doc.Create(ctx, p)
 
 	return err
+}
+
+func takeAll[T Post | Pidor](iter *firestore.DocumentIterator) ([]T, error) {
+	var records []T
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		var r T
+		if err := doc.DataTo(&r); err != nil {
+			return nil, err
+		}
+		records = append(records, r)
+	}
+	return records, nil
 }

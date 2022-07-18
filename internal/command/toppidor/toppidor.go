@@ -49,12 +49,17 @@ func (h *TopPidor) Handle(ctx context.Context, message *tgbotapi.Message) error 
 	return nil
 }
 
-func countScores(posts []storage.Pidor) map[string]int {
-	roflerScores := map[string]int{}
-	for _, p := range posts {
-		roflerScores[p.UserName] += 1
+func countScores(pidors []storage.Pidor) map[string]int {
+	pidorScores := map[storage.UserRef]int{}
+	for _, p := range pidors {
+		pidorScores[p.UserRef] += 1
 	}
-	return roflerScores
+
+	names := map[string]int{}
+	for k, v := range pidorScores {
+		names[k.DisplayName] = v
+	}
+	return names
 }
 
 func (h *TopPidor) ShouldRun(message *tgbotapi.Message) bool {

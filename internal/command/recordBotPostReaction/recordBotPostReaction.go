@@ -48,7 +48,7 @@ func (h *RecordBotPostReaction) Handle(ctx context.Context, m *tgbotapi.Message)
 		return nil
 	}
 
-	exPost.AddReaction(reply.Sender, reply.Text, reply.MessageId)
+	exPost.AddReaction(reply.Sender, reply.Text, reply.ToMessageId)
 	h.storage.UpsertPost(ctx, exPost)
 	return nil
 }
@@ -58,10 +58,10 @@ func (h *RecordBotPostReaction) ShouldRun(m *tgbotapi.Message) bool {
 }
 
 type replyToMediaPost struct {
-	VideoId   string
-	MessageId int // RepllyToMessage.ID not the update.Message.ID
-	Sender    string
-	Text      string
+	VideoId     string
+	ToMessageId int // RepllyToMessage.ID not the update.Message.ID
+	Sender      string
+	Text        string
 }
 
 func extractVideoRepostReaction(upd *tgbotapi.Message) replyToMediaPost {
@@ -69,10 +69,10 @@ func extractVideoRepostReaction(upd *tgbotapi.Message) replyToMediaPost {
 	sender := upd.From.UserName
 
 	reply := replyToMediaPost{
-		VideoId:   rtm.Video.FileName,
-		Sender:    sender,
-		Text:      upd.Text,
-		MessageId: upd.MessageID,
+		VideoId:     rtm.Video.FileName,
+		Sender:      sender,
+		Text:        upd.Text,
+		ToMessageId: rtm.MessageID,
 	}
 
 	return reply

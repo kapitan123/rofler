@@ -4,16 +4,16 @@ import (
 	"context"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"github.com/google/uuid"
 	"google.golang.org/api/iterator"
 )
 
 type Pidor struct {
 	ChosenOn time.Time `firestore:"chosen_on"`
-	UserName string    `firestore:"user_name"`
+	UserName string    `firestore:"user_name"` // AK TODO migrate
 	ChatId   int64     `firestore:"chat_id"`
-	UserId   int64     `firestore:"user_id"`
+	UserId   int64     `firestore:"user_id"` // AK TODO migrate
+	UserRef  UserRef   `firestore:"user_ref"`
 }
 
 const pidorsCollection = "pidors"
@@ -22,14 +22,19 @@ const pidorsCollection = "pidors"
 func (s *Storage) GetAllPidors(ctx context.Context) ([]Pidor, error) {
 	iter := s.client.Collection(pidorsCollection).Documents(ctx)
 
-	return takeAll(iter)
+	return takeAll[Pidor](iter)
 }
 
 func (s *Storage) GetChatPidors(ctx context.Context, chatid int64) ([]Pidor, error) {
 	query := s.client.Collection(pidorsCollection).Where("chat_id", "==", chatid)
 	iter := query.Documents(ctx)
+	pidors, _ := takeAll[Pidor](iter)
 
-	return takeAll(iter)
+	for _, p := range pidors {
+		p.UserRef = UserRef{Id: p.UserId, DisplayName: p.UserName}
+	}
+
+	return takeAll[Pidor](iter)
 }
 
 func (s *Storage) GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (Pidor, bool, error) {
@@ -54,14 +59,13 @@ func (s *Storage) GetPidorForDate(ctx context.Context, chatid int64, date time.T
 
 }
 
-func (s *Storage) CreatePidor(ctx context.Context, chatid int64, username string, userid int64, date time.Time) error {
+func (s *Storage) CreatePidor(ctx context.Context, chatid int64, userRef UserRef, date time.Time) error {
 	uuid := uuid.New()
 
 	p := &Pidor{
 		ChosenOn: date,
-		UserName: username,
+		UserRef:  userRef,
 		ChatId:   chatid,
-		UserId:   userid,
 	}
 
 	doc := s.client.Collection(pidorsCollection).Doc(uuid.String())
@@ -81,23 +85,4 @@ func getEndOfTheDay(t time.Time) time.Time {
 	rounded = rounded.Add(oneDay)
 
 	return rounded
-}
-
-func takeAll(iter *firestore.DocumentIterator) ([]Pidor, error) {
-	var pidors []Pidor
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		var p Pidor
-		if err := doc.DataTo(&p); err != nil {
-			return nil, err
-		}
-		pidors = append(pidors, p)
-	}
-	return pidors, nil
 }

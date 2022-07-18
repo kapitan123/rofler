@@ -3,15 +3,16 @@ package choosePidor
 import (
 	"context"
 	_ "embed"
+	"fmt"
 	"math/rand"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/kapitan123/telegrofler/internal/messenger/format"
 	"github.com/kapitan123/telegrofler/internal/storage"
 	log "github.com/sirupsen/logrus"
 )
 
-// AK TODO remove duplicate embedding
 //go:embed pidormark.png
 var pidormarkPicture []byte
 
@@ -41,7 +42,7 @@ type (
 
 	pidorStorage interface {
 		GetPidorForDate(ctx context.Context, chatid int64, date time.Time) (storage.Pidor, bool, error)
-		CreatePidor(ctx context.Context, chatid int64, username string, userId int64, date time.Time) error
+		CreatePidor(ctx context.Context, chatid int64, userRef storage.UserRef, date time.Time) error
 	}
 
 	systemclock interface {
@@ -71,7 +72,8 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 	}
 
 	if found {
-		err = h.messenger.SendText(chatId, pidor.UserName+" is still sucking juicy cocks")
+		mention := format.AsUserMention(pidor.UserRef.Id, pidor.UserRef.DisplayName)
+		err = h.messenger.SendText(chatId, fmt.Sprintf(mention+" is still sucking juicy cocks"))
 		return err
 	}
 
@@ -81,18 +83,23 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 		return err
 	}
 
-	chosenOne := chooseRandom(admins)
+	chosenOne := chooseRandom(admins).User
 
-	err = h.storage.CreatePidor(ctx, chatId, chosenOne.User.UserName, chosenOne.User.ID, currDate)
+	fullName := chosenOne.FirstName + " " + chosenOne.LastName
+	ur := storage.UserRef{Id: chosenOne.ID, DisplayName: fullName}
+
+	err = h.storage.CreatePidor(ctx, chatId, ur, currDate)
 	if err != nil {
 		return err
 	}
 
-	ppic, err := h.messenger.GetUserCurrentProfilePic(chosenOne.User.ID)
+	ppic, err := h.messenger.GetUserCurrentProfilePic(chosenOne.ID)
+
+	mention := format.AsUserMention(ur.Id, ur.DisplayName)
 
 	if err != nil {
 		log.WithError(err).Error("failed to generate user profile pic")
-		return h.messenger.SendImg(chatId, tinfoilPicture, "tinfoil.png", "Скрытный пидор дня у нас @"+chosenOne.User.UserName)
+		return h.messenger.SendImg(chatId, tinfoilPicture, "tinfoil.png", "Скрытный пидор дня у нас "+mention)
 	}
 
 	markedPic, err := h.watermarker.Apply(ppic, pidormarkPicture)
@@ -101,7 +108,7 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 		return err
 	}
 
-	return h.messenger.SendImg(chatId, markedPic, "pidor.png", "Pidor of the day is @"+chosenOne.User.UserName)
+	return h.messenger.SendImg(chatId, markedPic, "pidor.png", "Pidor of the day is"+mention)
 }
 
 func chooseRandom(memebers []tgbotapi.ChatMember) tgbotapi.ChatMember {
