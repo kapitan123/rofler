@@ -18,7 +18,7 @@ var pidormarkPicture []byte
 //go:embed tinfoil.jpg
 var tinfoilPicture []byte
 
-const commandName = "choosePidor"
+const commandName = "choosepidor"
 
 type ChoosePidor struct {
 	messenger   messenger
@@ -105,7 +105,7 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 }
 
 func chooseRandom(memebers []tgbotapi.ChatMember) tgbotapi.ChatMember {
-	return memebers[rand.Intn(len(memebers)-1)]
+	return memebers[rand.Intn(len(memebers))]
 }
 
 func (h *ChoosePidor) ShouldRun(message *tgbotapi.Message) bool {
