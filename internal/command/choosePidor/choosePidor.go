@@ -108,7 +108,7 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 		return err
 	}
 
-	return h.messenger.SendImg(chatId, markedPic, "pidor.png", "Pidor of the day is"+mention)
+	return h.messenger.SendImg(chatId, markedPic, "pidor.png", "Pidor of the day is "+mention)
 }
 
 func chooseRandom(memebers []tgbotapi.ChatMember) tgbotapi.ChatMember {
