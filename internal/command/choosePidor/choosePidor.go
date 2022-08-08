@@ -88,10 +88,11 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 	fullName := chosenOne.FirstName + " " + chosenOne.LastName
 	ur := storage.UserRef{Id: chosenOne.ID, DisplayName: fullName}
 
-	// err = h.storage.CreatePidor(ctx, chatId, ur, currDate)
-	//if err != nil {
-	//	return err
-	//}
+	err = h.storage.CreatePidor(ctx, chatId, ur, currDate)
+	if err != nil {
+		return err
+	}
+
 	ppic, err := h.messenger.GetUserCurrentProfilePic(chosenOne.ID)
 
 	mention := format.AsUserMention(ur.Id, ur.DisplayName)
@@ -112,8 +113,7 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 
 func chooseRandom(members []tgbotapi.ChatMember) tgbotapi.ChatMember {
 	rand.Seed(time.Now().UnixNano())
-	gnum := rand.Intn(len(members))
-	return members[gnum]
+	return members[rand.Intn(len(members))]
 }
 
 func (h *ChoosePidor) ShouldRun(message *tgbotapi.Message) bool {
