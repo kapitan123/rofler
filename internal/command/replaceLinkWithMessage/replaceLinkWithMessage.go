@@ -62,7 +62,7 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 	}
 
 	mention := format.AsUserMention(senderId, senderName)
-	caption := fmt.Sprintf("<b>Rofler:</b> 🔥@%s🔥\n<b>Title</b>: %s", mention, meta.Title)
+	caption := fmt.Sprintf("<b>Rofler:</b> 🔥%s🔥\n<b>Title</b>: %s", mention, meta.Title)
 
 	err = h.messenger.SendVideo(chatId, meta.Id, caption, content)
 

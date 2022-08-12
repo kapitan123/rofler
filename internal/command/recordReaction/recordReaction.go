@@ -57,6 +57,7 @@ func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error 
 			Url:       "",
 			Reactions: reactions,
 			PostedOn:  time.Now(),
+			ChatId:    m.Chat.ID,
 		}
 	}
 

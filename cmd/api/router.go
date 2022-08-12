@@ -26,17 +26,17 @@ func messageHandler(runner *command.Runner) http.HandlerFunc {
 		var update tgbotapi.Update
 		err := json.NewDecoder(r.Body).Decode(&update)
 		if err != nil {
-			log.WithError(err).Error("Failed to decode the callback message.")
+			log.WithError(err).Error("Failed to decode the callback message")
 
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		logContent(update.Message)
+		logContent(&update)
 
 		err = runner.Run(r.Context(), update.Message)
 		if err != nil {
-			log.WithError(err).Error("Failed trying to invoke a command.")
+			log.WithError(err).Error("Failed trying to invoke a command")
 		}
 		// Intentionally swallows all exception so messages are not resend
 		w.WriteHeader(http.StatusOK)
@@ -49,21 +49,21 @@ func choosePidorHandler(pdr *choosePidor.ChoosePidor) http.HandlerFunc {
 
 		chatId, err := strconv.ParseInt(chatarg, 10, 64)
 		if err != nil {
-			log.WithError(err).Error("Failed trying to invoke a command.", err)
+			log.WithError(err).Error("Failed trying to parse chat id", err)
 			w.WriteHeader(http.StatusBadRequest)
 		}
 
 		err = pdr.ChoosePidor(r.Context(), chatId)
 
 		if err != nil {
-			log.Error("Failed trying to invoke a command.", err)
+			log.Error("Failed trying to choose a pidor", err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 		w.WriteHeader(http.StatusOK)
 	}
 }
 
-func logContent(update *tgbotapi.Message) {
+func logContent(update *tgbotapi.Update) {
 	ujs, _ := json.Marshal(update)
 	log.Info("Callback content:", string(ujs))
 }

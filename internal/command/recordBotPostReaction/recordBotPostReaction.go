@@ -3,10 +3,13 @@ package recordBotPostReaction
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
 )
+
+var posterMakerRegExp = regexp.MustCompile(`🔥(.*?)🔥`)
 
 type RecordBotPostReaction struct {
 	messenger messenger
@@ -84,10 +87,16 @@ func containsVideoRepostReaction(upd *tgbotapi.Message) bool {
 	}
 
 	// monitored bot posts has exactly one mention
-	if len(rtm.Entities) == 0 {
+	if !posterMakerRegExp.MatchString(rtm.Caption) {
 		return false
 	}
 
-	// if the user reference his own post it is not a reaction.
-	return upd.From.ID != rtm.Entities[0].User.ID
+	for _, e := range rtm.CaptionEntities {
+		// only if reactor is not a mentioned in caption user (not an orignial poster)
+		if e.Type == "text_mention" && e.User.ID != upd.From.ID {
+			return true
+		}
+	}
+
+	return false
 }
