@@ -85,7 +85,7 @@ func (h *RecordReaction) ShouldRun(m *tgbotapi.Message) bool {
 		return false
 	}
 
-	hasMedia := rtm.Video == nil || len(rtm.Photo) > 0
+	hasMedia := rtm.Video != nil || len(rtm.Photo) > 0
 
 	if rtm == nil || !hasMedia || m.From.UserName == "" {
 		return false
