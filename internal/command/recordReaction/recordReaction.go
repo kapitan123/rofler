@@ -50,9 +50,16 @@ func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error 
 			DisplayName: fmt.Sprintf("%s %s", from.FirstName, from.LastName),
 		}
 
+		// misc is video can be migrated to video type in the future
+		postType := "pic"
+
+		if m.ReplyToMessage.Video != nil {
+			postType = "misc"
+		}
+
 		exPost = storage.Post{
 			VideoId:   mediaReply.VideoId,
-			Source:    "misc",
+			Source:    postType,
 			UserRef:   roflerRef,
 			Url:       "",
 			Reactions: reactions,
@@ -70,7 +77,17 @@ func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error 
 func (h *RecordReaction) ShouldRun(m *tgbotapi.Message) bool {
 	rtm := m.ReplyToMessage
 
-	if rtm == nil || rtm.Video == nil || m.From.UserName == "" {
+	if rtm == nil {
+		return false
+	}
+
+	if m.From.ID == rtm.From.ID {
+		return false
+	}
+
+	hasMedia := rtm.Video == nil || len(rtm.Photo) > 0
+
+	if rtm == nil || !hasMedia || m.From.UserName == "" {
 		return false
 	}
 
@@ -86,8 +103,17 @@ type replyToMediaPost struct {
 
 func extractUserMediaReaction(upd *tgbotapi.Message) replyToMediaPost {
 	rtm := upd.ReplyToMessage
+
+	// VideoId field also stores image id's should be converted with migration into another field
+	mediaId := ""
+	if rtm.Video != nil {
+		mediaId = rtm.Video.FileID
+	} else {
+		mediaId = rtm.Photo[0].FileUniqueID
+	}
+
 	vr := replyToMediaPost{
-		VideoId: rtm.Video.FileID,
+		VideoId: mediaId,
 		ReactorRef: storage.UserRef{
 			Id:          rtm.From.ID,
 			DisplayName: fmt.Sprintf("%s %s", upd.From.FirstName, upd.From.LastName),
