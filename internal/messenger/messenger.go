@@ -3,6 +3,7 @@ package messenger
 import (
 	_ "embed"
 	"errors"
+	"io"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -47,14 +48,21 @@ func (m *Messenger) ReplyWithText(chatId int64, replyToMessageId int, caption st
 }
 
 // AK TODO merge innternal calls to reduce dupliction
-func (m *Messenger) SendImg(chatId int64, img []byte, imgName string, caption string) error {
-	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: img})
+
+// HERE I can pipe it to reader
+func (m *Messenger) SendImg(chatId int64, img io.Reader, imgName string, caption string) error {
+	imgBytes, err := io.ReadAll(img)
+
+	if err != nil {
+		return err
+	}
+	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: imgBytes})
 	msg.ParseMode = tgbotapi.ModeHTML
 	if caption != "" {
 		msg.Caption = caption
 	}
 
-	_, err := m.api.Send(msg)
+	_, err = m.api.Send(msg)
 
 	if err != nil {
 		return err

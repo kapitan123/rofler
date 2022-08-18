@@ -6,6 +6,7 @@ import (
 	"image/draw"
 	_ "image/jpeg"
 	"image/png"
+	"io"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -18,18 +19,18 @@ func New() *Watermarker {
 	return &Watermarker{}
 }
 
-func (w *Watermarker) Apply(bakground []byte, foreground []byte) ([]byte, error) {
+func (wm *Watermarker) Apply(bg []byte, fg []byte, w io.Writer) error {
 	defer logDuration(time.Now())
 
-	bgImg, _, err := image.Decode(bytes.NewReader(bakground))
+	bgImg, _, err := image.Decode(bytes.NewReader(bg))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	fgImg, err := png.Decode(bytes.NewReader(foreground))
+	fgImg, err := png.Decode(bytes.NewReader(fg))
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	b := bgImg.Bounds()
@@ -37,14 +38,13 @@ func (w *Watermarker) Apply(bakground []byte, foreground []byte) ([]byte, error)
 	draw.Draw(resImg, b, bgImg, image.Point{}, draw.Src)
 	draw.Draw(resImg, fgImg.Bounds(), fgImg, image.Point{}, draw.Over)
 
-	resBuf := new(bytes.Buffer)
-	err = png.Encode(resBuf, resImg)
+	err = png.Encode(w, resImg)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return resBuf.Bytes(), nil
+	return nil
 }
 
 func logDuration(invocation time.Time) {

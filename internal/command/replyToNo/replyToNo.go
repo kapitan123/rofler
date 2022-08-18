@@ -1,8 +1,10 @@
 package replyToNo
 
 import (
+	"bytes"
 	"context"
 	_ "embed"
+	"io"
 	"regexp"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -21,7 +23,7 @@ type ReplyToNo struct {
 }
 
 type watermarker interface {
-	Apply(bakground []byte, foreground []byte) ([]byte, error)
+	Apply(bakground []byte, foreground []byte, writer io.Writer) error
 }
 
 type messenger interface {
@@ -39,12 +41,14 @@ func New(messenger messenger, watermarker watermarker) *ReplyToNo {
 func (h *ReplyToNo) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	ppic, _ := h.messenger.GetUserCurrentProfilePic(m.From.ID)
 
-	markedPic, err := h.watermarker.Apply(ppic, pidormarkPicture)
+	buffer := bytes.NewBuffer([]byte{})
+	err := h.watermarker.Apply(ppic, pidormarkPicture, buffer)
 	if err != nil {
 		return err
 	}
 
-	err = h.messenger.ReplyWithImg(m.Chat.ID, m.MessageID, markedPic, "pidormark.png", pidorText)
+	// AK TODO convert to reader as well
+	err = h.messenger.ReplyWithImg(m.Chat.ID, m.MessageID, buffer.Bytes(), "pidormark.png", pidorText)
 
 	if err != nil {
 		return err

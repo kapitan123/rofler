@@ -1,9 +1,11 @@
 package choosePidor
 
 import (
+	"bytes"
 	"context"
 	_ "embed"
 	"fmt"
+	"io"
 	"math/rand"
 	"time"
 
@@ -30,12 +32,12 @@ type ChoosePidor struct {
 
 type (
 	watermarker interface {
-		Apply(bakground []byte, foreground []byte) ([]byte, error)
+		Apply(bakground []byte, foreground []byte, w io.Writer) error
 	}
 
 	messenger interface {
 		SendText(chatId int64, text string) error
-		SendImg(chatId int64, img []byte, imgName string, caption string) error
+		SendImg(chatId int64, img io.Reader, imgName string, caption string) error
 		GetChatAdmins(chatId int64) ([]tgbotapi.ChatMember, error)
 		GetUserCurrentProfilePic(userId int64) ([]byte, error)
 	}
@@ -99,16 +101,17 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 
 	if err != nil {
 		log.WithError(err).Error("failed to generate user profile pic")
-		return h.messenger.SendImg(chatId, tinfoilPicture, "tinfoil.png", "Скрытный пидор дня у нас "+mention)
+		return h.messenger.SendImg(chatId, bytes.NewReader(tinfoilPicture), "tinfoil.png", "Скрытный пидор дня у нас "+mention)
 	}
 
-	markedPic, err := h.watermarker.Apply(ppic, pidormarkPicture)
+	buffer := bytes.NewBuffer([]byte{})
+	err = h.watermarker.Apply(ppic, pidormarkPicture, buffer)
 
 	if err != nil {
 		return err
 	}
 
-	return h.messenger.SendImg(chatId, markedPic, "pidor.png", "Pidor of the day is "+mention)
+	return h.messenger.SendImg(chatId, buffer, "pidor.png", "Pidor of the day is "+mention)
 }
 
 func chooseRandom(members []tgbotapi.ChatMember) tgbotapi.ChatMember {
