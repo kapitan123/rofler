@@ -121,5 +121,5 @@ func chooseRandom(members []tgbotapi.ChatMember) tgbotapi.ChatMember {
 }
 
 func (h *ChoosePidor) ShouldRun(message *tgbotapi.Message) bool {
-	return message.IsCommand() && message.Command() == commandName
+	return message != nil && message.IsCommand() && message.Command() == commandName
 }

@@ -15,7 +15,7 @@ type Messenger struct {
 }
 
 type downloader interface {
-	DownloadContent(dUrl string) ([]byte, error)
+	DownloadContent(dUrl string, res io.Writer) error
 }
 
 func New(api *tgbotapi.BotAPI, downloader downloader) *Messenger {
@@ -49,8 +49,6 @@ func (m *Messenger) ReplyWithText(chatId int64, replyToMessageId int, caption st
 }
 
 // AK TODO merge innternal calls to reduce dupliction
-
-// HERE I can pipe it to reader
 func (m *Messenger) SendImg(chatId int64, img io.Reader, imgName string, caption string) error {
 	imgBytes, err := io.ReadAll(img)
 
@@ -95,7 +93,7 @@ func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img io.Read
 	return nil
 }
 
-func (m *Messenger) GetUserCurrentProfilePic(userId int64) ([]byte, error) {
+func (m *Messenger) GetUserCurrentProfilePic(userId int64, res io.Writer) error {
 	ppicReq := tgbotapi.UserProfilePhotosConfig{
 		UserID: userId,
 		Offset: 0,
@@ -104,11 +102,11 @@ func (m *Messenger) GetUserCurrentProfilePic(userId int64) ([]byte, error) {
 
 	pics, err := m.api.GetUserProfilePhotos(ppicReq)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if len(pics.Photos) == 0 {
-		return nil, errors.New("no profile picture was found")
+		return errors.New("no profile picture was found")
 	}
 
 	ppicMeta := pics.Photos[0][2]
@@ -116,13 +114,13 @@ func (m *Messenger) GetUserCurrentProfilePic(userId int64) ([]byte, error) {
 	ppic, err := m.api.GetFile(tgbotapi.FileConfig{FileID: ppicMeta.FileID})
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	downloadLink := ppic.Link(m.api.Token)
 
 	// AK TODO this crap is super slow
-	return m.downloader.DownloadContent(downloadLink)
+	return m.downloader.DownloadContent(downloadLink, res)
 }
 
 func (b *Messenger) Delete(chatId int64, messageId int) error {
