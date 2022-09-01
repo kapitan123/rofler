@@ -22,7 +22,7 @@ type messenger interface {
 }
 
 type postStorage interface {
-	GetLastWeekPosts(ctx context.Context) ([]storage.Post, error)
+	GetLastWeekPosts(ctx context.Context, chatid int64) ([]storage.Post, error)
 }
 
 func New(messenger messenger, storage postStorage) *TopRofl {
@@ -33,7 +33,7 @@ func New(messenger messenger, storage postStorage) *TopRofl {
 }
 
 func (h *TopRofl) Handle(ctx context.Context, message *tgbotapi.Message) error {
-	posts, err := h.storage.GetLastWeekPosts(ctx)
+	posts, err := h.storage.GetLastWeekPosts(ctx, message.Chat.ID)
 	if err != nil {
 		return err
 	}
