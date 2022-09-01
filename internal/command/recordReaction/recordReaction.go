@@ -77,6 +77,10 @@ func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error 
 func (h *RecordReaction) ShouldRun(m *tgbotapi.Message) bool {
 	rtm := m.ReplyToMessage
 
+	if rtm.From.IsBot {
+		return false
+	}
+
 	if rtm == nil {
 		return false
 	}
