@@ -23,12 +23,12 @@ type ReplyToNo struct {
 }
 
 type watermarker interface {
-	Apply(bakground []byte, foreground []byte, writer io.Writer) error
+	Apply(bakground io.Reader, foreground io.Reader, writer io.Writer) error
 }
 
 type messenger interface {
-	ReplyWithImg(chatId int64, replyToMessageId int, img []byte, imgName string, caption string) error
-	GetUserCurrentProfilePic(userId int64) ([]byte, error)
+	ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) error
+	GetUserCurrentProfilePic(userId int64, w io.Writer) error
 }
 
 func New(messenger messenger, watermarker watermarker) *ReplyToNo {
@@ -39,16 +39,19 @@ func New(messenger messenger, watermarker watermarker) *ReplyToNo {
 }
 
 func (h *ReplyToNo) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	ppic, _ := h.messenger.GetUserCurrentProfilePic(m.From.ID)
-
-	buffer := bytes.NewBuffer([]byte{})
-	err := h.watermarker.Apply(ppic, pidormarkPicture, buffer)
+	ppicBuf := bytes.NewBuffer([]byte{})
+	err := h.messenger.GetUserCurrentProfilePic(m.From.ID, ppicBuf)
 	if err != nil {
 		return err
 	}
 
-	// AK TODO convert to reader as well
-	err = h.messenger.ReplyWithImg(m.Chat.ID, m.MessageID, buffer.Bytes(), "pidormark.png", pidorText)
+	resBuf := bytes.NewBuffer([]byte{})
+	err = h.watermarker.Apply(ppicBuf, bytes.NewReader(pidormarkPicture), resBuf)
+	if err != nil {
+		return err
+	}
+
+	err = h.messenger.ReplyWithImg(m.Chat.ID, m.MessageID, resBuf, "pidormark.png", pidorText)
 
 	if err != nil {
 		return err

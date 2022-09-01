@@ -8,6 +8,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+// AK TODO convert all byte arrays to io readers and writers
 type Messenger struct {
 	api        *tgbotapi.BotAPI
 	downloader downloader
@@ -71,8 +72,13 @@ func (m *Messenger) SendImg(chatId int64, img io.Reader, imgName string, caption
 	return nil
 }
 
-func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img []byte, imgName string, caption string) error {
-	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: img})
+func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) error {
+	imgbytes, err := io.ReadAll(img)
+	if err != nil {
+		return err
+	}
+
+	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: imgbytes})
 	msg.ReplyToMessageID = replyToMessageId
 	msg.ParseMode = tgbotapi.ModeHTML
 
@@ -80,7 +86,7 @@ func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img []byte,
 		msg.Caption = caption
 	}
 
-	_, err := m.api.Send(msg)
+	_, err = m.api.Send(msg)
 
 	if err != nil {
 		return err
@@ -144,16 +150,21 @@ type VideoData struct {
 	Payload []byte
 }
 
-func (b *Messenger) SendVideo(chatId int64, videoId string, caption string, payload []byte) error {
+func (b *Messenger) SendVideo(chatId int64, videoId string, caption string, payload io.Reader) error {
+	vidbytes, err := io.ReadAll(payload)
+
+	if err != nil {
+		return err
+	}
 	// Filename is id of the video
-	fb := tgbotapi.FileBytes{Name: videoId, Bytes: payload}
+	fb := tgbotapi.FileBytes{Name: videoId, Bytes: vidbytes}
 
 	v := tgbotapi.NewVideo(chatId, fb)
 
 	v.Caption = caption
 	v.ParseMode = tgbotapi.ModeHTML
 
-	_, err := b.api.Send(v)
+	_, err = b.api.Send(v)
 
 	return err
 }

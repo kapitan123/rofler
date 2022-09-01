@@ -32,14 +32,14 @@ type ChoosePidor struct {
 
 type (
 	watermarker interface {
-		Apply(bakground []byte, foreground []byte, w io.Writer) error
+		Apply(bakground io.Reader, foreground io.Reader, w io.Writer) error
 	}
 
 	messenger interface {
 		SendText(chatId int64, text string) error
 		SendImg(chatId int64, img io.Reader, imgName string, caption string) error
 		GetChatAdmins(chatId int64) ([]tgbotapi.ChatMember, error)
-		GetUserCurrentProfilePic(userId int64) ([]byte, error)
+		GetUserCurrentProfilePic(userId int64, w io.Writer) error
 	}
 
 	pidorStorage interface {
@@ -95,7 +95,8 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 		return err
 	}
 
-	ppic, err := h.messenger.GetUserCurrentProfilePic(chosenOne.ID)
+	ppicBuf := bytes.NewBuffer([]byte{})
+	err = h.messenger.GetUserCurrentProfilePic(chosenOne.ID, ppicBuf)
 
 	mention := format.AsUserMention(ur.Id, ur.DisplayName)
 
@@ -104,14 +105,14 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 		return h.messenger.SendImg(chatId, bytes.NewReader(tinfoilPicture), "tinfoil.png", "Скрытный пидор дня у нас "+mention)
 	}
 
-	buffer := bytes.NewBuffer([]byte{})
-	err = h.watermarker.Apply(ppic, pidormarkPicture, buffer)
+	resBuf := bytes.NewBuffer([]byte{})
+	err = h.watermarker.Apply(ppicBuf, bytes.NewReader(pidormarkPicture), resBuf)
 
 	if err != nil {
 		return err
 	}
 
-	return h.messenger.SendImg(chatId, buffer, "pidor.png", "Pidor of the day is "+mention)
+	return h.messenger.SendImg(chatId, resBuf, "pidor.png", "Pidor of the day is "+mention)
 }
 
 func chooseRandom(members []tgbotapi.ChatMember) tgbotapi.ChatMember {

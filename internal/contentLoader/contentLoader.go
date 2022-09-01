@@ -43,13 +43,13 @@ func New(extractors ...VideoMetaExtractor) *ContentLoader {
 
 // AK TODO make it injectable, requires refactoring of sources
 // AK TODO should have context for termination
-func (d *ContentLoader) DownloadContent(dUrl string) ([]byte, error) {
+func (d *ContentLoader) DownloadContent(dUrl string, w io.Writer) error {
 	log.Info("Start downloading ", time.Now())
 	defer log.Info("Finish downloading ", time.Now())
 
 	resp, err := d.client.Get(dUrl)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer resp.Body.Close()
@@ -57,14 +57,19 @@ func (d *ContentLoader) DownloadContent(dUrl string) ([]byte, error) {
 	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("the request has failde with statuscode %d. Data: %s", resp.StatusCode, body)
+		return fmt.Errorf("the request has failde with statuscode %d. Data: %s", resp.StatusCode, body)
+	}
+	_, err = io.Copy(w, resp.Body)
+
+	if err != nil {
+		return err
 	}
 
-	return body, nil
+	return nil
 }
 
 func (l *ContentLoader) ExtractVideoMeta(url string) (*VideoMeta, error) {

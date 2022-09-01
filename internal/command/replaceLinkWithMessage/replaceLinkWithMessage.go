@@ -1,8 +1,10 @@
 package replaceLinkWithMessage
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/kapitan123/telegrofler/internal/contentLoader"
@@ -21,7 +23,7 @@ type ReplaceLinkWithMessage struct {
 
 type messenger interface {
 	ReplyWithText(chatId int64, messageId int, text string) error
-	SendVideo(chatId int64, trackToken string, caption string, payload []byte) error
+	SendVideo(chatId int64, trackToken string, caption string, payload io.Reader) error
 	Delete(chatId int64, messageId int) error
 }
 
@@ -30,7 +32,7 @@ type postStorage interface {
 }
 
 type downloader interface {
-	DownloadContent(dUrl string) ([]byte, error)
+	DownloadContent(dUrl string, res io.Writer) error
 	ExtractVideoMeta(url string) (*contentLoader.VideoMeta, error)
 	CanExtractVideoMeta(url string) bool
 }
@@ -55,7 +57,8 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 
 	log.Info("Url was found in a callback message: ", url)
 
-	content, err := h.downloader.DownloadContent(meta.DownloadUrl)
+	contentBuf := bytes.NewBuffer([]byte{})
+	err = h.downloader.DownloadContent(meta.DownloadUrl, contentBuf)
 
 	if err != nil {
 		return err
@@ -64,7 +67,7 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 	mention := format.AsUserMention(senderId, senderName)
 	caption := fmt.Sprintf("<b>Rofler:</b> 🔥%s🔥\n<b>Title</b>: %s", mention, meta.Title)
 
-	err = h.messenger.SendVideo(chatId, meta.Id, caption, content)
+	err = h.messenger.SendVideo(chatId, meta.Id, caption, contentBuf)
 
 	if err != nil {
 		return err
