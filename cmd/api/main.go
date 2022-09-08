@@ -19,7 +19,6 @@ import (
 	"github.com/kapitan123/telegrofler/internal/command/replyToNo"
 	"github.com/kapitan123/telegrofler/internal/command/replyToYes"
 	"github.com/kapitan123/telegrofler/internal/command/toppidor"
-	"github.com/kapitan123/telegrofler/internal/command/toprofl"
 	"github.com/kapitan123/telegrofler/internal/command/toprofler"
 	"github.com/kapitan123/telegrofler/internal/contentLoader"
 	"github.com/kapitan123/telegrofler/internal/contentLoader/lovetik"
@@ -69,7 +68,6 @@ func main() {
 		replyToYes.New(m),
 		toprofler.New(m, s),
 		toppidor.New(m, s),
-		toprofl.New(m, s),
 	)
 
 	router := mux.NewRouter()
