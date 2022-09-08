@@ -23,3 +23,9 @@ cmd/api/api
 
 # Dev keys
 keys/
+
+# Terraform providers
+iac/gcp/.terraform
+
+# Extensionless files 
+[^\.]*
