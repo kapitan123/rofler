@@ -15,7 +15,7 @@ resource "google_cloud_run_service" "telegrofler" {
         resources {
           limits = {
             cpu    = 2.0
-            memory = "1GiB"
+            memory = "1 Gi"
           }
         }
 
