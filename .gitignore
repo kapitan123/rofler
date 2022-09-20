@@ -27,5 +27,5 @@ keys/
 # Terraform providers
 iac/gcp/.terraform
 
-# Extensionless files 
-[^\.]*
+# built file
+api
