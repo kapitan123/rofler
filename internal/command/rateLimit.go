@@ -14,7 +14,7 @@ var (
 )
 
 // decorator to limit commands abuse
-type RateLimit struct {
+type RateLimitedCommand struct {
 	userProfiles map[int64]profile
 	command      command
 }
@@ -25,18 +25,18 @@ type profile struct {
 	penaltyExpiresOn time.Time
 }
 
-func WithRateLimit(cmd command) *RateLimit {
-	return &RateLimit{
+func WithRateLimit(cmd command) *RateLimitedCommand {
+	return &RateLimitedCommand{
 		command:      cmd,
 		userProfiles: map[int64]profile{},
 	}
 }
 
-func (rl *RateLimit) ShouldRun(m *tgbotapi.Message) bool {
+func (rl *RateLimitedCommand) ShouldRun(m *tgbotapi.Message) bool {
 	return rl.command.ShouldRun(m)
 }
 
-func (rl *RateLimit) Handle(ctx context.Context, m *tgbotapi.Message) error {
+func (rl *RateLimitedCommand) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	userId, isCommand, now := m.From.ID, m.IsCommand(), time.Now()
 
 	if !isCommand {
@@ -52,7 +52,7 @@ func (rl *RateLimit) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	return rl.command.Handle(ctx, m)
 }
 
-func (rl *RateLimit) updateProfile(userId int64, now time.Time) profile {
+func (rl *RateLimitedCommand) updateProfile(userId int64, now time.Time) profile {
 	prf, ok := rl.userProfiles[userId]
 
 	if !ok {
