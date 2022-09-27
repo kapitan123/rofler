@@ -6,8 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"encoding/json"
-
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -55,21 +53,9 @@ func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, messageId int) error {
 		return err
 	}
 
-	delJson, err := json.Marshal(
-		struct {
-			ChatId    int64 `json:"chatId"`
-			MessageId int   `json:"messageId"`
-		}{
-			chatId,
-			messageId,
-		},
-	)
+	url := fmt.Sprintf("%s/chat/%d/%d", q.selfUrl, chatId, messageId)
 
-	if err != nil {
-		return err
-	}
-
-	req := q.createPostRequest(q.selfUrl, delJson)
+	req := q.createDeleteRequest(url)
 
 	createdTask, err := q.client.CreateTask(q.ctx, req)
 
@@ -111,14 +97,14 @@ func (q *TaskQueue) initClient() error {
 	return err
 }
 
-func (q *TaskQueue) createPostRequest(url string, payload []byte) *taskspb.CreateTaskRequest {
+func (q *TaskQueue) createDeleteRequest(url string) *taskspb.CreateTaskRequest {
 	req := &taskspb.CreateTaskRequest{
 		Parent: q.Path,
 		Task: &taskspb.Task{
 			// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#HttpRequest
 			MessageType: &taskspb.Task_HttpRequest{
 				HttpRequest: &taskspb.HttpRequest{
-					HttpMethod: taskspb.HttpMethod_POST,
+					HttpMethod: taskspb.HttpMethod_DELETE,
 					Url:        url,
 					AuthorizationHeader: &taskspb.HttpRequest_OidcToken{
 						OidcToken: &taskspb.OidcToken{
@@ -130,8 +116,6 @@ func (q *TaskQueue) createPostRequest(url string, payload []byte) *taskspb.Creat
 			ScheduleTime: getMinutesOffset(defaultMessageLifeTime),
 		},
 	}
-
-	req.Task.GetHttpRequest().Body = payload
 
 	return req
 }

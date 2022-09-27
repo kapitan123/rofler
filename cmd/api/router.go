@@ -18,6 +18,7 @@ import (
 func setupRouter(r *mux.Router, runner *command.Runner, pdr *choosePidor.ChoosePidor) {
 	r.HandleFunc("/callback", messageHandler(runner)).Methods("POST")
 	r.HandleFunc("/chat/{chatid}/pidoroftheday", choosePidorHandler(pdr)).Methods("POST")
+	r.HandleFunc("/chat/{chatid}/{messageid}", deleteMessageHandler(pdr)).Methods("DELETE")
 }
 
 // AK TODO send messages to a dead message quee
@@ -44,6 +45,27 @@ func messageHandler(runner *command.Runner) http.HandlerFunc {
 }
 
 func choosePidorHandler(pdr *choosePidor.ChoosePidor) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		chatarg := mux.Vars(r)["chatid"]
+
+		chatId, err := strconv.ParseInt(chatarg, 10, 64)
+		if err != nil {
+			log.WithError(err).Error("Failed trying to parse chat id", err)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+
+		err = pdr.ChoosePidor(r.Context(), chatId)
+
+		if err != nil {
+			log.Error("Failed trying to choose a pidor", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+// AK TODO actual handler
+func deleteMessageHandler(pdr *choosePidor.ChoosePidor) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		chatarg := mux.Vars(r)["chatid"]
 
