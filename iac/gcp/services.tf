@@ -2,7 +2,7 @@ resource "google_project_service" "cloudscheduler_googleapis_com" {
   service = "cloudscheduler.googleapis.com"
 }
 
-resource "google_project_service" "cr_googleapis_com" {
+resource "google_project_service" "cloud_run_googleapis_com" {
   service = "run.googleapis.com"
 }
 
