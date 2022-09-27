@@ -1,6 +1,5 @@
 variable "project_id" {
   type    = string
-  default = "neat-cycling-346311" // secret
 }
 
 variable "region" {
@@ -20,9 +19,4 @@ variable "name" {
 variable "port" {
   type    = number
   default = 9001
-}
-
-variable "state_bucket" {
-  type    = string
-  default = "304373b586ff10b7-bucket-tfstate" // secret
 }

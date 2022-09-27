@@ -59,15 +59,15 @@ func main() {
 	sc := systemclock.New()
 
 	commandRunner := command.NewRunner(config.WorkersCount,
-		choosePidor.New(m, s, w, sc),
+		command.WithRateLimit(choosePidor.New(m, s, w, sc)),
+		command.WithRateLimit(toprofler.New(m, s)),
+		command.WithRateLimit(toppidor.New(m, s)),
 		recordBotPostReaction.New(m, s),
 		recordReaction.New(m, s),
 		replaceLinkWithMessage.New(m, s, d),
 		replyTo300.New(m),
 		replyToNo.New(m, w),
 		replyToYes.New(m),
-		toprofler.New(m, s),
-		toppidor.New(m, s),
 	)
 
 	router := mux.NewRouter()
