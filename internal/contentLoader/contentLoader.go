@@ -54,15 +54,10 @@ func (d *ContentLoader) DownloadContent(dUrl string, w io.Writer) error {
 
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-
-	if err != nil {
-		return err
-	}
-
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("the request has failde with statuscode %d. Data: %s", resp.StatusCode, body)
+		return fmt.Errorf("the request has failde with statuscode %d", resp.StatusCode)
 	}
+
 	_, err = io.Copy(w, resp.Body)
 
 	if err != nil {
@@ -97,5 +92,5 @@ func (l *ContentLoader) GetExtractor(url string) (VideoMetaExtractor, error) {
 			return extractor, nil
 		}
 	}
-	return nil, fmt.Errorf("No extractor found for url %s. Video can't be converted. Please register an extractor.", url)
+	return nil, fmt.Errorf("no extractor found for url %s. Video can't be converted. Please register an extractor", url)
 }
