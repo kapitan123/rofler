@@ -36,9 +36,14 @@ func New(messenger messenger, queue queue) *ReplyToYes {
 }
 
 func (h *ReplyToYes) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	_, err := h.messenger.ReplyWithImg(m.Chat.ID, m.MessageID, bytes.NewReader(yesPicture), "kirkorov.png", "")
+	chatId := m.Chat.ID
+	newMessageId, err := h.messenger.ReplyWithImg(chatId, m.MessageID, bytes.NewReader(yesPicture), "kirkorov.png", "")
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	return h.queue.EnqueueDeleteMessage(chatId, newMessageId)
 }
 
 func (h *ReplyToYes) ShouldRun(m *tgbotapi.Message) bool {
