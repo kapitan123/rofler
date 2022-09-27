@@ -25,12 +25,7 @@ resource "google_cloud_run_service" "telegrofler" {
         }
 
         env {
-          name  = "FIRESTORE_PROJECT_ID"
-          value = var.project_id
-        }
-
-        env {
-          name  = "GOOGLE_CLOUD_PROJECT"
+          name  = "GCLOUD_PROJECT_ID"
           value = var.project_id
         }
 

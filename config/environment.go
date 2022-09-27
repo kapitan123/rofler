@@ -1,3 +1,5 @@
+// Should not be used outside of main.go
+// will be converted to flags
 package config
 
 import (
@@ -9,7 +11,7 @@ import (
 
 const (
 	telegramTokenEnv  = "TELEGRAM_BOT_TOKEN"
-	projectIdEnv      = "FIRESTORE_PROJECT_ID"
+	projectIdEnv      = "GCLOUD_PROJECT_ID"
 	gcloudAppCredsEnv = "GOOGLE_APPLICATION_CREDENTIALS"
 	port              = "PORT"
 	selfUrl           = "SELF_URL"
@@ -30,7 +32,7 @@ func init() {
 	}
 
 	if ProjectId == "" {
-		log.Panic("Firestore projectid is not set. Please set the environment variable ", projectIdEnv)
+		log.Panic("Projectid is not set. Please set the environment variable ", projectIdEnv)
 	}
 
 	if GcloudCreds == "" {
