@@ -25,7 +25,7 @@ type queue interface {
 }
 
 type messenger interface {
-	ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) error
+	ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) (int, error)
 }
 
 func New(messenger messenger, queue queue) *ReplyToYes {
@@ -36,7 +36,7 @@ func New(messenger messenger, queue queue) *ReplyToYes {
 }
 
 func (h *ReplyToYes) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	err := h.messenger.ReplyWithImg(m.Chat.ID, m.MessageID, bytes.NewReader(yesPicture), "kirkorov.png", "")
+	_, err := h.messenger.ReplyWithImg(m.Chat.ID, m.MessageID, bytes.NewReader(yesPicture), "kirkorov.png", "")
 
 	return err
 }

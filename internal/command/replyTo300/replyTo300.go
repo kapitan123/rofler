@@ -15,7 +15,7 @@ type ReplyTo300 struct {
 }
 
 type messenger interface {
-	ReplyWithText(chatId int64, messageId int, text string) error
+	ReplyWithText(chatId int64, messageId int, text string) (int, error)
 }
 
 type queue interface {
@@ -30,7 +30,7 @@ func New(messenger messenger, queue queue) *ReplyTo300 {
 }
 
 func (h *ReplyTo300) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	err := h.messenger.ReplyWithText(m.Chat.ID, m.MessageID, "🤣🚜 ♂ Отсоси у тракториста ♂ 🚜🤣")
+	_, err := h.messenger.ReplyWithText(m.Chat.ID, m.MessageID, "🤣🚜 ♂ Отсоси у тракториста ♂ 🚜🤣")
 
 	return err
 }

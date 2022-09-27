@@ -22,8 +22,8 @@ type ReplaceLinkWithMessage struct {
 }
 
 type messenger interface {
-	ReplyWithText(chatId int64, messageId int, text string) error
-	SendVideo(chatId int64, trackToken string, caption string, payload io.Reader) error
+	ReplyWithText(chatId int64, messageId int, text string) (int, error)
+	SendVideo(chatId int64, trackToken string, caption string, payload io.Reader) (int, error)
 	Delete(chatId int64, messageId int) error
 }
 
@@ -67,7 +67,7 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 	mention := format.AsUserMention(senderId, senderName)
 	caption := fmt.Sprintf("<b>Rofler:</b> 🔥%s🔥\n<b>Title</b>: %s", mention, meta.Title)
 
-	err = h.messenger.SendVideo(chatId, meta.Id, caption, contentBuf)
+	_, err = h.messenger.SendVideo(chatId, meta.Id, caption, contentBuf)
 
 	if err != nil {
 		return err

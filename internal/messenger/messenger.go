@@ -25,55 +25,48 @@ func New(api *tgbotapi.BotAPI, downloader downloader) *Messenger {
 	}
 }
 
-func (m *Messenger) SendText(chatID int64, text string) error {
+func (m *Messenger) SendText(chatID int64, text string) (int, error) {
 	msg := tgbotapi.NewMessage(chatID, text)
 
 	msg.ParseMode = tgbotapi.ModeHTML
 
-	_, err := m.api.Send(msg)
-	return err
+	res, err := m.api.Send(msg)
+	return res.MessageID, err
 }
 
-func (m *Messenger) ReplyWithText(chatId int64, replyToMessageId int, caption string) error {
+func (m *Messenger) ReplyWithText(chatId int64, replyToMessageId int, caption string) (int, error) {
 	msg := tgbotapi.NewMessage(chatId, caption)
 	msg.ReplyToMessageID = replyToMessageId
 	msg.ParseMode = tgbotapi.ModeHTML
 
-	_, err := m.api.Send(msg)
+	res, err := m.api.Send(msg)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return res.MessageID, err
 }
 
 // AK TODO merge innternal calls to reduce dupliction
-func (m *Messenger) SendImg(chatId int64, img io.Reader, imgName string, caption string) error {
+func (m *Messenger) SendImg(chatId int64, img io.Reader, imgName string, caption string) (int, error) {
 	imgBytes, err := io.ReadAll(img)
 
 	if err != nil {
-		return err
+		return 0, err
 	}
+
 	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: imgBytes})
 	msg.ParseMode = tgbotapi.ModeHTML
 	if caption != "" {
 		msg.Caption = caption
 	}
 
-	_, err = m.api.Send(msg)
+	res, err := m.api.Send(msg)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return res.MessageID, err
 }
 
-func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) error {
+func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) (int, error) {
 	imgbytes, err := io.ReadAll(img)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: imgbytes})
@@ -86,11 +79,9 @@ func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img io.Read
 
 	_, err = m.api.Send(msg)
 
-	if err != nil {
-		return err
-	}
+	res, err := m.api.Send(msg)
 
-	return nil
+	return res.MessageID, err
 }
 
 func (m *Messenger) GetUserCurrentProfilePic(userId int64, res io.Writer) error {
@@ -148,11 +139,11 @@ type VideoData struct {
 	Payload []byte
 }
 
-func (b *Messenger) SendVideo(chatId int64, videoId string, caption string, payload io.Reader) error {
+func (b *Messenger) SendVideo(chatId int64, videoId string, caption string, payload io.Reader) (int, error) {
 	vidbytes, err := io.ReadAll(payload)
 
 	if err != nil {
-		return err
+		return 0, err
 	}
 	// Filename is id of the video
 	fb := tgbotapi.FileBytes{Name: videoId, Bytes: vidbytes}
@@ -162,9 +153,9 @@ func (b *Messenger) SendVideo(chatId int64, videoId string, caption string, payl
 	v.Caption = caption
 	v.ParseMode = tgbotapi.ModeHTML
 
-	_, err = b.api.Send(v)
+	res, err := b.api.Send(v)
 
-	return err
+	return res.MessageID, err
 }
 
 // AK we can abstract away ChatMember. But all the commands already has a dependency on tgBotApi.

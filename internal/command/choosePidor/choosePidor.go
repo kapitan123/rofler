@@ -36,8 +36,8 @@ type (
 	}
 
 	messenger interface {
-		SendText(chatId int64, text string) error
-		SendImg(chatId int64, img io.Reader, imgName string, caption string) error
+		SendText(chatId int64, text string) (int, error)
+		SendImg(chatId int64, img io.Reader, imgName string, caption string) (int, error)
 		GetChatAdmins(chatId int64) ([]tgbotapi.ChatMember, error)
 		GetUserCurrentProfilePic(userId int64, w io.Writer) error
 	}
@@ -75,7 +75,7 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 
 	if found {
 		mention := format.AsUserMention(pidor.UserRef.Id, pidor.UserRef.DisplayName)
-		err = h.messenger.SendText(chatId, fmt.Sprintf(mention+" is still sucking juicy cocks"))
+		_, err = h.messenger.SendText(chatId, fmt.Sprintf(mention+" is still sucking juicy cocks"))
 		return err
 	}
 
@@ -102,7 +102,8 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 
 	if err != nil {
 		log.WithError(err).Error("failed to generate user profile pic")
-		return h.messenger.SendImg(chatId, bytes.NewReader(tinfoilPicture), "tinfoil.png", "Скрытный пидор дня у нас "+mention)
+		_, err := h.messenger.SendImg(chatId, bytes.NewReader(tinfoilPicture), "tinfoil.png", "Скрытный пидор дня у нас "+mention)
+		return err
 	}
 
 	resBuf := bytes.NewBuffer([]byte{})
@@ -112,7 +113,8 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 		return err
 	}
 
-	return h.messenger.SendImg(chatId, resBuf, "pidor.png", "Pidor of the day is "+mention)
+	_, err = h.messenger.SendImg(chatId, resBuf, "pidor.png", "Pidor of the day is "+mention)
+	return err
 }
 
 func chooseRandom(members []tgbotapi.ChatMember) tgbotapi.ChatMember {

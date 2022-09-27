@@ -16,7 +16,7 @@ type TopRofler struct {
 }
 
 type messenger interface {
-	SendText(chatId int64, text string) error
+	SendText(chatId int64, text string) (int, error)
 }
 
 type postStorage interface {
@@ -40,7 +40,7 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 
 	listMeassge := format.AsDescendingList(roflerScores, "🤡 <b>%s</b>: %d")
 
-	err = h.messenger.SendText(message.Chat.ID, listMeassge)
+	_, err = h.messenger.SendText(message.Chat.ID, listMeassge)
 	if err != nil {
 		return err
 	}

@@ -78,8 +78,8 @@ func main() {
 		recordReaction.New(m, s),
 		replaceLinkWithMessage.New(m, s, d),
 		replyTo300.New(m, q),
-		replyToNo.New(m, w),
-		replyToYes.New(m),
+		replyToNo.New(m, w, q),
+		replyToYes.New(m, q),
 	)
 
 	router := mux.NewRouter()
