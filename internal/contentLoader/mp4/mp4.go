@@ -1,10 +1,11 @@
 package mp4
 
 import (
-	"github.com/kapitan123/telegrofler/internal/contentLoader"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/kapitan123/telegrofler/internal/contentLoader"
 )
 
 type MetaExtractor struct {
@@ -25,6 +26,7 @@ func (e *MetaExtractor) ExtractVideoMeta(url string) (*contentLoader.VideoMeta, 
 	return &contentLoader.VideoMeta{
 		Id:          url,
 		DownloadUrl: url,
+		Type:        "mp4",
 	}, nil
 
 }
