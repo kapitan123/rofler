@@ -33,18 +33,27 @@ import (
 )
 
 func main() {
+	meta, err := config.GetMetadata()
+
+	if err != nil {
+		log.WithError(err).Fatal("Metada is not accessable")
+	}
+
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
-	client, err := firestore.NewClient(ctx, config.ProjectId)
+
+	client, err := firestore.NewClient(ctx, meta.ProjectId)
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create firestore client")
 	}
+
 	defer func() {
 		err := client.Close()
 		if err != nil {
 			log.WithError(err).Fatal("Failed to close firestore client")
 		}
 	}()
+
 	s := storage.New(client)
 
 	botapi, err := tgbotapi.NewBotAPI(config.TelegramToken)

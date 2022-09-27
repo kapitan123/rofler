@@ -23,12 +23,6 @@ resource "google_cloud_run_service" "telegrofler" {
           name  = "TELEGRAM_BOT_TOKEN"
           value = var.bot_token
         }
-
-        env {
-          name  = "GCLOUD_PROJECT_ID"
-          value = var.project_id
-        }
-
       }
     }
   }

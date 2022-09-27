@@ -126,7 +126,6 @@ jobs:
           image:  ${{ env.IMAGE_NAME }}
           region: europe-central2
           env_vars: |
-            GCLOUD_PROJECT_ID=${{ steps.auth.outputs.project_id }}
             TELEGRAM_BOT_TOKEN=${{ steps.secrets-manager.outputs.telegram-bot-token }}
 
       - name: 'Use output'
