@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 
-	"cloud.google.com/go/compute/metadata"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,21 +14,17 @@ const (
 	gcloudAppCredsEnv = "GOOGLE_APPLICATION_CREDENTIALS"
 	port              = "PORT"
 	selfUrl           = "SELF_URL"
+	deletionQueueName = "DELETION_QUEUE_NAME"
 )
 
 var (
-	TelegramToken = os.Getenv(telegramTokenEnv)
-	ServerPort, _ = strconv.Atoi(os.Getenv(port))
-	GcloudCreds   = os.Getenv(gcloudAppCredsEnv)
-	WorkersCount  = 1
-	SelfUrl       = os.Getenv(selfUrl)
+	TelegramToken     = os.Getenv(telegramTokenEnv)
+	ServerPort, _     = strconv.Atoi(os.Getenv(port))
+	GcloudCreds       = os.Getenv(gcloudAppCredsEnv)
+	WorkersCount      = 1
+	SelfUrl           = os.Getenv(selfUrl)
+	DeletionQueueName = os.Getenv(deletionQueueName)
 )
-
-type Meta struct {
-	ProjectId string
-	Region    string
-	Email     string
-}
 
 func init() {
 	if TelegramToken == "" {
@@ -43,30 +38,4 @@ func init() {
 	if SelfUrl == "" {
 		log.Info("self url is not set. Bot won't be able to enqueue tasks. Variable ", selfUrl)
 	}
-}
-
-func GetMetadata() (*Meta, error) {
-	projectId, err := metadata.ProjectID()
-
-	if err != nil {
-		return nil, err
-	}
-
-	region, err := metadata.Zone()
-
-	if err != nil {
-		return nil, err
-	}
-
-	email, err := metadata.Get("instance/service-accounts/default/email")
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &Meta{
-		ProjectId: projectId,
-		Region:    region,
-		Email:     email,
-	}, nil
 }

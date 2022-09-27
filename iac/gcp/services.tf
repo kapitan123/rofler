@@ -20,7 +20,7 @@ resource "google_project_service" "secretmanager_googleapis_com" {
 
 resource "google_project_service" "storage_googleapis_com" {
   service = "secretmanager.googleapis.com"
-} 
+}
 
 resource "google_project_service" "cloud_tasks_googleapis_com" {
   service = "cloudtasks.googleapis.com"

@@ -20,21 +20,23 @@ type TaskQueue struct {
 	client         *cloudtasks.Client
 	ctx            context.Context
 	initClientOnce sync.Once
+	selfUrl        string
 }
 
-type meta struct {
-	projectId string
-	region    string
-	email     string
+type meta interface {
+	GetProjectId() string
+	GetRegion() string
+	GetEmail() string
 }
 
 func New(ctx context.Context, name string, meta meta, selfUrl string) *TaskQueue {
 	return &TaskQueue{
 		Name:           name,
-		Path:           fmt.Sprintf("projects/%s/locations/%s/queues/%s", meta.projectId, meta.region, name),
+		Path:           fmt.Sprintf("projects/%s/locations/%s/queues/%s", meta.GetProjectId(), meta.GetRegion(), name),
 		meta:           meta,
 		ctx:            ctx,
 		initClientOnce: sync.Once{},
+		selfUrl:        selfUrl,
 	}
 }
 
@@ -116,7 +118,7 @@ func (q *TaskQueue) createPostRequest(url string, payload []byte) *taskspb.Creat
 					Url:        url,
 					AuthorizationHeader: &taskspb.HttpRequest_OidcToken{
 						OidcToken: &taskspb.OidcToken{
-							ServiceAccountEmail: q.meta.email,
+							ServiceAccountEmail: q.meta.GetEmail(),
 						},
 					},
 				},

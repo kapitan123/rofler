@@ -27,13 +27,14 @@ import (
 	"github.com/kapitan123/telegrofler/internal/messenger"
 	"github.com/kapitan123/telegrofler/internal/storage"
 	"github.com/kapitan123/telegrofler/internal/systemclock"
+	"github.com/kapitan123/telegrofler/internal/taskQueue"
 	"github.com/kapitan123/telegrofler/internal/watermarker"
 
 	"github.com/kapitan123/telegrofler/config"
 )
 
 func main() {
-	meta, err := config.GetMetadata()
+	meta, err := config.NewMetadata()
 
 	if err != nil {
 		log.WithError(err).Fatal("Metada is not accessable")
@@ -42,7 +43,7 @@ func main() {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 
-	client, err := firestore.NewClient(ctx, meta.ProjectId)
+	client, err := firestore.NewClient(ctx, meta.GetProjectId())
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create firestore client")
 	}
@@ -61,6 +62,7 @@ func main() {
 		log.WithError(err).Fatal("Failed to create bot api")
 	}
 
+	q := taskQueue.New(ctx, config.DeletionQueueName, meta, config.SelfUrl)
 	// AK TODO move bot and other shit to app
 	// otherwise we need to create multiple instances of bot and storage to handle scheduler
 	d := contentLoader.New(shortsget.New(), lovetik.New(), mp4.New())
