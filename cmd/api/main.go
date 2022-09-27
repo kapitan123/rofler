@@ -22,6 +22,7 @@ import (
 	"github.com/kapitan123/telegrofler/internal/command/toprofler"
 	"github.com/kapitan123/telegrofler/internal/contentLoader"
 	"github.com/kapitan123/telegrofler/internal/contentLoader/lovetik"
+	"github.com/kapitan123/telegrofler/internal/contentLoader/mp4"
 	"github.com/kapitan123/telegrofler/internal/contentLoader/shortsget"
 	"github.com/kapitan123/telegrofler/internal/messenger"
 	"github.com/kapitan123/telegrofler/internal/storage"
@@ -53,7 +54,7 @@ func main() {
 
 	// AK TODO move bot and other shit to app
 	// otherwise we need to create multiple instances of bot and storage to handle scheduler
-	d := contentLoader.New(shortsget.New(), lovetik.New())
+	d := contentLoader.New(shortsget.New(), lovetik.New(), mp4.New())
 	m := messenger.New(botapi, d)
 	w := watermarker.New()
 	sc := systemclock.New()
