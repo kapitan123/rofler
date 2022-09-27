@@ -4,14 +4,18 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"encoding/json"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	log "github.com/sirupsen/logrus"
 )
+
+var defaultMessageLifeTime = 10
 
 type TaskQueue struct {
 	Name           string
@@ -40,7 +44,7 @@ func New(ctx context.Context, name string, meta meta, selfUrl string) *TaskQueue
 	}
 }
 
-func (q *TaskQueue) EnqueueDeleteMessage(targetUrl string, chatId int64, messageId int) error {
+func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, messageId int) error {
 	var err error
 
 	q.initClientOnce.Do(func() {
@@ -65,7 +69,7 @@ func (q *TaskQueue) EnqueueDeleteMessage(targetUrl string, chatId int64, message
 		return err
 	}
 
-	req := q.createPostRequest(targetUrl, delJson)
+	req := q.createPostRequest(q.selfUrl, delJson)
 
 	createdTask, err := q.client.CreateTask(q.ctx, req)
 
@@ -123,10 +127,21 @@ func (q *TaskQueue) createPostRequest(url string, payload []byte) *taskspb.Creat
 					},
 				},
 			},
+			ScheduleTime: getMinutesOffset(defaultMessageLifeTime),
 		},
 	}
 
 	req.Task.GetHttpRequest().Body = payload
 
 	return req
+}
+
+func getMinutesOffset(minutes int) *timestamppb.Timestamp {
+	d := time.Minute * time.Duration(minutes)
+
+	ts := &timestamppb.Timestamp{
+		Seconds: time.Now().Add(d).Unix(),
+	}
+
+	return ts
 }

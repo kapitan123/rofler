@@ -77,7 +77,7 @@ func main() {
 		recordBotPostReaction.New(m, s),
 		recordReaction.New(m, s),
 		replaceLinkWithMessage.New(m, s, d),
-		replyTo300.New(m),
+		replyTo300.New(m, q),
 		replyToNo.New(m, w),
 		replyToYes.New(m),
 	)

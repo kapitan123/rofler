@@ -17,15 +17,21 @@ var yesPicture []byte
 
 type ReplyToYes struct {
 	messenger messenger
+	queue     queue
+}
+
+type queue interface {
+	EnqueueDeleteMessage(chatId int64, messageId int) error
 }
 
 type messenger interface {
 	ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) error
 }
 
-func New(messenger messenger) *ReplyToYes {
+func New(messenger messenger, queue queue) *ReplyToYes {
 	return &ReplyToYes{
 		messenger: messenger,
+		queue:     queue,
 	}
 }
 

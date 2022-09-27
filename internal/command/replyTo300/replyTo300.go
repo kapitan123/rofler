@@ -11,15 +11,21 @@ var regexp300 = regexp.MustCompile(`300|Триста|триста`)
 
 type ReplyTo300 struct {
 	messenger messenger
+	queue     queue
 }
 
 type messenger interface {
 	ReplyWithText(chatId int64, messageId int, text string) error
 }
 
-func New(messenger messenger) *ReplyTo300 {
+type queue interface {
+	EnqueueDeleteMessage(chatId int64, messageId int) error
+}
+
+func New(messenger messenger, queue queue) *ReplyTo300 {
 	return &ReplyTo300{
 		messenger: messenger,
+		queue:     queue,
 	}
 }
 
