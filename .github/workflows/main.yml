@@ -1,0 +1,55 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+     inputs:
+       env:
+         description: Environment
+         default: prod
+         required: true
+env:
+  IMAGE_NAME: eu.gcr.io/neat-cycling-346311/telegrofler
+
+jobs: 
+    deploy-telegrofler-new-version:
+      runs-on: ubuntu-latest
+      environment: prod #AK TODO there is no different env anyway
+      name: Deploys new version of telegrofler bot
+
+      steps:
+      - uses: 'actions/checkout@v3'
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - id: secrets-manager
+        uses: google-github-actions/get-secretmanager-secrets@v0
+        with:
+          secrets: |-
+            telegram-bot-token:${{ steps.auth.outputs.project_id }}/telegram_bot_token
+            app-name:${{ steps.auth.outputs.project_id }}/app_name
+
+      - name: SHOW IMAGE NAME
+        shell: bash
+        run: echo  ${{ env.IMAGE_NAME }}
+
+      - name: SHOW IMAGE NAME
+        shell: bash
+        run: echo  $IMAGE_NAME
+
+      - id: build-and-push
+        uses: ./.github/actions/gcp-build-and-push-image
+        with:
+          image-name: ${{ env.IMAGE_NAME }}
+
+      - id: deploy-to-cloud-run
+        uses: ./.github/actions/gcp-deploy-to-cloud-run
+        with:
+          image-name: ${{ env.IMAGE_NAME }}
+          project-id: ${{ steps.auth.outputs.project_id }}
+          telegram-token: ${{ steps.secrets-manager.outputs.telegram-bot-token }} 
