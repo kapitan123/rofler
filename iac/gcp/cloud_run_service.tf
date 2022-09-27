@@ -20,15 +20,18 @@ resource "google_cloud_run_service" "telegrofler" {
         }
 
         env {
-          name = "TELEGRAM_BOT_TOKEN"
+          name  = "TELEGRAM_BOT_TOKEN"
+          value = var.bot_token
         }
 
         env {
-          name = "FIRESTORE_PROJECT_ID"
+          name  = "FIRESTORE_PROJECT_ID"
+          value = var.project_id
         }
 
         env {
-          name = "GOOGLE_CLOUD_PROJECT"
+          name  = "GOOGLE_CLOUD_PROJECT"
+          value = var.project_id
         }
 
       }

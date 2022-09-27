@@ -45,6 +45,7 @@ jobs:
           run: |
             echo "TF_VAR_name=${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_ENV
             echo "TF_VAR_project_id=${{ steps.auth.outputs.project_id }}" >> $GITHUB_ENV
+            echo "TF_VAR_bot_token=${{ steps.secrets-manager.outputs.telegram-bot-token }}" >> $GITHUB_ENV
 
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v2

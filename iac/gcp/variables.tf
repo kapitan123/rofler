@@ -7,6 +7,11 @@ variable "region" {
   default = "europe-central2"
 }
 
+variable "bot_token" {
+  type      = string
+  sensitive = true
+}
+
 variable "registry_id" {
   type    = string
   default = "eu.gcr.io"
