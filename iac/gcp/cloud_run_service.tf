@@ -28,6 +28,11 @@ resource "google_cloud_run_service" "telegrofler" {
           name  = "DELETION_QUEUE_NAME"
           value = local.deletionQueueName
         }
+
+        env {
+          name  = "SELF_URL"
+          value = local.telegrofler_url
+        }
       }
     }
   }

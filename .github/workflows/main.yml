@@ -130,10 +130,3 @@ jobs:
 
       - name: 'Use output'
         run: 'curl "${{ steps.deploy.outputs.url }}"'
-
-      # - id: deploy-to-cloud-run
-      #   uses: ./.github/actions/gcp-deploy-to-cloud-run
-      #   with:
-      #     image-name: ${{ env.IMAGE_NAME }}
-      #     project-id: ${{ steps.auth.outputs.project_id }}
-      #     telegram-token: ${{ steps.secrets-manager.outputs.telegram-bot-token }} 
