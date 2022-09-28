@@ -42,7 +42,7 @@ func New(ctx context.Context, name string, meta meta, selfUrl string) *TaskQueue
 	}
 }
 
-func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, messageId int) error {
+func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
 	var err error
 
 	q.initClientOnce.Do(func() {
@@ -53,7 +53,7 @@ func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, messageId int) error {
 		return err
 	}
 
-	url := fmt.Sprintf("%s/chat/%d/%d", q.selfUrl, chatId, messageId)
+	url := fmt.Sprintf("%s/chat/%d/%d", q.selfUrl, chatId, msgId)
 
 	req := q.createDeleteRequest(url)
 

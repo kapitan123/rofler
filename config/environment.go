@@ -15,6 +15,9 @@ const (
 	port              = "PORT"
 	selfUrl           = "SELF_URL"
 	deletionQueueName = "DELETION_QUEUE_NAME"
+	region            = "REGION"
+	saEmail           = "SA_EMAIL"
+	projectId         = "PROJECT_ID"
 )
 
 var (
@@ -24,6 +27,9 @@ var (
 	WorkersCount      = 1
 	SelfUrl           = os.Getenv(selfUrl)
 	DeletionQueueName = os.Getenv(deletionQueueName)
+	Region            = os.Getenv(region)
+	SaEmail           = os.Getenv(saEmail)
+	ProjectId         = os.Getenv(projectId)
 )
 
 func init() {
@@ -37,5 +43,9 @@ func init() {
 
 	if SelfUrl == "" {
 		log.Info("self url is not set. Bot won't be able to enqueue tasks. Variable ", selfUrl)
+	}
+
+	if SaEmail == "" || Region == "" || ProjectId == "" {
+		log.Infof("metadata variables are not set, metadata server will be used %s, %s, %s ", saEmail, region, projectId)
 	}
 }
