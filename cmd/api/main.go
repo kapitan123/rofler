@@ -83,8 +83,9 @@ func main() {
 	)
 
 	router := mux.NewRouter()
+
 	// AK TODO pass args through app?
-	setupRouter(router, commandRunner, choosePidor.New(m, s, w, sc))
+	setupRouter(router, commandRunner, choosePidor.New(m, s, w, sc), m)
 
 	commandRunner.Start(ctx)
 
