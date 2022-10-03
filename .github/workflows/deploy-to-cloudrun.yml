@@ -2,9 +2,11 @@ name: Deploy to Cloud Run
 
 on:
   push:
-  #   branches: [ main ]
-  # pull_request:
-  #    types: [ opened, edited, synchronize ]
+     branches: [ main ]
+  pull_request:
+    types: [ opened, edited, synchronize ]
+  workflow_dispatch:
+   
 
 env:
   IMAGE_NAME: ""
@@ -65,9 +67,10 @@ jobs:
       #     image-name: ${{ env.IMAGE_NAME }}
       #     credentials-json: ${{ secrets.GCP_CREDENTIALS }}
 
-      # - name: Set cloudrun service name to branch name
-      #   run:
-      #     echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${{github.ref_name}}" >> $GITHUB_ENV
+      - name: Set cloudrun service name if is not master
+        if: github.ref_name != main
+        run:
+          echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${{github.ref_name}}" >> $GITHUB_ENV
 
       - id: deploy
         name: Deploy to Cloud Run
