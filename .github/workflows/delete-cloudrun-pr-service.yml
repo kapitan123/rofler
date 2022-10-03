@@ -1,8 +1,7 @@
 name: Deletes cloudrun PR service
 
 on:
-  pull_request:
-    types: [ closed ]
+  delete:
 
 jobs:
     delete-cloud-run:
@@ -26,4 +25,5 @@ jobs:
             app-name:${{ steps.auth.outputs.project_id }}/app_name
 
       - name: Delete service
-        run: gcloud run services delete ${{ steps.secrets-manager.outputs.app-name }}-${{github.ref_name}} --region europe-central2
+        if: github.ref_name != 'main'
+        run: gcloud run services delete ${{ steps.secrets-manager.outputs.app-name }}-${{github.ref_name}} --region europe-central2 --quiet

@@ -2,9 +2,9 @@ name: Deploy to Cloud Run
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-     types: [ opened, edited ]
+  #   branches: [ main ]
+  # pull_request:
+  #    types: [ opened, edited, synchronize ]
 
 env:
   IMAGE_NAME: ""
@@ -21,6 +21,9 @@ jobs:
       name: Deploys new version of telegrofler bot
 
       steps:
+      - name : Print Title of PR
+        run: echo The Title of your PR is ${{ github.event.pull_request.title }}
+
       - uses: 'actions/checkout@v3'
 
       - id: auth
@@ -40,7 +43,7 @@ jobs:
         name: Create image name with values from secrets secrets-manager
         run: |
           echo "IMAGE_NAME=eu.gcr.io/${{ steps.auth.outputs.project_id }}/${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_ENV
-          echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_ENV
+          echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${{github.ref_name}}" >> $GITHUB_ENV
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
@@ -62,10 +65,9 @@ jobs:
       #     image-name: ${{ env.IMAGE_NAME }}
       #     credentials-json: ${{ secrets.GCP_CREDENTIALS }}
 
-      - name: Set cloudrun service name if is not master
-        if: github.ref != 'refs/heads/master'
-        run:
-          echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${{github.ref_name}}" >> $GITHUB_ENV
+      # - name: Set cloudrun service name to branch name
+      #   run:
+      #     echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${{github.ref_name}}" >> $GITHUB_ENV
 
       - id: deploy
         name: Deploy to Cloud Run
@@ -77,7 +79,7 @@ jobs:
           env_vars: |
             TELEGRAM_BOT_TOKEN=${{ steps.secrets-manager.outputs.telegram-bot-token }}
             PROJECT_ID=${{ steps.auth.outputs.project_id}}
-            DELETION_QUEUE_NAME=tg-message-deletion
+            DELETION_QUEUE_NAME=tgmessage-deletion
 
       - name: Output deployed url
         run: curl "${{ steps.deploy.outputs.url }}"
