@@ -3,6 +3,12 @@ resource "google_cloud_run_service" "telegrofler" {
   location = var.region
   project  = var.project_id
 
+  lifecycle {
+    ignore_changes = [
+      template[0].spec[5],
+    ]
+  }
+
   template {
     spec {
       containers {
@@ -31,7 +37,7 @@ resource "google_cloud_run_service" "telegrofler" {
 
         env {
           name  = "SELF_URL"
-          value = local.telegrofler_url
+          value = ""
         }
       }
     }
@@ -42,7 +48,7 @@ resource "google_cloud_run_service" "telegrofler" {
     latest_revision = true
   }
 
-  depends_on = [google_project_service.cr_googleapis_com]
+  depends_on = [google_project_service.cloud_run_googleapis_com]
 }
 
 # Allow unauthenticated users to invoke the service
