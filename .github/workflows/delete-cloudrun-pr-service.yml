@@ -4,7 +4,14 @@ on:
   pull_request:
     types: [ closed ]
   delete:
+  workflow_dispatch:
+    inputs:
+      pr-number: 
+        description: Image name to deploy
+        required: true
 
+env:
+  CLOUD_RUN_SERVICE_NAME: ""
 
 jobs:
     delete-cloud-run:
@@ -29,4 +36,4 @@ jobs:
 
       - name: Delete service
         if: github.ref_name != 'main'
-        run: gcloud run services delete ${{ steps.secrets-manager.outputs.app-name }}-${{github.ref_name}} --region europe-central2 #--quiet
+        run: gcloud run services delete ${{ steps.secrets-manager.outputs.app-name }}-${{github.event.number}} --region europe-central2 #--quiet
