@@ -12,7 +12,7 @@ env:
 
 # AK TODO extract env setup 
 # can extract env-setup-action
-# wich outputs a token and app name 
+# wich outputs a token and app name pr trigger
 
 jobs:
     deploy-cloudrun-service:
