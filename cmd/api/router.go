@@ -51,6 +51,8 @@ func choosePidorHandler(pdr *choosePidor.ChoosePidor) http.HandlerFunc {
 		if err != nil {
 			log.WithError(err).Error("Failed trying to parse chat id", err)
 			w.WriteHeader(http.StatusBadRequest)
+
+			return
 		}
 
 		err = pdr.ChoosePidor(r.Context(), chatId)
@@ -58,6 +60,8 @@ func choosePidorHandler(pdr *choosePidor.ChoosePidor) http.HandlerFunc {
 		if err != nil {
 			log.Error("Failed trying to choose a pidor", err)
 			w.WriteHeader(http.StatusInternalServerError)
+
+			return
 		}
 		w.WriteHeader(http.StatusOK)
 	}
@@ -69,12 +73,16 @@ func deleteMessageHandler(msgr *messenger.Messenger) http.HandlerFunc {
 		if err != nil {
 			log.WithError(err).Error("Failed trying to parse chat id", err)
 			w.WriteHeader(http.StatusBadRequest)
+
+			return
 		}
 
 		messageid, err := extractMessageId(r)
 		if err != nil {
 			log.WithError(err).Error("Failed trying to parse message id", err)
 			w.WriteHeader(http.StatusBadRequest)
+
+			return
 		}
 
 		err = msgr.Delete(chatId, messageid)
@@ -82,7 +90,10 @@ func deleteMessageHandler(msgr *messenger.Messenger) http.HandlerFunc {
 		if err != nil {
 			log.Error("Failed trying to delete a message", err)
 			w.WriteHeader(http.StatusInternalServerError)
+
+			return
 		}
+
 		w.WriteHeader(http.StatusOK)
 	}
 }
