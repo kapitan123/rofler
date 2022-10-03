@@ -67,10 +67,9 @@ jobs:
       #     image-name: ${{ env.IMAGE_NAME }}
       #     credentials-json: ${{ secrets.GCP_CREDENTIALS }}
 
-      - name: Set cloudrun service name if is not master
+      - name: Set cloudrun service name if is not main
         if: github.ref_name != 'main'
         run: |-
-          edww 
           echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${${{github.ref_name}}%.*}" >> $GITHUB_ENV
 
       - id: deploy
