@@ -68,7 +68,7 @@ jobs:
       #     credentials-json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Set cloudrun service name if is not master
-        if: github.ref_name != main
+        if: github.ref_name != 'main'
         run:
           echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${{github.ref_name}}" >> $GITHUB_ENV
 
