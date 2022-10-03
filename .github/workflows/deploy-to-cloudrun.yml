@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-     types: [ opened ]
+     types: [ opened, edited ]
 
 env:
   IMAGE_NAME: ""
@@ -12,7 +12,7 @@ env:
 
 # AK TODO extract env setup 
 # can extract env-setup-action
-# wich outputs a token and app name 
+# wich outputs a token and app name pr trigger
 
 jobs:
     deploy-cloudrun-service:
@@ -51,12 +51,7 @@ jobs:
 
       - name: Build Docker image
         shell: bash
-        run: docker build . -t ${{ env.IMAGE_NAME }} # AK TODO should actually use env variable???
-
-        # - Extract tests to a new job
-        # - name: Test Docker image
-        #   shell: bash
-        #   run: docker run ${{ inputs.image-name }} sh -c "go test -v"
+        run: docker build . -t ${{ env.IMAGE_NAME }}
 
       - name: Push Docker image
         shell: bash
@@ -76,11 +71,13 @@ jobs:
         name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v0
         with:
-          service: ${{ steps.secrets-manager.outputs.app-name }}
+          service: ${{ env.CLOUD_RUN_SERVICE_NAME }}
           image:  ${{ env.IMAGE_NAME }}
           region: europe-central2
           env_vars: |
             TELEGRAM_BOT_TOKEN=${{ steps.secrets-manager.outputs.telegram-bot-token }}
+            PROJECT_ID=${{ steps.auth.outputs.project_id}}
+            DELETION_QUEUE_NAME=tg-message-deletion
 
       - name: Output deployed url
         run: curl "${{ steps.deploy.outputs.url }}"

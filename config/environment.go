@@ -11,25 +11,31 @@ import (
 
 const (
 	telegramTokenEnv  = "TELEGRAM_BOT_TOKEN"
-	gcloudAppCredsEnv = "GOOGLE_APPLICATION_CREDENTIALS"
+	gcloudAppCredsEnv = "GOOGLE_APPLICATION_CREDENTIALS" // Default cloudrun env
 	port              = "PORT"
 	selfUrl           = "SELF_URL"
 	deletionQueueName = "DELETION_QUEUE_NAME"
 	region            = "REGION"
 	saEmail           = "SA_EMAIL"
 	projectId         = "PROJECT_ID"
+	serviceName       = "K_SERVICE" // Default cloudrun env
 )
 
 var (
 	TelegramToken     = os.Getenv(telegramTokenEnv)
 	ServerPort, _     = strconv.Atoi(os.Getenv(port))
-	GcloudCreds       = os.Getenv(gcloudAppCredsEnv)
 	WorkersCount      = 1
-	SelfUrl           = os.Getenv(selfUrl)
 	DeletionQueueName = os.Getenv(deletionQueueName)
-	Region            = os.Getenv(region)
-	SaEmail           = os.Getenv(saEmail)
-	ProjectId         = os.Getenv(projectId)
+)
+
+// these var are used to manually set context, which is fetched from gcloud metadata when deployed
+var (
+	GcloudCreds = os.Getenv(gcloudAppCredsEnv)
+	SelfUrl     = os.Getenv(selfUrl)
+	Region      = os.Getenv(region)
+	SaEmail     = os.Getenv(saEmail)
+	ServiceName = os.Getenv(serviceName)
+	ProjectId   = os.Getenv(projectId)
 )
 
 func init() {
@@ -45,7 +51,7 @@ func init() {
 		log.Info("self url is not set. Bot won't be able to enqueue tasks. Variable ", selfUrl)
 	}
 
-	if SaEmail == "" || Region == "" || ProjectId == "" {
+	if SaEmail == "" || Region == "" || ProjectId == "" || SelfUrl == "" {
 		log.Infof("metadata variables are not set, metadata server will be used %s, %s, %s ", saEmail, region, projectId)
 	}
 }

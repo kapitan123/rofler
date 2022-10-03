@@ -14,6 +14,8 @@ resource "google_cloud_tasks_queue" "tg_message_deletion" {
     min_backoff        = "2s"
     max_doublings      = 1
   }
+
+  depends_on = [google_project_service.cloud_tasks_googleapis_com]
 }
 
 locals {
