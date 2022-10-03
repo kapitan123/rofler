@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-     types: [ opened ]
+     types: [ opened, edited ]
 
 env:
   IMAGE_NAME: ""
@@ -52,11 +52,6 @@ jobs:
       - name: Build Docker image
         shell: bash
         run: docker build . -t ${{ env.IMAGE_NAME }}
-
-        # - Extract tests to a new job
-        # - name: Test Docker image
-        #   shell: bash
-        #   run: docker run ${{ inputs.image-name }} sh -c "go test -v"
 
       - name: Push Docker image
         shell: bash
