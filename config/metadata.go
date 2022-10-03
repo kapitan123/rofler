@@ -1,21 +1,28 @@
 package config
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+
+	log "github.com/sirupsen/logrus"
 
 	"cloud.google.com/go/compute/metadata"
+	"golang.org/x/oauth2/google"
 )
 
 type MetaData struct {
 	projectId string
 	region    string
 	email     string
+	selfUrl   string
 }
 
 func NewMetadata() (*MetaData, error) {
 	meta := getMetadataFromEnvVars()
 
-	if meta.projectId != "" && meta.email != "" && meta.region != "" {
+	if meta.projectId != "" && meta.email != "" && meta.region != "" && meta.selfUrl != "" {
 		return &meta, nil
 	}
 
@@ -37,10 +44,19 @@ func NewMetadata() (*MetaData, error) {
 		return nil, err
 	}
 
+	projectNumber, err := metadata.NumericProjectID()
+
+	if err != nil {
+		return nil, err
+	}
+
+	selfUrl, err := getCloudRunUrl(region, projectNumber, ServiceName)
+
 	return &MetaData{
 		projectId: projectId,
 		region:    region,
 		email:     email,
+		selfUrl:   selfUrl,
 	}, nil
 }
 
@@ -61,5 +77,44 @@ func getMetadataFromEnvVars() MetaData {
 		projectId: ProjectId,
 		region:    Region,
 		email:     SaEmail,
+		selfUrl:   SelfUrl,
 	}
+}
+
+func getCloudRunUrl(region string, projectNumber string, serviceName string) (string, error) {
+
+	ctx := context.Background()
+
+	client, err := google.DefaultClient(ctx)
+
+	cloudRunApi := fmt.Sprintf("https://%s-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/%s/services/%s", region, projectNumber, serviceName)
+
+	log.Info(cloudRunApi)
+
+	resp, err := client.Get(cloudRunApi)
+
+	if err != nil {
+		return "", err
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return "", err
+	}
+
+	cloudRunResp := &cloudRunAPIUrlOnly{}
+	json.Unmarshal(body, cloudRunResp)
+	url := cloudRunResp.Status.URL
+
+	log.Info("cloud run selfurl is set to: ", cloudRunApi)
+
+	return url, nil
+}
+
+type cloudRunAPIUrlOnly struct {
+	Status struct {
+		URL string `json:"url"`
+	} `json:"status"`
 }

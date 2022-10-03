@@ -36,8 +36,8 @@ resource "google_cloud_run_service" "telegrofler" {
         }
 
         env {
-          name  = "SELF_URL"
-          value = ""
+          name  = "PROJECT_ID"
+          value = var.project_id
         }
       }
     }

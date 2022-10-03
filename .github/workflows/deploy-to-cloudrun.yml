@@ -51,7 +51,7 @@ jobs:
 
       - name: Build Docker image
         shell: bash
-        run: docker build . -t ${{ env.IMAGE_NAME }} # AK TODO should actually use env variable???
+        run: docker build . -t ${{ env.IMAGE_NAME }}
 
         # - Extract tests to a new job
         # - name: Test Docker image
@@ -81,6 +81,8 @@ jobs:
           region: europe-central2
           env_vars: |
             TELEGRAM_BOT_TOKEN=${{ steps.secrets-manager.outputs.telegram-bot-token }}
+            PROJECT_ID=${{ steps.auth.outputs.project_id}}
+            DELETION_QUEUE_NAME=tg-message-deletion
 
       - name: Output deployed url
         run: curl "${{ steps.deploy.outputs.url }}"
