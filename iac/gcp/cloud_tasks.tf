@@ -19,5 +19,5 @@ resource "google_cloud_tasks_queue" "tg_message_deletion" {
 }
 
 locals {
-  deletionQueueName = "tg-message-deletion"
+  deletionQueueName = "tgmessage-deletion"
 }

@@ -79,7 +79,7 @@ jobs:
           env_vars: |
             TELEGRAM_BOT_TOKEN=${{ steps.secrets-manager.outputs.telegram-bot-token }}
             PROJECT_ID=${{ steps.auth.outputs.project_id}}
-            DELETION_QUEUE_NAME=tg-message-deletion
+            DELETION_QUEUE_NAME=tgmessage-deletion
 
       - name: Output deployed url
         run: curl "${{ steps.deploy.outputs.url }}"
