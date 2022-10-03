@@ -35,5 +35,4 @@ jobs:
             app-name:${{ steps.auth.outputs.project_id }}/app_name
 
       - name: Delete service
-        if: github.ref_name != 'main'
         run: gcloud run services delete ${{ steps.secrets-manager.outputs.app-name }}-${{github.event.number}} --region europe-central2 #--quiet
