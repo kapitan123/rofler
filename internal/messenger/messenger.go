@@ -31,6 +31,11 @@ func (m *Messenger) SendText(chatID int64, text string) (int, error) {
 	msg.ParseMode = tgbotapi.ModeHTML
 
 	res, err := m.api.Send(msg)
+
+	if err != nil {
+		return 0, err
+	}
+
 	return res.MessageID, err
 }
 
@@ -40,6 +45,10 @@ func (m *Messenger) ReplyWithText(chatId int64, replyToMessageId int, caption st
 	msg.ParseMode = tgbotapi.ModeHTML
 
 	res, err := m.api.Send(msg)
+
+	if err != nil {
+		return 0, err
+	}
 
 	return res.MessageID, err
 }
@@ -59,6 +68,10 @@ func (m *Messenger) SendImg(chatId int64, img io.Reader, imgName string, caption
 	}
 
 	res, err := m.api.Send(msg)
+
+	if err != nil {
+		return 0, err
+	}
 
 	return res.MessageID, err
 }
@@ -80,6 +93,10 @@ func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img io.Read
 	_, err = m.api.Send(msg)
 
 	res, err := m.api.Send(msg)
+
+	if err != nil {
+		return 0, err
+	}
 
 	return res.MessageID, err
 }
@@ -154,6 +171,10 @@ func (b *Messenger) SendVideo(chatId int64, videoId string, caption string, payl
 	v.ParseMode = tgbotapi.ModeHTML
 
 	res, err := b.api.Send(v)
+
+	if err != nil {
+		return 0, err
+	}
 
 	return res.MessageID, err
 }
