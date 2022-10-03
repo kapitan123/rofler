@@ -43,6 +43,7 @@ func New(ctx context.Context, name string, meta meta, selfUrl string) *TaskQueue
 }
 
 func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
+	return nil
 	var err error
 
 	q.initClientOnce.Do(func() {
