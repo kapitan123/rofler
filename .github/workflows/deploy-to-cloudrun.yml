@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-     types: [ opened, edited ]
+     types: [ opened, edited, synchronize ]
 
 env:
   IMAGE_NAME: ""
@@ -21,6 +21,9 @@ jobs:
       name: Deploys new version of telegrofler bot
 
       steps:
+      - name : Print Title of PR
+        run: echo The Title of your PR is ${{ github.event.pull_request.title }}
+
       - uses: 'actions/checkout@v3'
 
       - id: auth
