@@ -70,7 +70,7 @@ jobs:
       - name: Set cloudrun service name if is not main
         if: github.ref_name != 'main'
         run: |-
-          echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${${{github.ref_name}}%.*}" >> $GITHUB_ENV
+          echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${${{github.ref_name}}%/*}" >> $GITHUB_ENV
 
       - id: deploy
         name: Deploy to Cloud Run
