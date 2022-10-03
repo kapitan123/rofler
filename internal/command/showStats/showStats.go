@@ -25,7 +25,7 @@ type ShowStats struct {
 
 type (
 	messenger interface {
-		SendImg(chatId int64, img []byte, imgName string, caption string) error
+		SendImg(chatId int64, img []byte, imgName string, caption string) (int, error)
 	}
 
 	postStorage interface {
@@ -66,8 +66,9 @@ func (h *ShowStats) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	if err != nil {
 		return err
 	}
+	_, err = h.messenger.SendImg(m.Chat.ID, buffer.Bytes(), "stats.png", "")
 
-	return h.messenger.SendImg(m.Chat.ID, buffer.Bytes(), "stats.png", "")
+	return err
 }
 
 // I can just use a map or create a map subclass

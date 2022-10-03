@@ -27,24 +27,34 @@ import (
 	"github.com/kapitan123/telegrofler/internal/messenger"
 	"github.com/kapitan123/telegrofler/internal/storage"
 	"github.com/kapitan123/telegrofler/internal/systemclock"
+	"github.com/kapitan123/telegrofler/internal/taskQueue"
 	"github.com/kapitan123/telegrofler/internal/watermarker"
 
 	"github.com/kapitan123/telegrofler/config"
 )
 
 func main() {
+	meta, err := config.NewMetadata()
+
+	if err != nil {
+		log.WithError(err).Fatal("Metada is not accessable")
+	}
+
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
-	client, err := firestore.NewClient(ctx, config.ProjectId)
+
+	client, err := firestore.NewClient(ctx, meta.GetProjectId())
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create firestore client")
 	}
+
 	defer func() {
 		err := client.Close()
 		if err != nil {
 			log.WithError(err).Fatal("Failed to close firestore client")
 		}
 	}()
+
 	s := storage.New(client)
 
 	botapi, err := tgbotapi.NewBotAPI(config.TelegramToken)
@@ -52,6 +62,7 @@ func main() {
 		log.WithError(err).Fatal("Failed to create bot api")
 	}
 
+	q := taskQueue.New(ctx, config.DeletionQueueName, meta, config.SelfUrl)
 	// AK TODO move bot and other shit to app
 	// otherwise we need to create multiple instances of bot and storage to handle scheduler
 	d := contentLoader.New(shortsget.New(), lovetik.New(), mp4.New())
@@ -66,14 +77,15 @@ func main() {
 		recordBotPostReaction.New(m, s),
 		recordReaction.New(m, s),
 		replaceLinkWithMessage.New(m, s, d),
-		replyTo300.New(m),
-		replyToNo.New(m, w),
-		replyToYes.New(m),
+		replyTo300.New(m, q),
+		replyToNo.New(m, w, q),
+		replyToYes.New(m, q),
 	)
 
 	router := mux.NewRouter()
+
 	// AK TODO pass args through app?
-	setupRouter(router, commandRunner, choosePidor.New(m, s, w, sc))
+	setupRouter(router, commandRunner, choosePidor.New(m, s, w, sc), m)
 
 	commandRunner.Start(ctx)
 

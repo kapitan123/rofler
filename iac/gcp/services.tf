@@ -2,7 +2,7 @@ resource "google_project_service" "cloudscheduler_googleapis_com" {
   service = "cloudscheduler.googleapis.com"
 }
 
-resource "google_project_service" "cr_googleapis_com" {
+resource "google_project_service" "cloud_run_googleapis_com" {
   service = "run.googleapis.com"
 }
 
@@ -20,4 +20,8 @@ resource "google_project_service" "secretmanager_googleapis_com" {
 
 resource "google_project_service" "storage_googleapis_com" {
   service = "secretmanager.googleapis.com"
+}
+
+resource "google_project_service" "cloud_tasks_googleapis_com" {
+  service = "cloudtasks.googleapis.com"
 } 

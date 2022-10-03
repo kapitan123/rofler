@@ -20,6 +20,7 @@ var pidormarkPicture []byte
 type ReplyToNo struct {
 	messenger   messenger
 	watermarker watermarker
+	queue       queue
 }
 
 type watermarker interface {
@@ -27,37 +28,45 @@ type watermarker interface {
 }
 
 type messenger interface {
-	ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) error
+	ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) (int, error)
 	GetUserCurrentProfilePic(userId int64, w io.Writer) error
 }
 
-func New(messenger messenger, watermarker watermarker) *ReplyToNo {
+type queue interface {
+	EnqueueDeleteMessage(chatId int64, messageId int) error
+}
+
+func New(messenger messenger, watermarker watermarker, queue queue) *ReplyToNo {
 	return &ReplyToNo{
 		messenger:   messenger,
 		watermarker: watermarker,
+		queue:       queue,
 	}
 }
 
 func (h *ReplyToNo) Handle(ctx context.Context, m *tgbotapi.Message) error {
+	chatId := m.Chat.ID
 	ppicBuf := bytes.NewBuffer([]byte{})
 	err := h.messenger.GetUserCurrentProfilePic(m.From.ID, ppicBuf)
+
 	if err != nil {
 		return err
 	}
 
 	resBuf := bytes.NewBuffer([]byte{})
 	err = h.watermarker.Apply(ppicBuf, bytes.NewReader(pidormarkPicture), resBuf)
-	if err != nil {
-		return err
-	}
-
-	err = h.messenger.ReplyWithImg(m.Chat.ID, m.MessageID, resBuf, "pidormark.png", pidorText)
 
 	if err != nil {
 		return err
 	}
 
-	return nil
+	newMessageId, err := h.messenger.ReplyWithImg(chatId, m.MessageID, resBuf, "pidormark.png", pidorText)
+
+	if err != nil {
+		return err
+	}
+
+	return h.queue.EnqueueDeleteMessage(chatId, newMessageId)
 }
 
 func (h *ReplyToNo) ShouldRun(m *tgbotapi.Message) bool {

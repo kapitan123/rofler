@@ -16,7 +16,7 @@ type RecordReaction struct {
 
 type (
 	messenger interface {
-		ReplyWithText(chatId int64, messageId int, text string) error
+		ReplyWithText(chatId int64, messageId int, text string) (int, error)
 	}
 
 	postStorage interface {

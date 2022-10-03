@@ -25,15 +25,14 @@ resource "google_cloud_run_service" "telegrofler" {
         }
 
         env {
-          name  = "FIRESTORE_PROJECT_ID"
-          value = var.project_id
+          name  = "DELETION_QUEUE_NAME"
+          value = local.deletionQueueName
         }
 
         env {
-          name  = "GOOGLE_CLOUD_PROJECT"
-          value = var.project_id
+          name  = "SELF_URL"
+          value = local.telegrofler_url
         }
-
       }
     }
   }

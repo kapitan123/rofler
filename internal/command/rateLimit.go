@@ -25,6 +25,7 @@ type profile struct {
 	penaltyExpiresOn time.Time
 }
 
+// Can live in a separate package as well
 func WithRateLimit(cmd command) *RateLimitedCommand {
 	return &RateLimitedCommand{
 		command:      cmd,

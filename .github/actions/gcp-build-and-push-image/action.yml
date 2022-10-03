@@ -1,3 +1,4 @@
+# AK TODO is kept there just because github docs on reusable actions are pain in the ass to find
 name: Build and publish new container version 
 description: Build and tests sources and pushes container to gcloud artifact registry
 inputs:

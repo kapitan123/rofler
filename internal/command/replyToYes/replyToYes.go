@@ -17,22 +17,33 @@ var yesPicture []byte
 
 type ReplyToYes struct {
 	messenger messenger
+	queue     queue
+}
+
+type queue interface {
+	EnqueueDeleteMessage(chatId int64, messageId int) error
 }
 
 type messenger interface {
-	ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) error
+	ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) (int, error)
 }
 
-func New(messenger messenger) *ReplyToYes {
+func New(messenger messenger, queue queue) *ReplyToYes {
 	return &ReplyToYes{
 		messenger: messenger,
+		queue:     queue,
 	}
 }
 
 func (h *ReplyToYes) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	err := h.messenger.ReplyWithImg(m.Chat.ID, m.MessageID, bytes.NewReader(yesPicture), "kirkorov.png", "")
+	chatId := m.Chat.ID
+	newMessageId, err := h.messenger.ReplyWithImg(chatId, m.MessageID, bytes.NewReader(yesPicture), "kirkorov.png", "")
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	return h.queue.EnqueueDeleteMessage(chatId, newMessageId)
 }
 
 func (h *ReplyToYes) ShouldRun(m *tgbotapi.Message) bool {
