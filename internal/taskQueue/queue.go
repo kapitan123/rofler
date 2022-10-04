@@ -13,7 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var defaultMessageLifeTime = 10
+var defaultMessageLifeTime = 2
 
 type TaskQueue struct {
 	Name           string
@@ -43,12 +43,9 @@ func New(ctx context.Context, name string, meta meta, selfUrl string) *TaskQueue
 }
 
 func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
-	return nil
 	var err error
 
-	q.initClientOnce.Do(func() {
-		err = q.initClient()
-	})
+	q.initClient()
 
 	if err != nil {
 		return err
@@ -59,6 +56,10 @@ func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
 	req := q.createDeleteRequest(url)
 
 	createdTask, err := q.client.CreateTask(q.ctx, req)
+
+	if err != nil {
+		return err
+	}
 
 	log.Info("Message deletion task was created ", createdTask.Name)
 
