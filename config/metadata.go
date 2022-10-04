@@ -53,7 +53,11 @@ func NewMetadata() (*MetaData, error) {
 
 	selfUrl, err := getCloudRunUrl(region, projectNumber, ServiceName)
 
-	log.Info("meta.region:%s meta.projectId.region:%s meta.email:%s meta.selfUrl:%s ", region, projectId, email, selfUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infof("meta.region:%s meta.projectId.region:%s meta.email:%s meta.selfUrl:%s ", region, projectId, email, selfUrl)
 
 	return &MetaData{
 		projectId: projectId,
@@ -111,7 +115,7 @@ func getCloudRunUrl(region string, projectNumber string, serviceName string) (st
 	json.Unmarshal(body, cloudRunResp)
 	url := cloudRunResp.Status.URL
 
-	log.Info("cloud run selfurl is set to: ", cloudRunApi)
+	log.Info("cloud run selfurl is set to: ", url)
 
 	return url, nil
 }
