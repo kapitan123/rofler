@@ -43,6 +43,12 @@ func New(ctx context.Context, name string, meta meta, selfUrl string) *TaskQueue
 }
 
 func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
+
+	if q.selfUrl == "" {
+		log.Info("Self url is not set operation can't be enqued")
+		return nil
+	}
+
 	var err error
 
 	q.initClient()
