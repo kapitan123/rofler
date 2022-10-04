@@ -94,9 +94,13 @@ func getCloudRunUrl(region string, projectNumber string, serviceName string) (st
 
 	client, err := google.DefaultClient(ctx)
 
+	if err != nil {
+		return "", err
+	}
+
 	cloudRunApi := fmt.Sprintf("https://%s-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/%s/services/%s", region, projectNumber, serviceName)
 
-	log.Info(cloudRunApi)
+	log.Info("cloud run api url: ", cloudRunApi)
 
 	resp, err := client.Get(cloudRunApi)
 
@@ -110,6 +114,8 @@ func getCloudRunUrl(region string, projectNumber string, serviceName string) (st
 	if err != nil {
 		return "", err
 	}
+
+	log.Info("Response payload: ", string(body[:]))
 
 	cloudRunResp := &cloudRunAPIUrlOnly{}
 	json.Unmarshal(body, cloudRunResp)
