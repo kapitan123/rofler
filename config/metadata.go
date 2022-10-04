@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -52,9 +53,11 @@ func NewMetadata() (*MetaData, error) {
 
 	selfUrl, err := getCloudRunUrl(region, projectNumber, ServiceName)
 
+	log.Info("meta.region:%s meta.projectId.region:%s meta.email:%s meta.selfUrl:%s ", region, projectId, email, selfUrl)
+
 	return &MetaData{
 		projectId: projectId,
-		region:    region,
+		region:    strings.TrimSuffix(region, "-1"), // for some reason endpoint returns region in different format
 		email:     email,
 		selfUrl:   selfUrl,
 	}, nil
