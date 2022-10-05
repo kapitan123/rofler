@@ -79,6 +79,10 @@ func (m *MetaData) GetRegion() string {
 	return m.region
 }
 
+func (m *MetaData) GetSelfUrl() string {
+	return m.selfUrl
+}
+
 func getMetadataFromEnvVars() MetaData {
 	return MetaData{
 		projectId: ProjectId,

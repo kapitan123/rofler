@@ -62,7 +62,7 @@ func main() {
 		log.WithError(err).Fatal("Failed to create bot api")
 	}
 
-	q := taskQueue.New(ctx, config.DeletionQueueName, meta, config.SelfUrl)
+	q := taskQueue.New(ctx, config.DeletionQueueName, meta)
 	// AK TODO move bot and other shit to app
 	// otherwise we need to create multiple instances of bot and storage to handle scheduler
 	d := contentLoader.New(shortsget.New(), lovetik.New(), mp4.New())

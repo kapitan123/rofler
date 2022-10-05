@@ -29,23 +29,22 @@ type meta interface {
 	GetProjectId() string
 	GetRegion() string
 	GetEmail() string
+	GetSelfUrl() string
 }
 
-func New(ctx context.Context, name string, meta meta, selfUrl string) *TaskQueue {
+func New(ctx context.Context, name string, meta meta) *TaskQueue {
 	return &TaskQueue{
 		Name:           name,
 		Path:           fmt.Sprintf("projects/%s/locations/%s/queues/%s", meta.GetProjectId(), meta.GetRegion(), name),
 		meta:           meta,
 		ctx:            ctx,
 		initClientOnce: sync.Once{},
-		selfUrl:        selfUrl,
 	}
 }
 
 func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
-
-	if q.selfUrl == "" {
-		log.Info("Self url is not set operation can't be enqued")
+	if q.meta.GetSelfUrl() == "" {
+		log.Warn("Self url is not set operation can't be enqued")
 		return nil
 	}
 
