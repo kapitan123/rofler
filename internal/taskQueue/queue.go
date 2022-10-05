@@ -22,7 +22,6 @@ type TaskQueue struct {
 	client         *cloudtasks.Client
 	ctx            context.Context
 	initClientOnce sync.Once
-	selfUrl        string
 }
 
 type meta interface {
@@ -43,7 +42,8 @@ func New(ctx context.Context, name string, meta meta) *TaskQueue {
 }
 
 func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
-	if q.meta.GetSelfUrl() == "" {
+	selfUrl := q.meta.GetSelfUrl()
+	if selfUrl == "" {
 		log.Warn("Self url is not set operation can't be enqued")
 		return nil
 	}
@@ -56,7 +56,7 @@ func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
 		return err
 	}
 
-	url := fmt.Sprintf("%s/chat/%d/%d", q.selfUrl, chatId, msgId)
+	url := fmt.Sprintf("%s/chat/%d/%d", selfUrl, chatId, msgId)
 
 	req := q.createDeleteRequest(url)
 
@@ -123,6 +123,8 @@ func (q *TaskQueue) createDeleteRequest(url string) *taskspb.CreateTaskRequest {
 			ScheduleTime: getMinutesOffset(defaultMessageLifeTime),
 		},
 	}
+
+	log.Info("Delete request created for: ", url)
 
 	return req
 }
