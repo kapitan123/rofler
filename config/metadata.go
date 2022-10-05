@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -33,7 +32,8 @@ func NewMetadata() (*MetaData, error) {
 		return nil, fmt.Errorf("metadata server is not accessable. if you wanted to set metadata manually set all the variables.  %w", err)
 	}
 
-	region, err := metadata.Zone()
+	region, err := metadata.Zone() // Returns region+ sub zone so we need to trim last two chars "us-central1-b"
+	region = region[:len(region)-2]
 
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func NewMetadata() (*MetaData, error) {
 
 	return &MetaData{
 		projectId: projectId,
-		region:    strings.TrimSuffix(region, "-1"), // for some reason endpoint returns region in different format
+		region:    region,
 		email:     email,
 		selfUrl:   selfUrl,
 	}, nil
@@ -98,6 +98,7 @@ func getCloudRunUrl(region string, projectNumber string, serviceName string) (st
 		return "", err
 	}
 
+	// this shit does not work
 	cloudRunApi := fmt.Sprintf("https://%s-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/%s/services/%s", region, projectNumber, serviceName)
 
 	log.Info("cloud run api url: ", cloudRunApi)
