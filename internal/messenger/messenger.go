@@ -90,8 +90,6 @@ func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img io.Read
 		msg.Caption = caption
 	}
 
-	_, err = m.api.Send(msg)
-
 	res, err := m.api.Send(msg)
 
 	if err != nil {
