@@ -1,4 +1,4 @@
-package showstats
+package statsTrend
 
 import "time"
 
@@ -8,7 +8,7 @@ type StatPoint struct {
 }
 
 func (sp StatPoint) FloatDate() float64 {
-	return float64(sp.Day.Day()) // this is a simple hack and will work only inside one month
+	return float64(sp.Day.UnixNano()) // this is a simple hack and will work only inside one month
 }
 
 // probably Should have a property which converts Day, to a float representation

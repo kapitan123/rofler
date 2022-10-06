@@ -1,9 +1,10 @@
-package showstats
+package statsTrend
 
 import (
 	"bytes"
 	"context"
 	"io"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/internal/storage"
@@ -17,7 +18,7 @@ import (
 //	ractionsMetric        = "reactions"
 //)
 
-const commandName = "showstats"
+const commandName = "statsTrend"
 
 type ShowStats struct {
 	messenger messenger
@@ -48,14 +49,29 @@ func (h *ShowStats) Handle(ctx context.Context, m *tgbotapi.Message) error {
 		return err
 	}
 
-	authStats, err := groupPostsByUser(posts)
+	authorStats, err := groupPostsByUser(posts)
 
 	if err != nil {
 		return err
 	}
 
-	lines := splitAuthorsToSeries(authStats)
-	graph := chart.Chart{Series: lines}
+	lines := splitAuthorsToSeries(authorStats)
+
+	graph := chart.Chart{
+		Title:  "Week Rofler stats",
+		Series: lines,
+		XAxis: chart.XAxis{
+			Name: "postedon",
+		},
+
+		YAxis: chart.YAxis{
+			Name: "posts",
+		},
+	}
+
+	graph.Elements = []chart.Renderable{
+		chart.Legend(&graph),
+	}
 
 	buffer := bytes.NewBuffer([]byte{})
 	err = graph.Render(chart.PNG, buffer)
@@ -69,24 +85,18 @@ func (h *ShowStats) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	return err
 }
 
-// I can just use a map or create a map subclass
-// x axis is total count
-// y axis is time
-// metric is userPosts
-// and reactions
-
 func groupPostsByUser(posts []storage.Post) (map[storage.UserRef][]StatPoint, error) {
 	authors := make(map[storage.UserRef][]StatPoint)
+	startOfTheWeek := time.Now().AddDate(0, 0, -7)
+
 	for _, p := range posts {
-		var points []StatPoint
 		if points, ok := authors[p.UserRef]; ok {
 			total := float64(len(points))
 			points = append(points, StatPoint{Value: total, Day: p.PostedOn})
+			authors[p.UserRef] = points
 		} else {
-			points = make([]StatPoint, 0)
+			authors[p.UserRef] = []StatPoint{{Value: 0, Day: startOfTheWeek}, {Value: 1, Day: p.PostedOn}}
 		}
-
-		authors[p.UserRef] = points
 	}
 
 	return authors, nil
@@ -94,29 +104,29 @@ func groupPostsByUser(posts []storage.Post) (map[storage.UserRef][]StatPoint, er
 
 func splitAuthorsToSeries(authors map[storage.UserRef][]StatPoint) []chart.Series {
 	series := make([]chart.Series, len(authors))
-
+	i := 0
 	for a, sps := range authors {
-		xSet, ySet := splitCoordinates(sps)
+		totals, timestamps := splitCoordinates(sps)
 
-		series = append(series, chart.ContinuousSeries{
+		series[i] = chart.TimeSeries{
 			Name:    a.DisplayName,
-			XValues: xSet,
-			YValues: ySet,
-		})
+			XValues: timestamps,
+			YValues: totals,
+		}
+		i++
 	}
 
 	return series
 }
 
-func splitCoordinates(points []StatPoint) (xs []float64, ys []float64) {
+func splitCoordinates(points []StatPoint) (totals []float64, timestamps []time.Time) {
 	for _, sp := range points {
-		ys = append(xs, sp.Value)
-		xs = append(xs, sp.FloatDate())
+		totals = append(totals, sp.Value)
+		timestamps = append(timestamps, sp.Day)
 	}
 	return
 }
 
 func (h *ShowStats) ShouldRun(message *tgbotapi.Message) bool {
-	// AK TODO check how command is split and hot to pass arguments
 	return message.IsCommand() && message.Command() == commandName
 }

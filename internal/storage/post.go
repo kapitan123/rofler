@@ -55,7 +55,7 @@ func (s *Storage) GetChatPosts(ctx context.Context, chatid int64) ([]Post, error
 }
 
 func (s *Storage) GetLastWeekPosts(ctx context.Context, chatid int64) ([]Post, error) {
-	query := s.client.Collection(postsCollection).Where("posted_on", ">", time.Now().AddDate(0, 0, -7))
+	query := s.client.Collection(postsCollection).Where("posted_on", ">=", time.Now().AddDate(0, 0, -7))
 	query = query.Where("chat_id", "==", chatid)
 
 	iter := query.Documents(ctx)

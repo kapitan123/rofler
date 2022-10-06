@@ -36,6 +36,10 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 		return err
 	}
 
+	if len(posts) == 0 {
+		return nil
+	}
+
 	roflerScores := countScores(posts)
 
 	listMeassge := format.AsDescendingList(roflerScores, "🤡 <b>%s</b>: %d")
