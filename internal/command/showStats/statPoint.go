@@ -1,4 +1,4 @@
-package showStats
+package showstats
 
 import "time"
 

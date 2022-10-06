@@ -18,6 +18,7 @@ import (
 	"github.com/kapitan123/telegrofler/internal/command/replyTo300"
 	"github.com/kapitan123/telegrofler/internal/command/replyToNo"
 	"github.com/kapitan123/telegrofler/internal/command/replyToYes"
+	"github.com/kapitan123/telegrofler/internal/command/showstats"
 	"github.com/kapitan123/telegrofler/internal/command/toppidor"
 	"github.com/kapitan123/telegrofler/internal/command/toprofler"
 	"github.com/kapitan123/telegrofler/internal/contentLoader"
@@ -74,6 +75,7 @@ func main() {
 		command.WithRateLimit(choosePidor.New(m, s, w, q, sc)),
 		command.WithRateLimit(toprofler.New(m, s)),
 		command.WithRateLimit(toppidor.New(m, s)),
+		showstats.New(m, s),
 		recordBotPostReaction.New(m, s),
 		recordReaction.New(m, s),
 		replaceLinkWithMessage.New(m, s, d),
