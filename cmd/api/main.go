@@ -71,7 +71,7 @@ func main() {
 	sc := systemclock.New()
 
 	commandRunner := command.NewRunner(config.WorkersCount,
-		command.WithRateLimit(choosePidor.New(m, s, w, sc)),
+		command.WithRateLimit(choosePidor.New(m, s, w, q, sc)),
 		command.WithRateLimit(toprofler.New(m, s)),
 		command.WithRateLimit(toppidor.New(m, s)),
 		recordBotPostReaction.New(m, s),
@@ -85,7 +85,7 @@ func main() {
 	router := mux.NewRouter()
 
 	// AK TODO pass args through app?
-	setupRouter(router, commandRunner, choosePidor.New(m, s, w, sc), m)
+	setupRouter(router, commandRunner, choosePidor.New(m, s, w, q, sc), m)
 
 	commandRunner.Start(ctx)
 

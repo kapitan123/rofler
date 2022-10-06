@@ -28,6 +28,7 @@ type ChoosePidor struct {
 	storage     pidorStorage
 	watermarker watermarker
 	systemclock systemclock
+	queue       queue
 }
 
 type (
@@ -50,14 +51,19 @@ type (
 	systemclock interface {
 		Now() time.Time
 	}
+
+	queue interface {
+		EnqueueDeleteMessage(chatId int64, messageId int) error
+	}
 )
 
-func New(messenger messenger, storage pidorStorage, watermarker watermarker, systemclock systemclock) *ChoosePidor {
+func New(messenger messenger, storage pidorStorage, watermarker watermarker, queue queue, systemclock systemclock) *ChoosePidor {
 	return &ChoosePidor{
 		messenger:   messenger,
 		storage:     storage,
 		watermarker: watermarker,
 		systemclock: systemclock,
+		queue:       queue,
 	}
 }
 
@@ -75,8 +81,13 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 
 	if found {
 		mention := format.AsUserMention(pidor.UserRef.Id, pidor.UserRef.DisplayName)
-		_, err = h.messenger.SendText(chatId, fmt.Sprintf(mention+" is still sucking juicy cocks"))
-		return err
+		msgId, err := h.messenger.SendText(chatId, fmt.Sprintf(mention+" is still sucking juicy cocks"))
+
+		if err != nil {
+			return err
+		}
+
+		return h.queue.EnqueueDeleteMessage(chatId, msgId)
 	}
 
 	admins, err := h.messenger.GetChatAdmins(chatId)
