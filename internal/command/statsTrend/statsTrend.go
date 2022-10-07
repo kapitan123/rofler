@@ -18,7 +18,7 @@ import (
 //	ractionsMetric        = "reactions"
 //)
 
-const commandName = "statsTrend"
+const commandName = "statstrend"
 
 type ShowStats struct {
 	messenger messenger
