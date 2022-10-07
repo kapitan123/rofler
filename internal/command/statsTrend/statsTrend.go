@@ -103,7 +103,7 @@ func groupPostsByUser(posts []storage.Post) (map[storage.UserRef][]StatPoint, er
 }
 
 func splitAuthorsToSeries(authors map[storage.UserRef][]StatPoint) []chart.Series {
-	series := make([]chart.Series, len(authors))
+	series := make([]chart.Series, len(authors)*2)
 	i := 0
 	for a, sps := range authors {
 		totals, timestamps := splitCoordinates(sps)
@@ -113,7 +113,18 @@ func splitAuthorsToSeries(authors map[storage.UserRef][]StatPoint) []chart.Serie
 			XValues: timestamps,
 			YValues: totals,
 		}
-		i++
+
+		series[i+1] = chart.AnnotationSeries{
+			Annotations: []chart.Value2{
+				{XValue: 1.0, YValue: 1.0, Label: "One"},
+				{XValue: 2.0, YValue: 2.0, Label: "Two"},
+				{XValue: 3.0, YValue: 3.0, Label: "Three"},
+				{XValue: 4.0, YValue: 4.0, Label: "Four"},
+				{XValue: 5.0, YValue: 5.0, Label: "Five"},
+			},
+		}
+
+		i = i + 2
 	}
 
 	return series
