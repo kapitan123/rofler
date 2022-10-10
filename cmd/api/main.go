@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/kapitan123/telegrofler/internal/contentLoader/webm"
 	"net/http"
 
 	"cloud.google.com/go/firestore"
@@ -66,7 +67,7 @@ func main() {
 	q := taskQueue.New(ctx, config.DeletionQueueName, meta)
 	// AK TODO move bot and other shit to app
 	// otherwise we need to create multiple instances of bot and storage to handle scheduler
-	d := contentLoader.New(shortsget.New(), lovetik.New(), mp4.New())
+	d := contentLoader.New(shortsget.New(), lovetik.New(), mp4.New(), webm.New())
 	m := messenger.New(botapi, d)
 	w := watermarker.New()
 	sc := systemclock.New()

@@ -14,6 +14,7 @@ type VideoMeta struct {
 	Title       string
 	Type        string
 	DownloadUrl string
+	Data        []byte
 }
 
 type VideoMetaExtractor interface {

@@ -55,10 +55,16 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 		return err
 	}
 
-	log.Info("Url was found in a callback message: ", url)
-
-	contentBuf := bytes.NewBuffer([]byte{})
-	err = h.downloader.DownloadContent(meta.DownloadUrl, contentBuf)
+	contentBuf := new(bytes.Buffer)
+	switch {
+	case meta.Data != nil:
+		_, err = contentBuf.Write(meta.Data)
+	case meta.DownloadUrl != "":
+		log.Info("Url was found in a callback message: ", url)
+		err = h.downloader.DownloadContent(meta.DownloadUrl, contentBuf)
+	default:
+		err = fmt.Errorf("no data or download url provided")
+	}
 
 	if err != nil {
 		return err

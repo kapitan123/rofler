@@ -29,6 +29,7 @@ RUN GOOS=linux \
 FROM alpine 
 
 WORKDIR /app
+RUN apk --no-cache add ffmpeg
 
 COPY --from=builder /build/server . 
 
