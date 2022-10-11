@@ -17,9 +17,8 @@ COPY config/ ./config/
 COPY cmd/ ./cmd/
 COPY internal/ ./internal/
 
-# All GCE instances are x86_64 linux based machines
-RUN GOOS=linux \
-    GOARCH=amd64 \
+# All GCE instances are x86_64 linux based machines. Dynamic linking is disabled because it will be copied to scratch.
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -ldflags="-w -s" \
     -o server github.com/kapitan123/telegrofler/cmd/api
 
@@ -28,14 +27,12 @@ RUN GOOS=linux \
 # ===================================================================================
 FROM scratch 
 
-WORKDIR /app
-
 # Add certs
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Add binary
-COPY --from=builder /build/server . 
+COPY --from=builder /build/server /server 
 
 EXPOSE 9001
 
-CMD [ "./server"]
+ENTRYPOINT [ "/server"]
