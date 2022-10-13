@@ -4,11 +4,6 @@ on:
   pull_request:
     types: [ closed ]
   delete:
-  workflow_dispatch:
-    inputs:
-      pr-number: 
-        description: Image name to deploy
-        required: true
 
 jobs:
     delete-cloud-run:

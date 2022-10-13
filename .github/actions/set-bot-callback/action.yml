@@ -1,0 +1,21 @@
+name: Update telegram callback
+description: Sets callback for bot token
+
+inputs:
+  bot-token: 
+    description: Bot token
+    required: true
+  callback-url: 
+    description: Bot callback url
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Checkout repository
+    uses: actions/checkout@v2
+
+  - name: Set callback through telegram REST API
+    shell: bash
+    run: |
+      curl -X “GET” "https://api.telegram.org/${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/callback" 

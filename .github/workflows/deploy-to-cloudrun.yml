@@ -5,7 +5,6 @@ on:
      branches: [ main ]
   pull_request:
     types: [ opened, edited, synchronize ]
-  workflow_dispatch:
    
 env:
   IMAGE_NAME: ""
@@ -22,9 +21,6 @@ jobs:
       name: Deploys new version of telegrofler bot
 
       steps:
-      - name : Print Title of PR
-        run: echo The Title of your PR is ${{ github.event.pull_request.title }}
-
       - uses: 'actions/checkout@v3'
 
       - id: auth
@@ -60,11 +56,6 @@ jobs:
       - name: Push Docker image
         shell: bash
         run: docker push ${{ env.IMAGE_NAME }}
-      # - id: build-and-push
-      #   uses: ./.github/actions/gcp-build-and-push-image
-      #   with:
-      #     image-name: ${{ env.IMAGE_NAME }}
-      #     credentials-json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Set cloudrun service name if is not main
         if: github.ref_name != 'main'
