@@ -1,4 +1,4 @@
-name: Deletes cloudrun PR service
+name: Delete CloudRun PR service
 
 on:
   pull_request:
