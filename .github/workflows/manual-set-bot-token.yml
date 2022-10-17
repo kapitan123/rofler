@@ -1,13 +1,7 @@
-# set manually
-# if main => token => if not main test_token
-name: Delete CloudRun PR service
+name: Set callback for test bot. Runs only on PRs
 
 on:
   workflow_dispatch:
-
-env:
-  CLOUD_RUN_SERVICE_NAME: ""
-  PR_NUMBER: ""
 
 jobs:
     delete-cloud-run:
@@ -20,9 +14,8 @@ jobs:
       
       - id: pr
         name: Get Pull Request Number
-        # if: github.ref_name != 'main'
         run: |
-          echo "::set-output number=pull_request_number::$(gh pr view --json number -q .number || echo "")"
+          echo "number=pull_request_number::$(gh pr view --json number -q .number || echo "")" >> $GITHUB_OUTPUT
 
       - name : Show PR Number
         run: echo Setting callback for PR ${{ ${{ steps.pr.outputs.number }} }}
@@ -37,20 +30,16 @@ jobs:
         uses: google-github-actions/get-secretmanager-secrets@v0
         with:
           secrets: |-
-            telegram-bot-token:${{ steps.auth.outputs.project_id }}/telegram_bot_token
             telegram-test-bot-token:${{ steps.auth.outputs.project_id }}/telegram_test_bot_token
             app-name:${{ steps.auth.outputs.project_id }}/app_name
 
-      - name: Set service name
-        if: ${{ env.CLOUD_RUN_SERVICE_NAME }}==""
-        run: |-
-          echo "CLOUD_RUN_SERVICE_NAME=${{ steps.secrets-manager.outputs.app-name }}-${{ steps.pr.outputs.number }}" >> $GITHUB_ENV
-
       - id: describe
         name: Get service url
+        env:
+          CLOUD_RUN_SERVICE_NAME: ${{ steps.secrets-manager.outputs.app-name }}-${{ steps.pr.outputs.number }}
         run: |
           metadataJson=$(gcloud run services describe ${{ env.CLOUD_RUN_SERVICE_NAME }} --region=europe-central2 --format=json)
-          echo "::set-output url=${{ fromJson(metadataJson).status.address.url }}"
+          echo "url=${{ fromJson(metadataJson).status.address.url }}"  >> $GITHUB_OUTPUT
 
       - uses: ./.github/actions/set-bot-callback
         with:

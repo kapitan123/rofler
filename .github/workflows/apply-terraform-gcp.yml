@@ -13,7 +13,6 @@ on:
          default: prod
          required: true
 jobs: 
-    # AK TODO nice candidate for reusable workflow
     deploy-infra:
       name: Terraform 
       environment: prod

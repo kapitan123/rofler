@@ -1,0 +1,105 @@
+name: Deploy to CloudRun reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      service-postfix:
+        required: false
+        type: string
+        default: ""
+
+    secrets:
+      GCP_CREDENTIALS:
+        required: true
+
+    outputs:
+      url:
+        description: Url of created bot
+        value: ${{ jobs.deploy-cloudrun-service.outputs.url }}
+
+      # AK TODO most likely this will not work
+      bot-token:
+        description: Token of created bot
+        value: ${{ jobs.deploy-cloudrun-service.outputs.bot-token }}
+env:
+  # Secrets can't be passed through outputs
+  IMAGE_NAME: ""
+  SERVICE_NAME: ""
+  BOT_TOKEN: ""
+
+jobs:
+    deploy-cloudrun-service:
+      runs-on: ubuntu-latest
+      environment: prod
+      name: Deploys new version of telegrofler bot
+
+      outputs:
+        url: ${{ steps.deploy.outputs.url }}
+        bot-token: ${{ steps.service-meta.outputs.bot-token }}
+
+      # GCP_CREDENTIALS hack is by design, otherwise env secrets are not available
+      # secrets MUST be used from env. and not form secrets.
+      # https://github.com/orgs/community/discussions/25238#discussioncomment-3247035
+      env:
+        GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+
+      steps:         
+      - uses: 'actions/checkout@v3'
+          
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+
+      - id: secrets-manager
+        uses: google-github-actions/get-secretmanager-secrets@v0
+        with:
+          secrets: |-
+            telegram-bot-token:${{ steps.auth.outputs.project_id }}/telegram_bot_token
+            telegram-test-bot-token:${{ steps.auth.outputs.project_id }}/telegram_test_bot_token
+            app-name:${{ steps.auth.outputs.project_id }}/app_name
+    
+      - id: service-meta
+        name: Calculate service deployment settings
+        run: |
+          echo "image=eu.gcr.io/${{ steps.auth.outputs.project_id }}/${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_OUTPUT
+
+          if [ ${{ inputs.service-postfix }} != "" ]; then
+            echo "name=${{ steps.secrets-manager.outputs.app-name }}-${{github.event.number}}" >> $GITHUB_OUTPUT
+            echo "bot-token=${{ steps.secrets-manager.outputs.telegram-test-bot-token }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_OUTPUT
+            echo "bot-token=${{ steps.secrets-manager.outputs.telegram-bot-token }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Configure Docker
+        shell: bash
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build Docker image
+        shell: bash
+        run: docker build . -t ${{ steps.service-meta.outputs.image }}
+
+      - name: Push Docker image
+        shell: bash
+        run: docker push ${{ steps.service-meta.outputs.image }}
+
+      - id: deploy
+        name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ steps.service-meta.outputs.name }}
+          image:  ${{ steps.service-meta.outputs.image }}
+          region: europe-central2
+          env_vars: |
+            TELEGRAM_BOT_TOKEN=${{ steps.service-meta.outputs.bot-token }}  
+            PROJECT_ID=${{ steps.auth.outputs.project_id}}
+            DELETION_QUEUE_NAME=tgmessage-deletion
+          flags: --allow-unauthenticated
+
+      - name: Output deployed url
+        run: echo "${{ steps.deploy.outputs.url }}"
