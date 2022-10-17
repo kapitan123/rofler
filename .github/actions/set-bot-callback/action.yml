@@ -13,9 +13,9 @@ runs:
   using: composite
   steps:
   - name: Checkout repository
-    uses: actions/checkout@v2
+    uses: actions/checkout@v3
 
   - name: Set callback through telegram REST API
     shell: bash
     run: |
-      curl -X “GET” "https://api.telegram.org/${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/callback" 
+      curl -X "GET" "https://api.telegram.org/${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/callback" 
