@@ -18,6 +18,8 @@ jobs:
     needs: deploy-to-cloudrun
 
     steps:
+    - uses: 'actions/checkout@v3'
+    
     - name: Set feature bot callback
       uses: ./.github/actions/set-bot-callback
       with:
