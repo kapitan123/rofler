@@ -102,7 +102,6 @@ func getCloudRunUrl(region string, projectNumber string, serviceName string) (st
 		return "", err
 	}
 
-	// this shit does not work
 	cloudRunApi := fmt.Sprintf("https://%s-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/%s/services/%s", region, projectNumber, serviceName)
 
 	log.Info("cloud run api url: ", cloudRunApi)
