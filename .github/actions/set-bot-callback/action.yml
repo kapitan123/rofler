@@ -16,6 +16,11 @@ runs:
     uses: actions/checkout@v3
 
   - name: Set callback through telegram REST API
+    id: webhook-curl
     shell: bash
     run: |
-      curl -X "GET" "https://api.telegram.org/${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/callback" 
+      status-code=$(curl -X "GET" -f -LI "https://api.telegram.org/${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/callback" -o /dev/null -w '%{http_code}\n' -s)
+      echo "status-code=$status-code" >> $GITHUB_OUTPUT
+      if [$status-code != 200]; then
+        echo "::error file=set-bo-callback/action.yml,line=21::Request has failed with status code $status-code"
+      fi
