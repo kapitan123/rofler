@@ -7,6 +7,7 @@ on:
         required: false
         type: string
         default: ""
+
       set-webhook:
         type: boolean
         required: false
@@ -16,21 +17,14 @@ on:
       GCP_CREDENTIALS:
         required: true
 
-    outputs:
-      url:
-        description: Url of created bot
-        value: ${{ jobs.deploy-cloudrun-service.outputs.url }}
-
-      # AK TODO most likely this will not work
-      bot-token:
-        description: Token of created bot
-        value: ${{ jobs.deploy-cloudrun-service.outputs.bot-token }}
-
 jobs:
     deploy-cloudrun-service:
       runs-on: ubuntu-latest
       environment: prod
       name: Deploys new version of telegrofler bot
+      concurrency:
+        group: cloudrun-deploy-${{ github.ref }}
+        cancel-in-progress: true
 
       outputs:
         url: ${{ steps.deploy.outputs.url }}
@@ -104,6 +98,7 @@ jobs:
         run: echo "${{ steps.deploy.outputs.url }}"
 
     update-callback:
+      if: ${{ inputs.set-webhook }} == true
       name: Set bot callback
       runs-on: ubuntu-latest
       needs: deploy-cloudrun-service
