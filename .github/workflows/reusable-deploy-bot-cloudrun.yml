@@ -26,10 +26,6 @@ jobs:
         group: cloudrun-deploy-${{ github.ref }}
         cancel-in-progress: true
 
-      outputs:
-        url: ${{ steps.deploy.outputs.url }}
-        bot-token: ${{ steps.service-meta.outputs.bot-token }}
-
       # GCP_CREDENTIALS hack is by design, otherwise env secrets are not available
       # secrets MUST be used from env. and not form secrets.
       # https://github.com/orgs/community/discussions/25238#discussioncomment-3247035
