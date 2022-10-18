@@ -7,6 +7,10 @@ on:
         required: false
         type: string
         default: ""
+      set-webhook:
+        type: boolean
+        required: false
+        default: false
 
     secrets:
       GCP_CREDENTIALS:
@@ -21,11 +25,6 @@ on:
       bot-token:
         description: Token of created bot
         value: ${{ jobs.deploy-cloudrun-service.outputs.bot-token }}
-env:
-  # Secrets can't be passed through outputs
-  IMAGE_NAME: ""
-  SERVICE_NAME: ""
-  BOT_TOKEN: ""
 
 jobs:
     deploy-cloudrun-service:
@@ -103,3 +102,17 @@ jobs:
 
       - name: Output deployed url
         run: echo "${{ steps.deploy.outputs.url }}"
+
+    update-callback:
+      name: Set bot callback
+      runs-on: ubuntu-latest
+      needs: deploy-cloudrun-service
+
+      steps:
+      - uses: 'actions/checkout@v3'
+      
+      - name: Set feature bot callback
+        uses: ./.github/actions/set-bot-callback
+        with:
+          bot-token: ${{ needs.jobs.deploy-cloudrun-service.outputs.bot-token }}
+          callback-url: ${{ needs.jobs.deploy-cloudrun-service.outputs.url }}

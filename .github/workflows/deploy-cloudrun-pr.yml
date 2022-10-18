@@ -10,18 +10,6 @@ jobs:
     uses: ./.github/workflows/reusable-deploy-bot-cloudrun.yml
     with:
       service-postfix: ${{ github.event.number }}
+      update-callback: true
     secrets: 
       GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
-
-  update-callback:
-    runs-on: ubuntu-latest
-    needs: deploy-to-cloudrun
-
-    steps:
-    - uses: 'actions/checkout@v3'
-    
-    - name: Set feature bot callback
-      uses: ./.github/actions/set-bot-callback
-      with:
-        bot-token: ${{ needs.jobs.deploy-cloudrun-service.outputs.bot-token }}
-        callback-url: ${{ needs.jobs.deploy-cloudrun-service.outputs.url }}
