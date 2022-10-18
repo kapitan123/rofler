@@ -1,0 +1,15 @@
+name: Deploy to CloudRun PR
+
+on:
+  pull_request:
+    types: [ opened, edited, synchronize ]
+
+jobs:
+  deploy-to-cloudrun:
+    name: Deploys new version of telegrofler bot
+    uses: ./.github/workflows/reusable-deploy-bot-cloudrun.yml
+    with:
+      service-postfix: ${{ github.event.number }}
+      set-webhook: true
+    secrets: 
+      GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}

@@ -1,0 +1,25 @@
+name: Update telegram callback
+description: Sets callback for bot token
+
+inputs:
+  bot-token: 
+    description: Bot token
+    required: true
+  callback-url: 
+    description: Bot callback url
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Checkout repository
+    uses: actions/checkout@v3
+
+  - name: Set callback through telegram REST API
+    id: webhook-curl
+    shell: bash
+    run: |
+      statuscode=$(curl -X "GET" -f -LI "https://api.telegram.org/bot${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/callback" -o /dev/null -w '%{http_code}\n' -s)
+      if [$statuscode != 200]; then
+        echo "::error::Filename set-bo-callback/action.yml request was not sucessfull" && exit 1
+      fi
