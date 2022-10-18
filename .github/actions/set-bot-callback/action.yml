@@ -19,7 +19,7 @@ runs:
     id: webhook-curl
     shell: bash
     run: |
-      status-code=$(curl -X "GET" -f -LI "https://api.telegram.org/${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/callback" -o /dev/null -w '%{http_code}\n' -s)
+      status-code=$(curl -X "GET" -f -LI "https://api.telegram.org/bot${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/callback" -o /dev/null -w '%{http_code}\n' -s)
       echo "status-code=$status-code" >> $GITHUB_OUTPUT
       if [$status-code != 200]; then
         echo "::error file=set-bo-callback/action.yml,line=21::Request has failed with status code $status-code"
