@@ -10,6 +10,6 @@ jobs:
     uses: ./.github/workflows/reusable-deploy-bot-cloudrun.yml
     with:
       service-postfix: ${{ github.event.number }}
-      update-callback: true
+      set-webhook: true
     secrets: 
       GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
