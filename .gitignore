@@ -29,3 +29,6 @@ iac/gcp/.terraform
 
 # built file
 api
+
+# Os Generated Files
+.DS_Store
