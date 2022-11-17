@@ -3,10 +3,11 @@ package choosePidor
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	_ "embed"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/big"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -129,8 +130,8 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 }
 
 func chooseRandom(members []tgbotapi.ChatMember) tgbotapi.ChatMember {
-	rand.Seed(time.Now().UnixNano())
-	return members[rand.Intn(len(members))]
+	randIndex, _ := rand.Int(rand.Reader, big.NewInt(int64(len(members))))
+	return members[randIndex.Int64()]
 }
 
 func (h *ChoosePidor) ShouldRun(message *tgbotapi.Message) bool {
