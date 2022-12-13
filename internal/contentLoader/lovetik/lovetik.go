@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	noWatermarkType = "<b> MP4</b> (NO watermark)"
+	MP4Type         = "<b> MP4</b>"
+	noWatermarkType = "NO watermark"
 	contentType     = "application/x-www-form-urlencoded; charset=UTF-8"
 	sourceLink      = "https://lovetik.com/api/ajax/search"
 	sourceType      = "tiktok"
@@ -56,7 +57,7 @@ func (s *Lovetik) ExtractVideoMeta(tikUrl string) (*contentLoader.VideoMeta, err
 	json.Unmarshal(body, sr)
 
 	for _, l := range sr.Links {
-		if l.Type != noWatermarkType {
+		if l.WatermarkType != noWatermarkType || l.Type != MP4Type {
 			continue
 		}
 

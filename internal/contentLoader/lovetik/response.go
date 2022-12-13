@@ -8,6 +8,7 @@ type SearchResult struct {
 }
 
 type Link struct {
-	DownloadAddr string `json:"a"`
-	Type         string `json:"t"`
+	DownloadAddr  string `json:"a"`
+	Type          string `json:"t"`
+	WatermarkType string `json:"s"`
 }
