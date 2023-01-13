@@ -34,6 +34,10 @@ func WithRateLimit(cmd command) *RateLimitedCommand {
 }
 
 func (rl *RateLimitedCommand) ShouldRun(m *tgbotapi.Message) bool {
+	if rl.command == nil {
+		return false
+	}
+
 	return rl.command.ShouldRun(m)
 }
 
@@ -47,7 +51,7 @@ func (rl *RateLimitedCommand) Handle(ctx context.Context, m *tgbotapi.Message) e
 	prf := rl.updateProfile(userId, now)
 
 	if prf.penaltyExpiresOn.After(now) {
-		return fmt.Errorf("user is banned from performing requests")
+		return fmt.Errorf("user is banned from performing requests %d", userId)
 	}
 
 	return rl.command.Handle(ctx, m)
