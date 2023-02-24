@@ -130,7 +130,7 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 }
 
 func chooseRandom(members []tgbotapi.ChatMember) tgbotapi.ChatMember {
-	randIndex, _ := rand.Int(rand.Reader, big.NewInt(int64(len(members))))
+	randIndex, _ := rand.Int(rand.Reader, big.NewInt(int64(len(members)-1)))
 	return members[randIndex.Int64()]
 }
 
