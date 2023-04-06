@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - iac/gcp/**
+      - bot/iac/gcp/**
       
   workflow_dispatch:
      inputs:
@@ -24,7 +24,7 @@ jobs:
 
       defaults:
         run:
-          working-directory: ./iac/gcp
+          working-directory: ./bot/iac/gcp
 
       steps:
         - uses: actions/checkout@v3
