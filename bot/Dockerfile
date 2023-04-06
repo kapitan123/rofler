@@ -13,14 +13,14 @@ COPY go.sum .
 RUN go mod download
 
 # Copy Go source files
-COPY config/ ./config/
-COPY api/ ./api/
-COPY internal/ ./internal/
+COPY bot/config/ ./config/
+COPY bot/cmd/ ./cmd/
+COPY bot/internal/ ./internal/
 
 # All GCE instances are x86_64 linux based machines. Dynamic linking is disabled because it will be copied to scratch.
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -ldflags="-w -s" \
-    -o server github.com/kapitan123/telegrofler/bot/api
+    -o server github.com/kapitan123/telegrofler/bot/cmd/api
 
 # ===================================================================================
 # === Stage 2: Create a lightweight container =======================================
