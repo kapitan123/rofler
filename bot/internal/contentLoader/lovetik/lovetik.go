@@ -11,7 +11,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/kapitan123/telegrofler/internal/contentLoader"
+	"github.com/kapitan123/telegrofler/bot/internal/contentLoader"
 )
 
 const (

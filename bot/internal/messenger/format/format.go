@@ -3,7 +3,7 @@ package format
 import (
 	"fmt"
 
-	"github.com/kapitan123/telegrofler/internal/sortedmap"
+	"github.com/kapitan123/telegrofler/bot/internal/sortedmap"
 )
 
 // AK TODO this is not really apparent that format is a formattable string using two arguments

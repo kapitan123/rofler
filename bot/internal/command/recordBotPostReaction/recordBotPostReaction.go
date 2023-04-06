@@ -6,7 +6,7 @@ import (
 	"regexp"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/internal/storage"
+	"github.com/kapitan123/telegrofler/bot/internal/storage"
 )
 
 var posterMakerRegExp = regexp.MustCompile(`🔥(.*?)🔥`)

@@ -15,20 +15,20 @@
 # vendor/
 
 # Go binaries
-cmd/api/api
+bot/cmd/api/api
 
 # Vscode setup
 .vscode/
 .devcontainer/
 
 # Dev keys
-keys/
+bot/keys/
 
 # Terraform providers
-iac/gcp/.terraform
+bot/iac/gcp/.terraform
 
 # built file
-api
+bot/api
 
 # Os Generated Files
 .DS_Store

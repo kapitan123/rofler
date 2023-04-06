@@ -4,8 +4,8 @@ import (
 	"context"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/internal/messenger/format"
-	"github.com/kapitan123/telegrofler/internal/storage"
+	"github.com/kapitan123/telegrofler/bot/internal/messenger/format"
+	"github.com/kapitan123/telegrofler/bot/internal/storage"
 )
 
 const commandName = "toprofler"
