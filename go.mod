@@ -1,6 +1,6 @@
-module github.com/kapitan123/telegrofler/bot
+module github.com/kapitan123/telegrofler
 
-go 1.20
+go 1.19
 
 require (
 	cloud.google.com/go/firestore v1.6.1

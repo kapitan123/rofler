@@ -13,9 +13,9 @@ COPY go.sum .
 RUN go mod download
 
 # Copy Go source files
-COPY bot/config/ ./config/
-COPY bot/cmd/ ./cmd/
-COPY bot/internal/ ./internal/
+COPY bot/config/ ./bot/config/
+COPY bot/cmd/ ./bot/cmd/
+COPY bot/internal/ ./bot/internal/
 
 # All GCE instances are x86_64 linux based machines. Dynamic linking is disabled because it will be copied to scratch.
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
