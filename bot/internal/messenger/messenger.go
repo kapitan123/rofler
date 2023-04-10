@@ -8,7 +8,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-// AK TODO convert all byte arrays to io readers and writers
 type Messenger struct {
 	api        *tgbotapi.BotAPI
 	downloader downloader
@@ -53,37 +52,26 @@ func (m *Messenger) ReplyWithText(chatId int64, replyToMessageId int, caption st
 	return res.MessageID, err
 }
 
-// AK TODO merge innternal calls to reduce dupliction
 func (m *Messenger) SendImg(chatId int64, img io.Reader, imgName string, caption string) (int, error) {
-	imgBytes, err := io.ReadAll(img)
-
-	if err != nil {
-		return 0, err
-	}
-
-	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: imgBytes})
-	msg.ParseMode = tgbotapi.ModeHTML
-	if caption != "" {
-		msg.Caption = caption
-	}
-
-	res, err := m.api.Send(msg)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return res.MessageID, err
+	return m.sendImg(chatId, 0, img, imgName, caption)
 }
 
 func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) (int, error) {
+	return m.sendImg(chatId, replyToMessageId, img, imgName, caption)
+}
+
+func (m *Messenger) sendImg(chatId int64, replyToMessageId int, img io.Reader, imgName string, caption string) (int, error) {
 	imgbytes, err := io.ReadAll(img)
 	if err != nil {
 		return 0, err
 	}
 
 	msg := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{Name: imgName, Bytes: imgbytes})
-	msg.ReplyToMessageID = replyToMessageId
+
+	if replyToMessageId > 0 {
+		msg.ReplyToMessageID = replyToMessageId
+	}
+
 	msg.ParseMode = tgbotapi.ModeHTML
 
 	if caption != "" {
@@ -99,7 +87,7 @@ func (m *Messenger) ReplyWithImg(chatId int64, replyToMessageId int, img io.Read
 	return res.MessageID, err
 }
 
-func (m *Messenger) GetUserCurrentProfilePic(userId int64, res io.Writer) error {
+func (m *Messenger) GetUserCurrentProfilePic(userId int64, result io.Writer) error {
 	ppicReq := tgbotapi.UserProfilePhotosConfig{
 		UserID: userId,
 		Offset: 0,
@@ -125,8 +113,7 @@ func (m *Messenger) GetUserCurrentProfilePic(userId int64, res io.Writer) error 
 
 	downloadLink := ppic.Link(m.api.Token)
 
-	// AK TODO this crap is super slow
-	return m.downloader.DownloadContent(downloadLink, res)
+	return m.downloader.DownloadContent(downloadLink, result)
 }
 
 func (b *Messenger) Delete(chatId int64, messageId int) error {

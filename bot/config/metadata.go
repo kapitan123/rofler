@@ -93,7 +93,6 @@ func getMetadataFromEnvVars() MetaData {
 }
 
 func getCloudRunUrl(region string, projectNumber string, serviceName string) (string, error) {
-
 	ctx := context.Background()
 
 	client, err := google.DefaultClient(ctx)

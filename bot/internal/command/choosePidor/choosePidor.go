@@ -69,10 +69,10 @@ func New(messenger messenger, storage pidorStorage, watermarker watermarker, que
 }
 
 func (h *ChoosePidor) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	return h.ChoosePidor(ctx, m.Chat.ID)
+	return h.ChoosePidor(ctx, m.MessageID, m.Chat.ID)
 }
 
-func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
+func (h *ChoosePidor) ChoosePidor(ctx context.Context, msgId int, chatId int64) error {
 	currDate := h.systemclock.Now()
 	pidor, found, err := h.storage.GetPidorForDate(ctx, chatId, currDate)
 
@@ -80,15 +80,23 @@ func (h *ChoosePidor) ChoosePidor(ctx context.Context, chatId int64) error {
 		return err
 	}
 
+	if msgId > 0 {
+		err = h.queue.EnqueueDeleteMessage(chatId, msgId)
+
+		if err != nil {
+			return err
+		}
+	}
+
 	if found {
 		mention := format.AsUserMention(pidor.UserRef.Id, pidor.UserRef.DisplayName)
-		msgId, err := h.messenger.SendText(chatId, fmt.Sprintf(mention+" is still sucking juicy cocks"))
+		newMsgId, err := h.messenger.SendText(chatId, fmt.Sprintf(mention+" is still sucking juicy cocks"))
 
 		if err != nil {
 			return err
 		}
 
-		return h.queue.EnqueueDeleteMessage(chatId, msgId)
+		return h.queue.EnqueueDeleteMessage(chatId, newMsgId)
 	}
 
 	admins, err := h.messenger.GetChatAdmins(chatId)

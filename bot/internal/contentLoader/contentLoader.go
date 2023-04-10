@@ -27,10 +27,6 @@ type ContentLoader struct {
 }
 
 func New(extractors ...VideoMetaExtractor) *ContentLoader {
-	// AK TODO temp solutions
-	//tr := &http.Transport{
-	//TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // <--- Problem
-	//}
 	client := &http.Client{
 		Timeout: 50 * time.Second,
 	}
