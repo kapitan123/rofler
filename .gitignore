@@ -15,7 +15,7 @@
 # vendor/
 
 # Go binaries
-bot/cmd/api/api
+bot/api/api
 
 # Vscode setup
 .vscode/
@@ -26,9 +26,6 @@ bot/keys/
 
 # Terraform providers
 iac/gcp/.terraform
-
-# built file
-bot/api
 
 # Os Generated Files
 .DS_Store
