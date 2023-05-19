@@ -1,4 +1,4 @@
-name: Deploy Convertorto CloudRun reusable workflow
+name: Deploy Convertor from main
 
 on:
   push:

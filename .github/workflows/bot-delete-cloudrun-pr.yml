@@ -1,4 +1,4 @@
-name: Delete bot CloudRun PR service
+name: Delete Bot PR
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ jobs:
   delete-cloud-run:
     runs-on: ubuntu-latest
     environment: prod
-    name: Deletes cloud run service
+    name: Deletes pr cloud run service
 
     steps:
       - uses: "actions/checkout@v3"

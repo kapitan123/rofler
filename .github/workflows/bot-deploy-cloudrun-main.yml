@@ -1,4 +1,4 @@
-name: Deploy bot to CloudRun to main service
+name: Deploy Bot from main
 
 on:
   push:

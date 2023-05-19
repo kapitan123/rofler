@@ -1,4 +1,4 @@
-name: Deploy to bot CloudRun PR
+name: Deploy Bot from PR
 
 on:
   pull_request:
