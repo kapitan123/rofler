@@ -1,0 +1,15 @@
+name: Deploy bot to CloudRun to main service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "bot/**"
+
+jobs:
+  deploy-to-cloudrun:
+    name: Deploys new version of telegrofler bot
+    uses: ./.github/workflows/bot-reusable-deploy-cloudrun.yml
+    secrets:
+      GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}

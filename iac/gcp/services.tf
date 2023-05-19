@@ -24,4 +24,8 @@ resource "google_project_service" "storage_googleapis_com" {
 
 resource "google_project_service" "cloud_tasks_googleapis_com" {
   service = "cloudtasks.googleapis.com"
+}
+
+resource "google_project_service" "cloud_functions_googleapis_com" {
+  service = "cloudfunctions.googleapis.com"
 } 

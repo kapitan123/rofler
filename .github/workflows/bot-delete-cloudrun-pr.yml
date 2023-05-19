@@ -1,0 +1,30 @@
+name: Delete bot CloudRun PR service
+
+on:
+  pull_request:
+    types: [closed]
+  delete:
+
+jobs:
+  delete-cloud-run:
+    runs-on: ubuntu-latest
+    environment: prod
+    name: Deletes cloud run service
+
+    steps:
+      - uses: "actions/checkout@v3"
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - id: secrets-manager
+        uses: google-github-actions/get-secretmanager-secrets@v0
+        with:
+          secrets: |-
+            app-name:${{ steps.auth.outputs.project_id }}/app_name
+
+      - name: Delete service
+        run: gcloud run services delete ${{ steps.secrets-manager.outputs.app-name }}-${{github.event.number}} --region europe-central2 --quiet

@@ -1,5 +1,5 @@
-resource "google_cloud_tasks_queue" "tg_message_deletion" {
-  name     = local.deletionQueueName
+resource "google_cloud_tasks_queue" "message_deletion" {
+  name     = var.deletion_queue_name
   location = var.region
   project  = var.project_id
 
@@ -16,8 +16,4 @@ resource "google_cloud_tasks_queue" "tg_message_deletion" {
   }
 
   depends_on = [google_project_service.cloud_tasks_googleapis_com]
-}
-
-locals {
-  deletionQueueName = "tgmessage-deletion"
 }

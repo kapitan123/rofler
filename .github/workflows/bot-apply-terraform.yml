@@ -1,0 +1,65 @@
+name: Apply terraform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - iac/gcp/**
+
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Environment
+        default: prod
+        required: true
+jobs:
+  deploy-infra:
+    name: Terraform
+    environment: prod
+    runs-on: ubuntu-latest
+
+    env:
+      TF_CLI_ARGS: ""
+      GOOGLE_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }} # Terraform relies on this predefined env
+
+    defaults:
+      run:
+        working-directory: ./bot/iac/gcp
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          create_credentials_file: true
+
+      - id: secrets-manager
+        uses: google-github-actions/get-secretmanager-secrets@v0
+        with:
+          secrets: |-
+            telegram-bot-token:${{ steps.auth.outputs.project_id }}/telegram_bot_token
+            app-name:${{ steps.auth.outputs.project_id }}/app_name
+
+      - name: Populate TF cli args
+        run: |
+          echo "TF_VAR_name=${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_ENV
+          echo "TF_VAR_project_id=${{ steps.auth.outputs.project_id }}" >> $GITHUB_ENV
+          echo "TF_VAR_bot_token=${{ steps.secrets-manager.outputs.telegram-bot-token }}" >> $GITHUB_ENV
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform format
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
