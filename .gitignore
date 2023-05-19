@@ -25,7 +25,7 @@ bot/cmd/api/api
 bot/keys/
 
 # Terraform providers
-bot/iac/gcp/.terraform
+iac/gcp/.terraform
 
 # built file
 bot/api

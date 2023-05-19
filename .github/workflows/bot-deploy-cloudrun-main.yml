@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy-to-cloudrun:
-    name: Deploys new version of telegrofler bot
+    name: Deploys new version of telegrofler bot to main
     uses: ./.github/workflows/bot-reusable-deploy-cloudrun.yml
     secrets:
       GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}

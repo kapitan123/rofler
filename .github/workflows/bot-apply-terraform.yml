@@ -24,7 +24,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./bot/iac/gcp
+        working-directory: ./iac/gcp
 
     steps:
       - uses: actions/checkout@v3

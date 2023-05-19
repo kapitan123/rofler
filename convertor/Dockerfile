@@ -14,7 +14,7 @@ RUN go mod download
 
 # Copy Go source files
 COPY convertor/config/ ./convertor/config/
-COPY convertor/api/ ./convertor/api/
+COPY convertor/api/ ./convertor/api/ 
 COPY convertor/internal/ ./convertor/internal/
 
 # All GCE instances are x86_64 linux based machines. Dynamic linking is disabled because it will be copied to scratch.
