@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kapitan123/telegrofler/bot/internal/contentLoader"
+	contentLoader "github.com/kapitan123/telegrofler/bot/internal/content_loader"
 )
 
 type MetaExtractor struct {

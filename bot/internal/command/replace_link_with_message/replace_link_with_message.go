@@ -7,7 +7,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/kapitan123/telegrofler/bot/internal/contentLoader"
+	contentLoader "github.com/kapitan123/telegrofler/bot/internal/content_loader"
 	"github.com/kapitan123/telegrofler/bot/internal/messenger/format"
 	"github.com/kapitan123/telegrofler/bot/internal/storage"
 

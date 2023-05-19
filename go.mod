@@ -15,11 +15,13 @@ require (
 require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
+	cloud.google.com/go/longrunning v0.4.1 // indirect
 	cloud.google.com/go/pubsub v1.30.1 // indirect
 	github.com/blend/go-sdk v1.20220411.3 // indirect
 	github.com/google/s2a-go v0.1.0 // indirect
 	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/time v0.3.0 // indirect
 )
 
 require (

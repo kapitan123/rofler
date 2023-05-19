@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kapitan123/telegrofler/bot/internal/contentLoader"
+	contentLoader "github.com/kapitan123/telegrofler/bot/internal/content_loader"
 )
 
 const (
