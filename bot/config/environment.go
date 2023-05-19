@@ -14,7 +14,7 @@ const (
 	gcloudAppCredsEnv = "GOOGLE_APPLICATION_CREDENTIALS" // Default cloudrun env
 	port              = "PORT"
 	selfUrl           = "SELF_URL"
-	deletionQueueName = "DELETION_QUEUE_NAME"
+	deletionQueueName = "MESSAGE_DELETION_QUEUE_NAME"
 	region            = "REGION"
 	saEmail           = "SA_EMAIL"
 	projectId         = "PROJECT_ID"

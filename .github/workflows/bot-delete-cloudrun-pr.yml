@@ -1,4 +1,4 @@
-name: Delete CloudRun PR service
+name: Delete bot CloudRun PR service
 
 on:
   pull_request:

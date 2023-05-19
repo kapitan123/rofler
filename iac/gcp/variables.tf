@@ -17,11 +17,21 @@ variable "registry_id" {
   default = "eu.gcr.io"
 }
 
-variable "name" {
+variable "bot_name" {
   type = string
 }
 
 variable "port" {
   type    = number
   default = 9001
+}
+
+variable "video_convertion_topic_name" {
+  type    = string
+  default = "video_convertion"
+}
+
+variable "deletion_queue_name" {
+  type    = string
+  default = "message-deletion"
 }

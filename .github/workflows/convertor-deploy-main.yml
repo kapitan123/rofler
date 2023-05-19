@@ -1,27 +1,17 @@
-name: Deploy to bot CloudRun reusable workflow
+name: Deploy Convertorto CloudRun reusable workflow
 
 on:
-  workflow_call:
-    inputs:
-      service-postfix:
-        required: false
-        type: string
-        default: ""
-
-      set-webhook:
-        type: boolean
-        required: false
-        default: false
-
-    secrets:
-      GCP_CREDENTIALS:
-        required: true
+  push:
+    branches:
+      - main
+    paths:
+      - "bot/**"
 
 jobs:
     deploy-cloudrun-service:
       runs-on: ubuntu-latest
       environment: prod
-      name: Deploys new version of telegrofler bot
+      name: Deploys new version of convertor
       concurrency:
         group: cloudrun-deploy-${{ github.ref }}
         cancel-in-progress: true
@@ -40,27 +30,13 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
-
-      - id: secrets-manager
-        uses: google-github-actions/get-secretmanager-secrets@v0
-        with:
-          secrets: |-
-            telegram-bot-token:${{ steps.auth.outputs.project_id }}/telegram_bot_token
-            telegram-test-bot-token:${{ steps.auth.outputs.project_id }}/telegram_test_bot_token
-            app-name:${{ steps.auth.outputs.project_id }}/app_name
-    
+ 
+      # AK TODO check if I need to set meta for convertor
       - id: service-meta
         name: Calculate service deployment settings
         run: |
           echo "image=eu.gcr.io/${{ steps.auth.outputs.project_id }}/${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_OUTPUT
-
-          if [ ${{ inputs.service-postfix }} != "" ]; then
-            echo "name=${{ steps.secrets-manager.outputs.app-name }}-${{github.event.number}}" >> $GITHUB_OUTPUT
-            echo "bot-token=${{ steps.secrets-manager.outputs.telegram-test-bot-token }}" >> $GITHUB_OUTPUT
-          else
-            echo "name=${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_OUTPUT
-            echo "bot-token=${{ steps.secrets-manager.outputs.telegram-bot-token }}" >> $GITHUB_OUTPUT
-          fi
+          echo "name=convertor" >> $GITHUB_OUTPUT
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
@@ -71,7 +47,7 @@ jobs:
 
       - name: Build Docker image
         shell: bash
-        run: docker build -f bot/Dockerfile . -t ${{ steps.service-meta.outputs.image }}
+        run: docker build -f convertor/Dockerfile . -t ${{ steps.service-meta.outputs.image }}
 
       - name: Push Docker image
         shell: bash
@@ -84,8 +60,7 @@ jobs:
           service: ${{ steps.service-meta.outputs.name }}
           image:  ${{ steps.service-meta.outputs.image }}
           region: europe-central2
-          env_vars: |
-            TELEGRAM_BOT_TOKEN=${{ steps.service-meta.outputs.bot-token }}  
+          env_vars: | 
             PROJECT_ID=${{ steps.auth.outputs.project_id}}
             DELETION_QUEUE_NAME=tgmessage-deletion
           flags: --allow-unauthenticated
