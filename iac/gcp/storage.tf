@@ -14,7 +14,7 @@ resource "google_storage_bucket" "tfstate" {
 }
 
 resource "google_storage_bucket" "converted_videos" {
-  name          = "converted-videos"
+  name          = "${random_id.bucket_prefix.hex}-converted-videos"
   force_destroy = true
   location      = var.region
   storage_class = "STANDARD"
