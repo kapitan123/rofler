@@ -6,6 +6,13 @@ on:
       - main
     paths:
       - "convertor/**"
+      #AK TODO temp solution
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Environment
+        default: prod
+        required: true
 
 jobs:
   deploy-cloudrun-service:
