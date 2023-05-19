@@ -2,21 +2,21 @@ name: Delete bot CloudRun PR service
 
 on:
   pull_request:
-    types: [ closed ]
+    types: [closed]
   delete:
 
 jobs:
-    delete-cloud-run:
-      runs-on: ubuntu-latest
-      environment: prod
-      name: Deletes cloud run service
+  delete-cloud-run:
+    runs-on: ubuntu-latest
+    environment: prod
+    name: Deletes cloud run service
 
-      steps:
-      - uses: 'actions/checkout@v3'
+    steps:
+      - uses: "actions/checkout@v3"
 
       - id: auth
         name: Authenticate to Google Cloud
-        uses: 'google-github-actions/auth@v0'
+        uses: "google-github-actions/auth@v0"
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 

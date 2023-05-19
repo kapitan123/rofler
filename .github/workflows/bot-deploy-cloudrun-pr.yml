@@ -2,14 +2,16 @@ name: Deploy to bot CloudRun PR
 
 on:
   pull_request:
-    types: [ opened, edited, synchronize ]
+    types: [opened, edited, synchronize]
+    paths:
+      - "bot/**"
 
 jobs:
   deploy-to-cloudrun:
-    name: Deploys new version of telegrofler bot
+    name: Deploys new version of telegrofler bot to a PR copy
     uses: ./.github/workflows/bot-reusable-deploy-cloudrun.yml
     with:
       service-postfix: ${{ github.event.number }}
       set-webhook: true
-    secrets: 
+    secrets:
       GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
