@@ -69,7 +69,6 @@ jobs:
           region: europe-central2
           env_vars: |
             PROJECT_ID=${{ steps.auth.outputs.project_id}}
-            DELETION_QUEUE_NAME=tgmessage-deletion
           flags: --allow-unauthenticated
 
       - name: Output deployed url

@@ -1,7 +1,7 @@
 output "service_url" {
-  value = local.telegrofler_url
+  value = local.bot_url
 }
 
 output "image_name" {
-  value = local.telegrofler_url
+  value = local.bot_image_url
 }
