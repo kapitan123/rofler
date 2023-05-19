@@ -1,4 +1,4 @@
-name: Deploy Convertor from main
+name: Convertor deploy main
 
 on:
   push:

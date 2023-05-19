@@ -1,4 +1,4 @@
-name: Deploy Bot from main
+name: Bot deploy main
 
 on:
   push:

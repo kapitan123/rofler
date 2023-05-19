@@ -1,4 +1,4 @@
-name: Delete Bot PR
+name: Bot delete PR
 
 on:
   pull_request:
