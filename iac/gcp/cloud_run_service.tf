@@ -40,7 +40,7 @@ resource "google_cloud_run_service" "bot" {
 
         env {
           name  = "MESSAGE_DELETION_QUEUE_ID"
-          value = google_cloud_tasks_queue.message_deletion.id
+          value = google_cloud_tasks_queue.tg_message_deletion.id
         }
 
         env {

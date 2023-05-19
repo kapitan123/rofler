@@ -1,4 +1,4 @@
-resource "google_cloud_tasks_queue" "message_deletion" {
+resource "google_cloud_tasks_queue" "tg_message_deletion" {
   name     = var.message_deletion_queue_name
   location = var.region
   project  = var.project_id
