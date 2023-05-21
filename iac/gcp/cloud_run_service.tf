@@ -46,7 +46,7 @@ resource "google_cloud_run_service" "bot" {
           name  = "VIDEO_FILES_BUCKET_URL"
           value = google_storage_bucket.converted_videos.url
         }
-        
+
         env {
           name  = "PROJECT_ID"
           value = var.project_id
