@@ -22,8 +22,8 @@ resource "google_cloud_run_service" "bot" {
 
         resources {
           limits = {
-            cpu    = 2.0
-            memory = "1 Gi"
+            cpu    = "2000m"
+            memory = "1Gi"
           }
         }
 
@@ -86,8 +86,8 @@ resource "google_cloud_run_service" "convertor" {
 
         resources {
           limits = {
-            cpu    = 2.0
-            memory = "1 Gi"
+            cpu    = "2000m"
+            memory = "1Gi"
           }
         }
 
