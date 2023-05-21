@@ -29,9 +29,6 @@ FROM golang:1.19-alpine
 
 RUN apk add --no-cache python3 py3-pip && apk add --no-cache ffmpeg && pip3 install youtube-dl
 
-# Add certs
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-
 # Add binary
 COPY --from=builder /build/server /server 
 
