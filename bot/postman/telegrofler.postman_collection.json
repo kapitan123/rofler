@@ -27,7 +27,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9001/chat/:chatid/pidoroftheday",
+							"raw": "http://localhost:9001/chats/:chatid/pidoroftheday",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -63,7 +63,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9001/chat/:chatid/:messageid",
+							"raw": "http://localhost:9001/chats/:chatid/:messageid",
 							"protocol": "http",
 							"host": [
 								"localhost"

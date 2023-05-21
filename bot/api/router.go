@@ -17,9 +17,10 @@ import (
 // AK TODO we just can't pass all stuff here, we still need an abstraction to group configuration
 // temp solution with direct handler function
 func setupRouter(r *mux.Router, runner *command.Runner, pdr *choosePidor.ChoosePidor, msgr *messenger.Messenger) {
-	r.HandleFunc("/callback", messageHandler(runner)).Methods("POST")
-	r.HandleFunc("/chat/{chatid}/pidoroftheday", choosePidorHandler(pdr)).Methods("POST")
-	r.HandleFunc("/chat/{chatid}/{messageid}", deleteMessageHandler(msgr)).Methods("DELETE")
+	r.HandleFunc("/telegram/callback", messageHandler(runner)).Methods("POST")
+	r.HandleFunc("/chats/{chatid}/pidoroftheday", choosePidorHandler(pdr)).Methods("POST")
+	r.HandleFunc("/chats/{chatid}/{messageid}", deleteMessageHandler(msgr)).Methods("DELETE")
+	r.HandleFunc("/pubsub/subscriptions/video-converted", choosePidorHandler(pdr)).Methods("POST")
 }
 
 // AK TODO send messages to a dead message quee

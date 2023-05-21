@@ -11,23 +11,23 @@ resource "google_pubsub_topic" "dead_letter_topic" {
 }
 
 resource "google_pubsub_subscription" "convertor_to_published_videos" {
-  name   = "convertor-to-published-videos"
-  topic  = google_pubsub_topic.bot_video_link_published_topic.name
-  push_endpoint = local.bot_url + "/convert"
+  name          = "convertor-to-published-videos"
+  topic         = google_pubsub_topic.bot_video_link_published_topic.name
+  push_endpoint = local.bot_url + "/pubsub/subscriptions/video-published"
 
-      dead_letter_policy {
-    dead_letter_topic = google_pubsub_topic.dead_letter_topic.id
+  dead_letter_policy {
+    dead_letter_topic     = google_pubsub_topic.dead_letter_topic.id
     max_delivery_attempts = 4
   }
 }
 
 resource "google_pubsub_subscription" "bot_to_converted_videos" {
-  name   = "bot-to-converted-videos"
-  topic  = google_pubsub_topic.convertor_video_converted_topic.name
-  push_endpoint = local.convertor_url + "/publish-video"
+  name          = "bot-to-converted-videos"
+  topic         = google_pubsub_topic.convertor_video_converted_topic.name
+  push_endpoint = local.convertor_url + "/pubsub/subscriptions/video-converted"
 
-    dead_letter_policy {
-    dead_letter_topic = google_pubsub_topic.dead_letter_topic.id
+  dead_letter_policy {
+    dead_letter_topic     = google_pubsub_topic.dead_letter_topic.id
     max_delivery_attempts = 4
   }
 }

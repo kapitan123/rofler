@@ -8,6 +8,6 @@ resource "google_cloud_scheduler_job" "choose_random_p" {
 
   http_target {
     http_method = "POST"
-    uri         = "${local.bot_url}/chat/-1001201899231/pidoroftheday"
+    uri         = "${local.bot_url}/chats/-1001201899231/pidoroftheday"
   }
 }
