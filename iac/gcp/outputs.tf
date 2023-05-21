@@ -1,7 +1,7 @@
-output "service_url" {
+output "bot_url" {
   value = local.bot_url
 }
 
-output "image_name" {
+output "bot_image_name" {
   value = local.bot_image_url
 }

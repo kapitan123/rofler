@@ -1,4 +1,4 @@
-name: Apply terraform
+name: Global Apply terraform
 
 on:
   push:

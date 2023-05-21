@@ -60,7 +60,7 @@ func main() {
 		log.WithError(err).Fatal("Failed to create bot api")
 	}
 
-	q := taskQueue.New(ctx, config.DeletionQueueName, meta)
+	q := taskQueue.New(ctx, config.DeletionQueueId, meta.GetEmail(), meta.GetSelfUrl())
 	// AK TODO move bot and other shit to app
 	// otherwise we need to create multiple instances of bot and storage to handle scheduler
 	d := contentLoader.New(lovetik.New())

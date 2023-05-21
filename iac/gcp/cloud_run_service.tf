@@ -32,12 +32,6 @@ resource "google_cloud_run_service" "bot" {
           value = var.bot_token
         }
 
-        # AK TODO REMOVE IF ID passing works as expected
-        env {
-          name  = "MESSAGE_DELETION_QUEUE_NAME"
-          value = var.message_deletion_queue_name
-        }
-
         env {
           name  = "MESSAGE_DELETION_QUEUE_ID"
           value = google_cloud_tasks_queue.tg_message_deletion.id
@@ -49,13 +43,13 @@ resource "google_cloud_run_service" "bot" {
         }
 
         env {
-          name  = "PROJECT_ID"
-          value = var.project_id
-        }
-
-        env {
           name  = "VIDEO_FILES_BUCKET_URL"
           value = google_storage_bucket.converted_videos.url
+        }
+        
+        env {
+          name  = "PROJECT_ID"
+          value = var.project_id
         }
       }
     }

@@ -14,7 +14,6 @@ const (
 	gcloudAppCredsEnv          = "GOOGLE_APPLICATION_CREDENTIALS" // Default cloudrun env
 	port                       = "PORT"
 	selfUrl                    = "SELF_URL"
-	deletionQueueName          = "MESSAGE_DELETION_QUEUE_NAME"
 	region                     = "REGION"
 	saEmail                    = "SA_EMAIL"
 	projectId                  = "PROJECT_ID"
@@ -27,7 +26,6 @@ var (
 	TelegramToken              = os.Getenv(telegramTokenEnv)
 	ServerPort, _              = strconv.Atoi(os.Getenv(port))
 	WorkersCount               = 1
-	DeletionQueueName          = os.Getenv(deletionQueueName)
 	DeletionQueueId            = os.Getenv(deletionQueueId)
 	VideoWasPublishedTopicName = os.Getenv(videoWasPublishedTopicName)
 )
@@ -58,6 +56,4 @@ func init() {
 	if SaEmail == "" || Region == "" || ProjectId == "" || SelfUrl == "" {
 		log.Infof("metadata variables are not set, metadata server will be used %s, %s, %s ", saEmail, region, projectId)
 	}
-
-	log.Infof("DeletionQueueId %s PubSubTopic %s", DeletionQueueId, VideoWasPublishedTopicName)
 }

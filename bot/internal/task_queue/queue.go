@@ -16,12 +16,12 @@ import (
 var defaultMessageLifeTime = 2
 
 type TaskQueue struct {
-	Name           string
-	Path           string
-	meta           meta
-	client         *cloudtasks.Client
-	ctx            context.Context
-	initClientOnce sync.Once
+	QueueId             string
+	ServiceAccountEmail string
+	callbackUrl         string
+	client              *cloudtasks.Client
+	ctx                 context.Context
+	initClientOnce      sync.Once
 }
 
 type meta interface {
@@ -31,18 +31,17 @@ type meta interface {
 	GetSelfUrl() string
 }
 
-func New(ctx context.Context, name string, meta meta) *TaskQueue {
+func New(ctx context.Context, qid string, ServiceAccountEmail string, callbackUrl string) *TaskQueue {
 	return &TaskQueue{
-		Name:           name,
-		Path:           fmt.Sprintf("projects/%s/locations/%s/queues/%s", meta.GetProjectId(), meta.GetRegion(), name),
-		meta:           meta,
+		QueueId:        qid,
+		callbackUrl:    callbackUrl,
 		ctx:            ctx,
 		initClientOnce: sync.Once{},
 	}
 }
 
 func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
-	selfUrl := q.meta.GetSelfUrl()
+	selfUrl := q.callbackUrl
 	if selfUrl == "" {
 		log.Warn("Self url is not set operation can't be enqued")
 		return nil
@@ -106,7 +105,7 @@ func (q *TaskQueue) initClient() error {
 
 func (q *TaskQueue) createDeleteRequest(url string) *taskspb.CreateTaskRequest {
 	req := &taskspb.CreateTaskRequest{
-		Parent: q.Path,
+		Parent: q.QueueId,
 		Task: &taskspb.Task{
 			// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#HttpRequest
 			MessageType: &taskspb.Task_HttpRequest{
