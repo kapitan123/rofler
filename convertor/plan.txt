@@ -1,6 +1,0 @@
--- add new container 
--- Add queue which stores tasks for youtube downloads
-
-1) Parses enques the task, task converts video and wrtites it in a simple storage
-2) Service listens to published files, when a new file is published it uploads it to telegram and deletes.
-3)
