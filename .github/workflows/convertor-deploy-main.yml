@@ -42,7 +42,7 @@ jobs:
       - id: service-meta
         name: Calculate service deployment settings
         run: |
-          echo "image=eu.gcr.io/${{ steps.auth.outputs.project_id }}/${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_OUTPUT
+          echo "image=eu.gcr.io/${{ steps.auth.outputs.project_id }}/convertor" >> $GITHUB_OUTPUT
           echo "name=convertor" >> $GITHUB_OUTPUT
 
       - name: Set up Cloud SDK
