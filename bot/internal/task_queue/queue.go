@@ -55,7 +55,7 @@ func (q *TaskQueue) EnqueueDeleteMessage(chatId int64, msgId int) error {
 		return err
 	}
 
-	url := fmt.Sprintf("%s/chats/%d/%d", selfUrl, chatId, msgId)
+	url := fmt.Sprintf("%s/chats/%d/messages/%d", selfUrl, chatId, msgId)
 
 	req := q.createDeleteRequest(url)
 

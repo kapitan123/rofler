@@ -19,11 +19,10 @@ import (
 func setupRouter(r *mux.Router, runner *command.Runner, pdr *choosePidor.ChoosePidor, msgr *messenger.Messenger) {
 	r.HandleFunc("/telegram/callback", messageHandler(runner)).Methods("POST")
 	r.HandleFunc("/chats/{chatid}/pidoroftheday", choosePidorHandler(pdr)).Methods("POST")
-	r.HandleFunc("/chats/{chatid}/{messageid}", deleteMessageHandler(msgr)).Methods("DELETE")
+	r.HandleFunc("/chats/{chatid}/messages/{messageid}", deleteMessageHandler(msgr)).Methods("DELETE")
 	r.HandleFunc("/pubsub/subscriptions/video-converted", choosePidorHandler(pdr)).Methods("POST")
 }
 
-// AK TODO send messages to a dead message quee
 func messageHandler(runner *command.Runner) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var update tgbotapi.Update
