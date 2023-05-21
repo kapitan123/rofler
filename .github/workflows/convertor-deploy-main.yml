@@ -20,7 +20,7 @@ jobs:
     environment: prod
     name: Deploys new version of convertor
     concurrency:
-      group: cloudrun-deploy-${{ github.ref }}
+      group: convertor-deploy-main-${{ github.ref }}
       cancel-in-progress: true
 
     # GCP_CREDENTIALS hack is by design, otherwise env secrets are not available
@@ -64,7 +64,7 @@ jobs:
         name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v0
         with:
-          service: ${{ steps.service-meta.outputs.name }}
+          service: convertor
           image: ${{ steps.service-meta.outputs.image }}
           region: europe-central2
           env_vars: |
@@ -73,10 +73,3 @@ jobs:
 
       - name: Output deployed url
         run: echo "URL of a new service is ${{ steps.deploy.outputs.url }}"
-
-      - name: Set feature bot callback
-        if: ${{ inputs.set-webhook }} == true
-        uses: ./.github/actions/set-bot-callback
-        with:
-          bot-token: ${{ steps.service-meta.outputs.bot-token }}
-          callback-url: ${{ steps.deploy.outputs.url }}

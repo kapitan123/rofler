@@ -84,7 +84,7 @@ resource "google_cloud_run_service" "convertor" {
   template {
     spec {
       containers {
-        image = local.bot_image_url
+        image = local.convertor_image_url
 
         ports {
           container_port = var.port
