@@ -10,22 +10,26 @@ import (
 )
 
 const (
-	telegramTokenEnv  = "TELEGRAM_BOT_TOKEN"
-	gcloudAppCredsEnv = "GOOGLE_APPLICATION_CREDENTIALS" // Default cloudrun env
-	port              = "PORT"
-	selfUrl           = "SELF_URL"
-	deletionQueueName = "MESSAGE_DELETION_QUEUE_NAME"
-	region            = "REGION"
-	saEmail           = "SA_EMAIL"
-	projectId         = "PROJECT_ID"
-	serviceName       = "K_SERVICE" // Default cloudrun env
+	telegramTokenEnv           = "TELEGRAM_BOT_TOKEN"
+	gcloudAppCredsEnv          = "GOOGLE_APPLICATION_CREDENTIALS" // Default cloudrun env
+	port                       = "PORT"
+	selfUrl                    = "SELF_URL"
+	deletionQueueName          = "MESSAGE_DELETION_QUEUE_NAME"
+	region                     = "REGION"
+	saEmail                    = "SA_EMAIL"
+	projectId                  = "PROJECT_ID"
+	serviceName                = "K_SERVICE" // Default cloudrun env
+	videoWasPublishedTopicName = "VIDEO_PUBLISHED_TOPIC"
+	deletionQueueId            = "MESSAGE_DELETION_QUEUE_ID"
 )
 
 var (
-	TelegramToken     = os.Getenv(telegramTokenEnv)
-	ServerPort, _     = strconv.Atoi(os.Getenv(port))
-	WorkersCount      = 1
-	DeletionQueueName = os.Getenv(deletionQueueName)
+	TelegramToken              = os.Getenv(telegramTokenEnv)
+	ServerPort, _              = strconv.Atoi(os.Getenv(port))
+	WorkersCount               = 1
+	DeletionQueueName          = os.Getenv(deletionQueueName)
+	DeletionQueueId            = os.Getenv(deletionQueueId)
+	VideoWasPublishedTopicName = os.Getenv(videoWasPublishedTopicName)
 )
 
 // these var are used to manually set context, which is fetched from gcloud metadata when deployed
@@ -54,4 +58,6 @@ func init() {
 	if SaEmail == "" || Region == "" || ProjectId == "" || SelfUrl == "" {
 		log.Infof("metadata variables are not set, metadata server will be used %s, %s, %s ", saEmail, region, projectId)
 	}
+
+	log.Infof("DeletionQueueId %s PubSubTopic %s", DeletionQueueId, VideoWasPublishedTopicName)
 }
