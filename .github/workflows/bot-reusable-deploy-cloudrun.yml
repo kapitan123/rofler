@@ -47,18 +47,17 @@ jobs:
           secrets: |-
             telegram-bot-token:${{ steps.auth.outputs.project_id }}/telegram_bot_token
             telegram-test-bot-token:${{ steps.auth.outputs.project_id }}/telegram_test_bot_token
-            app-name:${{ steps.auth.outputs.project_id }}/app_name
 
       - id: service-meta
         name: Calculate service deployment settings
         run: |
-          echo "image=eu.gcr.io/${{ steps.auth.outputs.project_id }}/${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_OUTPUT
+          echo "image=eu.gcr.io/${{ steps.auth.outputs.project_id }}/bot" >> $GITHUB_OUTPUT
 
           if [ ${{ inputs.service-postfix }} != "" ]; then
-            echo "name=${{ steps.secrets-manager.outputs.app-name }}-${{github.event.number}}" >> $GITHUB_OUTPUT
+            echo "name=bot-${{github.event.number}}" >> $GITHUB_OUTPUT
             echo "bot-token=${{ steps.secrets-manager.outputs.telegram-test-bot-token }}" >> $GITHUB_OUTPUT
           else
-            echo "name=${{ steps.secrets-manager.outputs.app-name }}" >> $GITHUB_OUTPUT
+            echo "name=bot" >> $GITHUB_OUTPUT
             echo "bot-token=${{ steps.secrets-manager.outputs.telegram-bot-token }}" >> $GITHUB_OUTPUT
           fi
 
