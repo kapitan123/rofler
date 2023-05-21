@@ -114,7 +114,7 @@ func (q *TaskQueue) createDeleteRequest(url string) *taskspb.CreateTaskRequest {
 					Url:        url,
 					AuthorizationHeader: &taskspb.HttpRequest_OidcToken{
 						OidcToken: &taskspb.OidcToken{
-							ServiceAccountEmail: q.meta.GetEmail(),
+							ServiceAccountEmail: q.ServiceAccountEmail,
 						},
 					},
 				},
