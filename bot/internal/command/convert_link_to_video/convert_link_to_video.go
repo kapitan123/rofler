@@ -1,4 +1,4 @@
-package replaceLinkWithMessage
+package convertLinkToVideo
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type ReplaceLinkWithMessage struct {
+type ConvertLinkToVideo struct {
 	messenger  messenger
 	storage    postStorage
 	downloader downloader
@@ -37,15 +37,15 @@ type downloader interface {
 	CanExtractVideoMeta(url string) bool
 }
 
-func New(messenger messenger, storage postStorage, downloader downloader) *ReplaceLinkWithMessage {
-	return &ReplaceLinkWithMessage{
+func New(messenger messenger, storage postStorage, downloader downloader) *ConvertLinkToVideo {
+	return &ConvertLinkToVideo{
 		messenger:  messenger,
 		storage:    storage,
 		downloader: downloader,
 	}
 }
 
-func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message) error {
+func (h *ConvertLinkToVideo) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	url, chatId, senderId := m.Text, m.Chat.ID, m.From.ID
 	senderName := fmt.Sprintf("%s %s", m.From.FirstName, m.From.LastName)
 
@@ -89,6 +89,6 @@ func (h *ReplaceLinkWithMessage) Handle(ctx context.Context, m *tgbotapi.Message
 	return err
 }
 
-func (h *ReplaceLinkWithMessage) ShouldRun(m *tgbotapi.Message) bool {
+func (h *ConvertLinkToVideo) ShouldRun(m *tgbotapi.Message) bool {
 	return h.downloader.CanExtractVideoMeta(m.Text)
 }

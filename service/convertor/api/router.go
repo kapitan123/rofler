@@ -3,27 +3,20 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"os"
+
+	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
-func main() {
-	http.HandleFunc("/", ConvertVideo)
-
-	// AK TODO fix Determine port for HTTP service.
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-		log.Printf("Defaulting to port %s", port)
-	}
-	// Start HTTP server.
-	log.Printf("Listening on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatal(err)
-	}
+// AK TODO we just can't pass all stuff here, we still need an abstraction to group configuration
+// temp solution with direct handler function
+func setupRouter(r *mux.Router) {
+	r.HandleFunc("/pubsub/subscriptions/video-published", convertVideo).Methods("POST")
+	r.HandleFunc("/converted-videos/{videoId}", getVideo).Methods("GET")
 }
 
+// AK TODO should go to handlerFolder ot shit like this
 type ConvertVideoMessage struct {
 	Message struct {
 		Data []byte `json:"data,omitempty"`
@@ -39,7 +32,7 @@ type ConvertableVideoPublishedEvent struct {
 }
 
 // ConvertVideo receives and processes a Pub/Sub push message with a convertable video
-func ConvertVideo(w http.ResponseWriter, r *http.Request) {
+func convertVideo(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -62,4 +55,8 @@ func ConvertVideo(w http.ResponseWriter, r *http.Request) {
 		name = "World"
 	}
 	log.Printf("Hello %s!", name)
+}
+
+// ConvertVideo receives and processes a Pub/Sub push message with a convertable video
+func getVideo(w http.ResponseWriter, r *http.Request) {
 }

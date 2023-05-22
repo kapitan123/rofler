@@ -22,20 +22,20 @@ type (
 	}
 
 	Reaction struct {
-		MessageId      int       `firestore:"message_id"` // RepllyToMessage.ID not the update.Message.ID
-		Sender         string    `firestore:"sender"`     // AK TODO migrate - to user ref
-		Text           string    `firestore:"text"`
-		PostedOn       time.Time `firestore:"posted_on"`
-		ReactorUserRef UserRef   `firestore:"reactor_user_ref"`
+		ReactToMessageId int       `firestore:"react_to_message_id"` // RepllyToMessage.ID not the update.Message.ID
+		Sender           UserRef   `firestore:"sender"`
+		Text             string    `firestore:"text"`
+		PostedOn         time.Time `firestore:"posted_on"`
+		ReactorUserRef   UserRef   `firestore:"reactor_user_ref"`
 	}
 )
 
 func (p *Post) AddReaction(reactor UserRef, text string, messageid int) {
 	reaction := Reaction{
-		ReactorUserRef: reactor,
-		Text:           text,
-		MessageId:      messageid,
-		PostedOn:       time.Now(),
+		ReactorUserRef:   reactor,
+		Text:             text,
+		ReactToMessageId: messageid,
+		PostedOn:         time.Now(),
 	}
 
 	p.Reactions = append(p.Reactions, reaction)

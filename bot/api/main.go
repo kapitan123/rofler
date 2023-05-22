@@ -12,9 +12,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kapitan123/telegrofler/bot/internal/command"
 	choosePidor "github.com/kapitan123/telegrofler/bot/internal/command/choose_pidor"
+	replaceLinkWithMessage "github.com/kapitan123/telegrofler/bot/internal/command/convert_link_to_video"
 	recordBotPostReaction "github.com/kapitan123/telegrofler/bot/internal/command/record_bot_post_reaction"
 	recordReaction "github.com/kapitan123/telegrofler/bot/internal/command/record_reaction"
-	replaceLinkWithMessage "github.com/kapitan123/telegrofler/bot/internal/command/replace_link_with_message"
 	replyTo300 "github.com/kapitan123/telegrofler/bot/internal/command/reply_to_300"
 	replyToNo "github.com/kapitan123/telegrofler/bot/internal/command/reply_to_no"
 	replyToYes "github.com/kapitan123/telegrofler/bot/internal/command/reply_to_yes"
@@ -44,6 +44,17 @@ func main() {
 	client, err := firestore.NewClient(ctx, meta.GetProjectId())
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create firestore client")
+	}
+
+	defer func() {
+		err := client.Close()
+		if err != nil {
+			log.WithError(err).Fatal("Failed to close firestore client")
+		}
+	}()
+
+	if err != nil {
+		log.WithError(err).Fatal("Failed to create cloud storage client")
 	}
 
 	defer func() {
