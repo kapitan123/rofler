@@ -4,10 +4,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Init() {
+func Init(debugMode bool) {
 	SetFormatter(logrus.StandardLogger())
 
-	logrus.SetLevel(logrus.DebugLevel)
+	if debugMode {
+		logrus.SetLevel(logrus.DebugLevel)
+	}
 }
 
 func SetFormatter(logger *logrus.Logger) {

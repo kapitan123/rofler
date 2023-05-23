@@ -32,7 +32,6 @@ var (
 
 // these var are used to manually set context, which is fetched from gcloud metadata when deployed
 var (
-	GcloudCreds = os.Getenv(gcloudAppCredsEnv)
 	SelfUrl     = os.Getenv(selfUrl)
 	Region      = os.Getenv(region)
 	SaEmail     = os.Getenv(saEmail)
@@ -43,10 +42,6 @@ var (
 func init() {
 	if TelegramToken == "" {
 		log.Panic("telegram bot token is not set. Please set the environment variable ", telegramTokenEnv)
-	}
-
-	if GcloudCreds == "" {
-		log.Info("gcloud creds not set. ADC default will be used. Variable ", gcloudAppCredsEnv)
 	}
 
 	if SelfUrl == "" {

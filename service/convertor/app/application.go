@@ -1,24 +1,33 @@
 package app
 
-import 
-(
+import (
 	"context"
+
+	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/storage"
 )
 
 type Application struct {
-	cloudStorage *storage.Client
+	videoConvertedTopic *pubsub.Topic
+	videFilesBucket     *storage.BucketHandle
 }
 
-func NewApplication(ctx context.Context) Application {
-	newClient, err := storage.NewClient(ctx)
-	
+func NewApplication(ctx context.Context, projectId string, videoConvertedTopicId string, videFilesBucketUrl string) Application {
+	newStorageClient, err := storage.NewClient(ctx)
+
+	if err != nil {
+		panic(err)
+	}
+
+	newPubSubClient, err := pubsub.NewClient(ctx, projectId)
+
 	if err != nil {
 		panic(err)
 	}
 
 	return Application{
-		cloudStorage : newClient,
+		videoConvertedTopic: newPubSubClient.Topic(videoConvertedTopicId),
+		videFilesBucket:     newStorageClient.Bucket(videFilesBucketUrl),
 	}
 }
 

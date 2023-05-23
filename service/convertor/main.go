@@ -9,25 +9,26 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/kapitan123/telegrofler/common/logs"
 	"github.com/kapitan123/telegrofler/service/convertor/app"
+	"github.com/kapitan123/telegrofler/service/convertor/config"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	logs.Init()
-
 	ctx := context.Background()
+	cfg := config.GetEnvVars()
 
-	application := app.NewApplication(ctx)
+	logs.Init(cfg.DebguMode)
+
+	application := app.NewApplication(ctx, cfg.VideoConvertedTopicId, cfg.VidoFilesBucketUrl)
 
 	apiRouter := chi.NewRouter()
 
 	setMiddlewares(apiRouter)
-	setRoutes(application)
+	setRoutes(apiRouter, application)
 
 	logrus.Info("Starting HTTP server")
 
-	// AK TODO ADD PORT
-	err := http.ListenAndServe(":8080", apiRouter)
+	err := http.ListenAndServe(cfg.Port, apiRouter)
 	if err != nil {
 		logrus.WithError(err).Panic("Unable to start HTTP server")
 	}

@@ -97,7 +97,7 @@ resource "google_cloud_run_service" "convertor" {
         }
 
         env {
-          name  = "VIDEO_CONVERTED_TOPIC"
+          name  = "VIDEO_CONVERTED_TOPIC_ID"
           value = google_pubsub_topic.convertor_video_converted_topic.id
         }
 

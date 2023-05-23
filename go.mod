@@ -33,6 +33,7 @@ require (
 	cloud.google.com/go/cloudtasks v1.10.0
 	cloud.google.com/go/compute v1.19.0
 	cloud.google.com/go/storage v1.30.1
+	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.8
