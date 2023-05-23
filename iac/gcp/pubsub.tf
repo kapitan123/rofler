@@ -24,7 +24,7 @@ resource "google_pubsub_subscription" "convertor_to_published_videos" {
 
   dead_letter_policy {
     dead_letter_topic     = google_pubsub_topic.dead_letter_topic.id
-    max_delivery_attempts = 4
+    max_delivery_attempts = 5
   }
 
   ack_deadline_seconds = 20
@@ -44,7 +44,7 @@ resource "google_pubsub_subscription" "bot_to_converted_videos" {
 
   dead_letter_policy {
     dead_letter_topic     = google_pubsub_topic.dead_letter_topic.id
-    max_delivery_attempts = 4
+    max_delivery_attempts = 5
   }
 
   ack_deadline_seconds = 20
