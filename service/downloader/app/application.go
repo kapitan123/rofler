@@ -19,7 +19,7 @@ type topic interface {
 }
 
 type fileBucket interface {
-	Save(w io.Writer) error
+	Save(r io.Reader) error
 	Read(addr string, r io.Reader) error
 }
 
@@ -27,7 +27,7 @@ type downloader interface {
 	DownloadFromUrl(url string, w io.Writer) error
 }
 
-func BoostrapNewApplication(ctx context.Context, projectId string, videoSavedTopicId string, videoFilesBucketUrl string) Application {
+func NewApplication(ctx context.Context, projectId string, videoSavedTopicId string, videoFilesBucketUrl string) Application {
 	newStorageClient, err := storage.NewClient(ctx)
 
 	if err != nil {

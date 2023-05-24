@@ -38,13 +38,13 @@ resource "google_cloud_run_service" "bot" {
         }
 
         env {
-          name  = "VIDEO_PUBLISHED_TOPIC"
-          value = google_pubsub_topic.bot_video_link_published_topic.id
+          name  = "VIDEO_SAVED_TOPIC"
+          value = google_pubsub_topic.uploadable_video_saved.id
         }
 
         env {
           name  = "VIDEO_FILES_BUCKET_URL"
-          value = google_storage_bucket.converted_videos.url
+          value = google_storage_bucket.videos.url
         }
 
         env {
@@ -97,8 +97,8 @@ resource "google_cloud_run_service" "downloader" {
         }
 
         env {
-          name  = "VIDEO_URL_DOWNLOADED_TOPIC_ID"
-          value = google_pubsub_topic.downloader_video_url_downloaded_topic.id
+          name  = "VIDEO_SAVED_TOPIC_ID"
+          value = google_pubsub_topic.uploadable_video_saved.id
         }
 
         env {

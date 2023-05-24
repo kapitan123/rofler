@@ -11,7 +11,7 @@ import (
 
 const (
 	telegramTokenEnv           = "TELEGRAM_BOT_TOKEN"
-	gcloudAppCredsEnv          = "GOOGLE_APPLICATION_CREDENTIALS" // Default cloudrun env
+	gcloudAppCredsEnv          = "GOOGLE_APPLICATION_CREDENTIALS" // Default cloudrun env -should be set to run local container
 	port                       = "PORT"
 	selfUrl                    = "SELF_URL"
 	region                     = "REGION"
