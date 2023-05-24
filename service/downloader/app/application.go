@@ -2,37 +2,56 @@ package app
 
 import (
 	"context"
+	"io"
 
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/storage"
-	"github.com/kapitan123/telegrofler/service/downloader/adapter/youtubeDl"
 )
 
 type Application struct {
-	videoSavedTopic  *pubsub.Topic // AK TODO I suppose to abstract it away I guess
-	videoFilesBucket *storage.BucketHandle
-	downloader       *youtubeDl.Downloader
+	videoSavedTopic  *topic
+	videoFilesBucket *fileBucket
+	downloader       *downloader
 }
 
-func NewApplication(ctx context.Context, projectId string, videoSavedTopicId string, videoFilesBucketUrl string) Application {
+type topic interface {
+	PublishSuccess(savedVideoAddr string, originalUrl string) error
+}
+
+type fileBucket interface {
+	Save(w io.Writer) error
+	Read(addr string, r io.Reader) error
+}
+
+type downloader interface {
+	DownloadFromUrl(url string, w io.Writer) error
+}
+
+func BoostrapNewApplication(ctx context.Context, projectId string, videoSavedTopicId string, videoFilesBucketUrl string) Application {
 	newStorageClient, err := storage.NewClient(ctx)
 
 	if err != nil {
 		panic(err)
 	}
 
+	// I should pass all this shit to adapters and here instaniate wrappers
+	// adapter.CloudStorageBucket(ctx, projectId)
+	// and then I can pass it as fileBucket interface
 	newPubSubClient, err := pubsub.NewClient(ctx, projectId)
 
 	if err != nil {
 		panic(err)
 	}
 
-	var mes = pubsub.Message{}
 	return Application{
 		videoSavedTopic:  newPubSubClient.Topic(videoSavedTopicId),
 		videoFilesBucket: newStorageClient.Bucket(videoFilesBucketUrl),
 		downloader:       youtubeDl.NewDownloader(),
 	}
+}
+
+func NewApplication(ctx context.Context, videoSavedTopic topic, videoBucket fileBucket) {
+
 }
 
 func (app *Application) SaveVideoToStorage() {

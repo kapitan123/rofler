@@ -14,7 +14,7 @@ func NewDownloader() *Downloader {
 	return &Downloader{}
 }
 
-func (q *Downloader) DownloadFromUrl(url string, w io.Writer) error {
+func (d *Downloader) DownloadFromUrl(url string, w io.Writer) error {
 	// youtube-dl -o - "https://www.youtube.com/watch?v=BaW_jenozKcj"
 	cmd := exec.Command("youtube-dl", "-o -", url)
 
