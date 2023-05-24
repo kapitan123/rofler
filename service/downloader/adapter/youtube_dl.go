@@ -1,4 +1,4 @@
-package youtubeDl
+package adapter
 
 import (
 	"fmt"
@@ -24,7 +24,8 @@ func (d *Downloader) DownloadFromUrl(url string, w io.Writer) error {
 		return err
 	}
 
-	// AK TODO check error handling
+	// AK TODO check error handling and also chekc do I even need to spawn it in a separate goroutine.
+	// Download may be so slow in the past exactly because container is deprovisioned after serving the request!
 	go func() {
 		_, err := io.Copy(io.MultiWriter(w, os.Stdout), stdout)
 		if err != nil {

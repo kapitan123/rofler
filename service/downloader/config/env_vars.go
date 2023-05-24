@@ -1,5 +1,3 @@
-// Should not be used outside of main.go
-// will be converted to flags
 package config
 
 import (

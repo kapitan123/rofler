@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -14,38 +15,40 @@ type CloudStorageBucket struct {
 	subdirectory string
 }
 
-func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFilesBucketUrl string) CloudStorageBucket {
+func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFilesBucketUrl string) *CloudStorageBucket {
 	newStorageClient, err := storage.NewClient(ctx)
 
 	if err != nil {
 		panic(err)
 	}
 
-	return CloudStorageBucket{
+	return &CloudStorageBucket{
 		bucket:       newStorageClient.Bucket(videoFilesBucketUrl),
-		subdirectory: "/downloaded",
+		subdirectory: "/saved/",
 	}
 }
 
-func (b *CloudStorageBucket) Save(id string, fromReader io.Reader) error {
+func (b *CloudStorageBucket) Save(fromReader io.Reader) (uuid.UUID, error) {
 	ctx := context.Background()
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
-	writer := b.bucket.Object(b.subdirectory + id).NewWriter(ctx)
+	newVideoId := uuid.New()
+	newFilePath := b.subdirectory + newVideoId.String() + ".mp4"
+	writer := b.bucket.Object(newFilePath).NewWriter(ctx)
 
 	defer writer.Close()
 
 	if _, err := io.Copy(writer, fromReader); err != nil {
-		return errors.Wrap(err, "unable to copy data to bucket object writer")
+		return uuid.Nil, errors.Wrap(err, "unable to copy data to bucket object writer")
 	}
 
 	if err := writer.Close(); err != nil {
-		return errors.Wrap(err, "unable to upload data to storage")
+		return uuid.Nil, errors.Wrap(err, "unable to upload data to storage")
 	}
 
-	return nil
+	return newVideoId, nil
 }
 
 func (b *CloudStorageBucket) Read(ctx context.Context, addr string, r io.Reader) error {
