@@ -9,12 +9,12 @@ import (
 )
 
 type Application struct {
-	videoConvertedTopic *pubsub.Topic // AK TODO I suppose to abstract it away I guess
-	videFilesBucket     *storage.BucketHandle
-	downloader          *youtubeDl.Downloader
+	videoSavedTopic  *pubsub.Topic // AK TODO I suppose to abstract it away I guess
+	videoFilesBucket *storage.BucketHandle
+	downloader       *youtubeDl.Downloader
 }
 
-func NewApplication(ctx context.Context, projectId string, videoConvertedTopicId string, videFilesBucketUrl string) Application {
+func NewApplication(ctx context.Context, projectId string, videoSavedTopicId string, videoFilesBucketUrl string) Application {
 	newStorageClient, err := storage.NewClient(ctx)
 
 	if err != nil {
@@ -27,10 +27,11 @@ func NewApplication(ctx context.Context, projectId string, videoConvertedTopicId
 		panic(err)
 	}
 
+	var mes = pubsub.Message{}
 	return Application{
-		videoConvertedTopic: newPubSubClient.Topic(videoConvertedTopicId),
-		videFilesBucket:     newStorageClient.Bucket(videFilesBucketUrl),
-		downloader:          youtubeDl.NewDownloader(),
+		videoSavedTopic:  newPubSubClient.Topic(videoSavedTopicId),
+		videoFilesBucket: newStorageClient.Bucket(videoFilesBucketUrl),
+		downloader:       youtubeDl.NewDownloader(),
 	}
 }
 
