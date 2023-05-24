@@ -5,11 +5,13 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/storage"
+	"github.com/kapitan123/telegrofler/service/downloader/adapter/youtubeDl"
 )
 
 type Application struct {
-	videoConvertedTopic *pubsub.Topic
+	videoConvertedTopic *pubsub.Topic // AK TODO I suppose to abstract it away I guess
 	videFilesBucket     *storage.BucketHandle
+	downloader          *youtubeDl.Downloader
 }
 
 func NewApplication(ctx context.Context, projectId string, videoConvertedTopicId string, videFilesBucketUrl string) Application {
@@ -28,11 +30,12 @@ func NewApplication(ctx context.Context, projectId string, videoConvertedTopicId
 	return Application{
 		videoConvertedTopic: newPubSubClient.Topic(videoConvertedTopicId),
 		videFilesBucket:     newStorageClient.Bucket(videFilesBucketUrl),
+		downloader:          youtubeDl.NewDownloader(),
 	}
 }
 
 func (app *Application) SaveVideoToStorage() {
-
+	// wc := d.bucket.Object(fileName).NewWriter(d.ctx)
 }
 
 // These wrappers can be put in a separate repo, but it seem like an overkill

@@ -1,11 +1,11 @@
-name: Convertor deploy main
+name: Downloader deploy main
 
 on:
   push:
     branches:
       - main
     paths:
-      - "convertor/**"
+      - "service/downloader/**"
       #AK TODO temp solution
   workflow_dispatch:
     inputs:
@@ -18,9 +18,9 @@ jobs:
   deploy-cloudrun-service:
     runs-on: ubuntu-latest
     environment: prod
-    name: Deploys new version of convertor
+    name: Deploys new version of downloader
     concurrency:
-      group: convertor-deploy-main-${{ github.ref }}
+      group: downloader-deploy-main-${{ github.ref }}
       cancel-in-progress: true
 
     # GCP_CREDENTIALS hack is by design, otherwise env secrets are not available
@@ -38,12 +38,11 @@ jobs:
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
 
-      # AK TODO check if I need to set meta for convertor
       - id: service-meta
         name: Calculate service deployment settings
         run: |
-          echo "image=eu.gcr.io/${{ steps.auth.outputs.project_id }}/convertor" >> $GITHUB_OUTPUT
-          echo "name=convertor" >> $GITHUB_OUTPUT
+          echo "image=eu.gcr.io/${{ steps.auth.outputs.project_id }}/downloader" >> $GITHUB_OUTPUT
+          echo "name=downloader" >> $GITHUB_OUTPUT
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
@@ -54,7 +53,7 @@ jobs:
 
       - name: Build Docker image
         shell: bash
-        run: docker build -f convertor/Dockerfile . -t ${{ steps.service-meta.outputs.image }}
+        run: docker build -f service/downloader/Dockerfile . -t ${{ steps.service-meta.outputs.image }}
 
       - name: Push Docker image
         shell: bash
@@ -64,7 +63,7 @@ jobs:
         name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v0
         with:
-          service: convertor
+          service: downloader
           image: ${{ steps.service-meta.outputs.image }}
           region: europe-central2
           env_vars: |

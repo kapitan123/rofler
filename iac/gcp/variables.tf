@@ -32,7 +32,7 @@ variable "bot_name" {
   default = "bot"
 }
 
-variable "convertor_name" {
+variable "downloader_name" {
   type    = string
-  default = "convertor"
+  default = "downloader"
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/kapitan123/telegrofler/common/logs"
-	"github.com/kapitan123/telegrofler/service/convertor/app"
-	"github.com/kapitan123/telegrofler/service/convertor/config"
+	"github.com/kapitan123/telegrofler/service/downloader/app"
+	"github.com/kapitan123/telegrofler/service/downloader/config"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,7 +19,7 @@ func main() {
 
 	logs.Init(cfg.DebguMode)
 
-	application := app.NewApplication(ctx, cfg.VideoConvertedTopicId, cfg.VidoFilesBucketUrl)
+	application := app.NewApplication(ctx, cfg.ProjectId, cfg.VideoConvertedTopicId, cfg.VidoFilesBucketUrl)
 
 	apiRouter := chi.NewRouter()
 

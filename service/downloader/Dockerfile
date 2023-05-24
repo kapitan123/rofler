@@ -13,14 +13,14 @@ COPY go.sum .
 RUN go mod download
 
 # Copy Go source files
-COPY convertor/config/ ./convertor/config/
-COPY convertor/api/ ./convertor/api/ 
-COPY convertor/internal/ ./convertor/internal/
+COPY downloader/config/ ./downloader/config/
+COPY downloader/api/ ./downloader/api/ 
+COPY downloader/internal/ ./downloader/internal/
 
 # All GCE instances are x86_64 linux based machines. Dynamic linking is disabled because it will be copied to scratch.
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -ldflags="-w -s" \
-    -o server github.com/kapitan123/telegrofler/convertor/api
+    -o server github.com/kapitan123/telegrofler/service/downloader/api
 
 # ===================================================================================
 # === Stage 2: Create a run container =======================================

@@ -1,21 +1,21 @@
-resource "google_pubsub_topic" "convertor_video_converted_topic" {
-  name = "convertor_video_converted"
+resource "google_pubsub_topic" "uploadable_video_saved" {
+  name = "uploadable_video_saved"
 }
 
-resource "google_pubsub_topic" "bot_video_link_published_topic" {
-  name = "bot_video_link_published"
+resource "google_pubsub_topic" "video_url_published" {
+  name = "video_url_published"
 }
 
-resource "google_pubsub_topic" "dead_letter_topic" {
-  name = "global_dead_letter_received"
+resource "google_pubsub_topic" "dead_letter_received" {
+  name = "dead_letter_received"
 }
 
-resource "google_pubsub_subscription" "convertor_to_published_videos" {
-  name  = "convertor-to-published-videos"
-  topic = google_pubsub_topic.bot_video_link_published_topic.name
+resource "google_pubsub_subscription" "downloader_to_video_url_published" {
+  name  = "downloader_to_video_url_published"
+  topic = google_pubsub_topic.video_url_published.name
 
   push_config {
-    push_endpoint = "${local.bot_url}/pubsub/subscriptions/video-published"
+    push_endpoint = "${local.bot_url}/pubsub/subscriptions/video-url-published"
 
     attributes = {
       x-goog-version = "v1"
@@ -23,19 +23,19 @@ resource "google_pubsub_subscription" "convertor_to_published_videos" {
   }
 
   dead_letter_policy {
-    dead_letter_topic     = google_pubsub_topic.dead_letter_topic.id
+    dead_letter_topic     = google_pubsub_topic.dead_letter_received.id
     max_delivery_attempts = 5
   }
 
   ack_deadline_seconds = 20
 }
 
-resource "google_pubsub_subscription" "bot_to_converted_videos" {
-  name  = "bot-to-converted-videos"
-  topic = google_pubsub_topic.convertor_video_converted_topic.name
+resource "google_pubsub_subscription" "bot_to_saved_videos" {
+  name  = "bot_to_saved_videos"
+  topic = google_pubsub_topic.uploadable_video_saved.name
 
   push_config {
-    push_endpoint = "${local.convertor_url}/pubsub/subscriptions/video-converted"
+    push_endpoint = "${local.downloader_url}/pubsub/subscriptions/video-saved"
 
     attributes = {
       x-goog-version = "v1"
@@ -43,7 +43,7 @@ resource "google_pubsub_subscription" "bot_to_converted_videos" {
   }
 
   dead_letter_policy {
-    dead_letter_topic     = google_pubsub_topic.dead_letter_topic.id
+    dead_letter_topic     = google_pubsub_topic.dead_letter_received.id
     max_delivery_attempts = 5
   }
 

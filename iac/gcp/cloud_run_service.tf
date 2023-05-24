@@ -63,9 +63,9 @@ resource "google_cloud_run_service" "bot" {
   depends_on = [google_project_service.cloud_run_googleapis_com]
 }
 
-// Convertor service
-resource "google_cloud_run_service" "convertor" {
-  name     = var.convertor_name
+// downloader service
+resource "google_cloud_run_service" "downloader" {
+  name     = var.downloader_name
   location = var.region
   project  = var.project_id
 
@@ -78,7 +78,7 @@ resource "google_cloud_run_service" "convertor" {
   template {
     spec {
       containers {
-        image = local.convertor_image_url
+        image = local.downloader_image_url
 
         ports {
           container_port = var.port
@@ -93,12 +93,12 @@ resource "google_cloud_run_service" "convertor" {
 
         env {
           name  = "VIDEO_FILES_BUCKET_URL"
-          value = google_storage_bucket.converted_videos.url
+          value = google_storage_bucket.videos.url
         }
 
         env {
-          name  = "VIDEO_CONVERTED_TOPIC_ID"
-          value = google_pubsub_topic.convertor_video_converted_topic.id
+          name  = "VIDEO_URL_DOWNLOADED_TOPIC_ID"
+          value = google_pubsub_topic.downloader_video_url_downloaded_topic.id
         }
 
         env {
