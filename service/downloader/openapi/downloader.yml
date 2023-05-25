@@ -8,41 +8,7 @@ servers:
     variables:
       hostname:
         default: localhost
-paths:
-  /saved-videos/{videoId}:
-    get:
-      operationId: getSavedVideo
-      parameters:
-        - in: path
-          name: videoId
-          description: The ID of the video
-          schema:
-            type: string
-            format: uuid
-          required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            video/mp4:
-              schema:
-                type: string
-                format: binary
-          headers:
-            Content-Disposition:
-              description: The filename of the video file
-              schema:
-                type: string
-              example: attachment; filename="video.mp4"
-        "404":
-          description: Video not found or link is expired
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-                
+paths:          
   /pubsub/subscriptions/video-url-published:
     post:
       operationId: handleVideoUrlPublishedMessage

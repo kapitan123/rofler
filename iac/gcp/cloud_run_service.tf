@@ -39,7 +39,7 @@ resource "google_cloud_run_service" "bot" {
         }
 
         env {
-          name  = "VIDEO_SAVED_TOPIC"
+          name  = "VIDEO_SAVED_TOPIC_ID"
           value = google_pubsub_topic.uploadable_video_saved.id
         }
 

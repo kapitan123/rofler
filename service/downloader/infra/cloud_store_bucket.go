@@ -28,25 +28,24 @@ func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFiles
 	}
 }
 
-func (b *CloudStorageBucket) Save(ctx context.Context, fromReader io.Reader) (uuid.UUID, error) {
+func (b *CloudStorageBucket) Save(ctx context.Context, fromReader io.Reader) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
-	newVideoId := uuid.New()
-	newFilePath := b.subdirectory + newVideoId.String() + ".mp4"
+	newFilePath := b.subdirectory + uuid.New().String() + ".mp4"
 	writer := b.bucket.Object(newFilePath).NewWriter(ctx)
 
 	defer writer.Close()
 
 	if _, err := io.Copy(writer, fromReader); err != nil {
-		return uuid.Nil, errors.Wrap(err, "unable to copy data to bucket object writer")
+		return "", errors.Wrap(err, "unable to copy data to bucket object writer")
 	}
 
 	if err := writer.Close(); err != nil {
-		return uuid.Nil, errors.Wrap(err, "unable to upload data to storage")
+		return "", errors.Wrap(err, "unable to upload data to storage")
 	}
 
-	return newVideoId, nil
+	return newFilePath, nil
 }
 
 func (b *CloudStorageBucket) Read(ctx context.Context, id uuid.UUID, r io.Reader) error {

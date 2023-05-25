@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/deepmap/oapi-codegen/pkg/runtime"
-	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -17,9 +15,6 @@ type ServerInterface interface {
 
 	// (POST /pubsub/subscriptions/video-url-published)
 	HandleVideoUrlPublishedMessage(w http.ResponseWriter, r *http.Request)
-
-	// (GET /saved-videos/{videoId})
-	GetSavedVideo(w http.ResponseWriter, r *http.Request, videoId openapi_types.UUID)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -37,32 +32,6 @@ func (siw *ServerInterfaceWrapper) HandleVideoUrlPublishedMessage(w http.Respons
 
 	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.HandleVideoUrlPublishedMessage(w, r)
-	})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetSavedVideo operation middleware
-func (siw *ServerInterfaceWrapper) GetSavedVideo(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "videoId" -------------
-	var videoId openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "videoId", runtime.ParamLocationPath, chi.URLParam(r, "videoId"), &videoId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "videoId", Err: err})
-		return
-	}
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetSavedVideo(w, r, videoId)
 	})
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -187,9 +156,6 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/pubsub/subscriptions/video-url-published", wrapper.HandleVideoUrlPublishedMessage)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/saved-videos/{videoId}", wrapper.GetSavedVideo)
 	})
 
 	return r

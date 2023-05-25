@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 
-	"github.com/google/uuid"
 	"github.com/kapitan123/telegrofler/service/downloader/infra"
 )
 
@@ -15,12 +14,11 @@ type Application struct {
 }
 
 type successTopic interface {
-	PublishSuccess(ctx context.Context, savedVideoId uuid.UUID, originalUrl string) error
+	PublishSuccess(ctx context.Context, savedVideoAddr string, originalUrl string) error
 }
 
 type fileBucket interface {
-	Save(ctx context.Context, fromReader io.Reader) (uuid.UUID, error)
-	Read(ctx context.Context, id uuid.UUID, r io.Reader) error
+	Save(ctx context.Context, fromReader io.Reader) (string, error)
 }
 
 type downloader interface {
@@ -66,8 +64,4 @@ func (app *Application) SaveVideoToStorage(ctx context.Context, url string) erro
 	}
 
 	return err
-}
-
-func (app *Application) GetVideo() {
-	// AK TODO implement
 }

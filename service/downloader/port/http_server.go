@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 	"github.com/go-chi/render"
 	"github.com/kapitan123/telegrofler/common/server/httperr"
 	"github.com/kapitan123/telegrofler/service/downloader/app"
@@ -42,10 +41,6 @@ func (h HttpServer) HandleVideoUrlPublishedMessage(w http.ResponseWriter, r *htt
 	}
 
 	render.Status(r, 200)
-}
-
-func (h HttpServer) GetSavedVideo(w http.ResponseWriter, r *http.Request, videoId openapi_types.UUID) {
-	// AK TODO check if google UUID and openapi_UUID are compitable
 }
 
 type VideoUrlPublishedMessage struct {

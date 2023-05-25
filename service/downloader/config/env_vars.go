@@ -24,11 +24,11 @@ func GetEnvVars() Config {
 	}
 
 	if cfg.VideoConvertedTopicId == "" {
-		log.Info("VIDEO_CONVERTED_TOPIC_ID is not set")
+		log.Panic("VIDEO_CONVERTED_TOPIC_ID is not set")
 	}
 
 	if cfg.ProjectId == "" {
-		log.Info("PROJECT_ID is not set")
+		log.Panic("PROJECT_ID is not set")
 	}
 
 	return cfg

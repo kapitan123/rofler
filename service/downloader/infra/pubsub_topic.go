@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,10 +26,10 @@ func NewPubSubTopicClient(ctx context.Context, projectId string, servicename str
 	}
 }
 
-func (t *PubSubTopic) PublishSuccess(ctx context.Context, savedVideoId uuid.UUID, originalUrl string) error {
+func (t *PubSubTopic) PublishSuccess(ctx context.Context, savedVideoAddr string, originalUrl string) error {
 	message, _ := json.Marshal(VideoSavedMessage{
-		SavedVideoId: savedVideoId,
-		OriginalUrl:  originalUrl,
+		SavedVideoAddr: savedVideoAddr,
+		OriginalUrl:    originalUrl,
 	})
 	result := t.topic.Publish(ctx, &pubsub.Message{
 		Data: message,
@@ -53,6 +52,6 @@ func (t *PubSubTopic) PublishSuccess(ctx context.Context, savedVideoId uuid.UUID
 }
 
 type VideoSavedMessage struct {
-	SavedVideoId uuid.UUID `json:"saved_video_id"`
-	OriginalUrl  string    `json:"original_url"`
+	SavedVideoAddr string `json:"saved_video_addr"`
+	OriginalUrl    string `json:"original_url"`
 }
