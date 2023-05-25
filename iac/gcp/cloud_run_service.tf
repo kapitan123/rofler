@@ -5,6 +5,7 @@ resource "google_cloud_run_service" "bot" {
   location = var.region
   project  = var.project_id
 
+  autogenerate_revision_name = true
   lifecycle {
     ignore_changes = [
       template[0].spec[5],
@@ -68,6 +69,8 @@ resource "google_cloud_run_service" "downloader" {
   name     = var.downloader_name
   location = var.region
   project  = var.project_id
+
+  autogenerate_revision_name = true
 
   lifecycle {
     ignore_changes = [

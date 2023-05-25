@@ -70,7 +70,7 @@ jobs:
 
       - name: Build Docker image
         shell: bash
-        run: docker build -f bot/Dockerfile . -t ${{ steps.service-meta.outputs.image }}
+        run: docker build -f service/bot/Dockerfile . -t ${{ steps.service-meta.outputs.image }}
 
       - name: Push Docker image
         shell: bash

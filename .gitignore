@@ -22,7 +22,7 @@ bot/api/api
 .devcontainer/
 
 # Dev keys
-bot/keys/
+keys/
 iac/gcp/terraform.tfvars
 
 # Terraform providers
