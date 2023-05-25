@@ -22,6 +22,7 @@ require (
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/google/s2a-go v0.1.0 // indirect
 	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 )
@@ -42,6 +43,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/samber/lo v1.38.1
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.7.0
