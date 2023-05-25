@@ -41,7 +41,7 @@ jobs:
       - id: get-bot
         name: Fetches bot url
         run: |
-          echo "url=$(gcloud run services describe ${{ inputs.service-postfix }} --region=europe-central2 --format='value(status.url)')" >> $GITHUB_OUTPUT
+          echo "url=$(gcloud run services describe ${{ inputs.service-name }} --region=europe-central2 --format='value(status.url)')" >> $GITHUB_OUTPUT
 
       - name: Set callback
         run: |
