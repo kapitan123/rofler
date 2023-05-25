@@ -46,5 +46,5 @@ jobs:
       - name: Set callback
         run: |
           curl -X "POST" "https://api.telegram.org/bot${{ steps.secrets-manager.outputs.telegram-bot-token }}/setWebhook" \
-            -d '{"url": "${{ steps.get-bot.outputs.url }}"}' \
+            -d '{"url": "${{ steps.get-bot.outputs.url }}/telegram/callback"}' \
             -H 'Content-Type: application/json; charset=utf-8'
