@@ -15,12 +15,12 @@ type Error struct {
 	Slug    string `json:"slug"`
 }
 
-// Message defines model for Message.
-type Message struct {
+// PostPubSubMessage defines model for PostPubSubMessage.
+type PostPubSubMessage struct {
 	Data        []byte             `json:"data"`
 	Id          openapi_types.UUID `json:"id"`
 	PublishTime time.Time          `json:"publishTime"`
 }
 
 // HandleVideoUrlPublishedMessageJSONRequestBody defines body for HandleVideoUrlPublishedMessage for application/json ContentType.
-type HandleVideoUrlPublishedMessageJSONRequestBody = Message
+type HandleVideoUrlPublishedMessageJSONRequestBody = PostPubSubMessage

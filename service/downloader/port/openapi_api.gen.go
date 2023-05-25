@@ -15,11 +15,11 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (GET /converted-videos/{videoId})
-	GetConvertedVideo(w http.ResponseWriter, r *http.Request, videoId openapi_types.UUID)
-
 	// (POST /pubsub/subscriptions/video-url-published)
 	HandleVideoUrlPublishedMessage(w http.ResponseWriter, r *http.Request)
+
+	// (GET /saved-videos/{videoId})
+	GetSavedVideo(w http.ResponseWriter, r *http.Request, videoId openapi_types.UUID)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -31,8 +31,23 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
-// GetConvertedVideo operation middleware
-func (siw *ServerInterfaceWrapper) GetConvertedVideo(w http.ResponseWriter, r *http.Request) {
+// HandleVideoUrlPublishedMessage operation middleware
+func (siw *ServerInterfaceWrapper) HandleVideoUrlPublishedMessage(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.HandleVideoUrlPublishedMessage(w, r)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetSavedVideo operation middleware
+func (siw *ServerInterfaceWrapper) GetSavedVideo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
@@ -47,22 +62,7 @@ func (siw *ServerInterfaceWrapper) GetConvertedVideo(w http.ResponseWriter, r *h
 	}
 
 	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetConvertedVideo(w, r, videoId)
-	})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// HandleVideoUrlPublishedMessage operation middleware
-func (siw *ServerInterfaceWrapper) HandleVideoUrlPublishedMessage(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.HandleVideoUrlPublishedMessage(w, r)
+		siw.Handler.GetSavedVideo(w, r, videoId)
 	})
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -186,10 +186,10 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/converted-videos/{videoId}", wrapper.GetConvertedVideo)
+		r.Post(options.BaseURL+"/pubsub/subscriptions/video-url-published", wrapper.HandleVideoUrlPublishedMessage)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/pubsub/subscriptions/video-url-published", wrapper.HandleVideoUrlPublishedMessage)
+		r.Get(options.BaseURL+"/saved-videos/{videoId}", wrapper.GetSavedVideo)
 	})
 
 	return r

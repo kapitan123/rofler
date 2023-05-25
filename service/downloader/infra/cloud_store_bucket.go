@@ -1,4 +1,4 @@
-package adapter
+package infra
 
 import (
 	"context"
@@ -28,9 +28,7 @@ func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFiles
 	}
 }
 
-func (b *CloudStorageBucket) Save(fromReader io.Reader) (uuid.UUID, error) {
-	ctx := context.Background()
-
+func (b *CloudStorageBucket) Save(ctx context.Context, fromReader io.Reader) (uuid.UUID, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
@@ -51,7 +49,7 @@ func (b *CloudStorageBucket) Save(fromReader io.Reader) (uuid.UUID, error) {
 	return newVideoId, nil
 }
 
-func (b *CloudStorageBucket) Read(ctx context.Context, addr string, r io.Reader) error {
+func (b *CloudStorageBucket) Read(ctx context.Context, id uuid.UUID, r io.Reader) error {
 	// AK TODO implement
 	return nil
 }

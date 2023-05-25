@@ -9,9 +9,9 @@ servers:
       hostname:
         default: localhost
 paths:
-  /converted-videos/{videoId}:
+  /saved-videos/{videoId}:
     get:
-      operationId: getConvertedVideo
+      operationId: getSavedVideo
       parameters:
         - in: path
           name: videoId
@@ -52,7 +52,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Message"
+              $ref: "#/components/schemas/PostPubSubMessage"
       responses:
         "200":
           description: Video was sucessfully downloaded
@@ -65,7 +65,7 @@ paths:
 
 components:
   schemas:
-    Message:
+    PostPubSubMessage:
       type: object
       required: [id, data, publishTime]
       properties:

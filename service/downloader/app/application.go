@@ -1,29 +1,42 @@
 package app
 
 import (
+	"context"
 	"io"
+
+	"github.com/google/uuid"
+	"github.com/kapitan123/telegrofler/service/downloader/infra"
 )
 
 type Application struct {
-	videoSavedTopic  topic
+	videoSavedTopic  successTopic
 	videoFilesBucket fileBucket
 	downloader       downloader
 }
 
-type topic interface {
-	PublishSuccess(savedVideoAddr string, originalUrl string) error
+type successTopic interface {
+	PublishSuccess(ctx context.Context, savedVideoId uuid.UUID, originalUrl string) error
 }
 
 type fileBucket interface {
-	Save(fromReader io.Reader) (string, error)
-	Read(addr string, r io.Reader) error
+	Save(ctx context.Context, fromReader io.Reader) (uuid.UUID, error)
+	Read(ctx context.Context, id uuid.UUID, r io.Reader) error
 }
 
 type downloader interface {
 	DownloadFromUrl(url string, w io.Writer) error
 }
 
-func NewApplication(videoSavedTopic topic, videoBucket fileBucket, downloader downloader) Application {
+func NewApplicationFromConfig(ctx context.Context, servicename string, projectId string, videoFileBucket string, videoSavedTopicId string) Application {
+
+	videoBucket := infra.NewCloudStoreBucketClient(ctx, projectId, videoFileBucket)
+	successTopic := infra.NewPubSubTopicClient(ctx, projectId, servicename, videoSavedTopicId)
+	youtubeDl := infra.NewDownloader()
+
+	return NewApplication(successTopic, videoBucket, youtubeDl)
+}
+
+func NewApplication(videoSavedTopic successTopic, videoBucket fileBucket, downloader downloader) Application {
 	return Application{
 		videoSavedTopic:  videoSavedTopic,
 		videoFilesBucket: videoBucket,
@@ -31,7 +44,7 @@ func NewApplication(videoSavedTopic topic, videoBucket fileBucket, downloader do
 	}
 }
 
-func (app *Application) SaveVideoToStorage(url string) error {
+func (app *Application) SaveVideoToStorage(ctx context.Context, url string) error {
 	pipeReader, pipeWriter := io.Pipe()
 
 	err := app.downloader.DownloadFromUrl(url, pipeWriter)
@@ -40,13 +53,13 @@ func (app *Application) SaveVideoToStorage(url string) error {
 		return err
 	}
 
-	path, err := app.videoFilesBucket.Save(pipeReader)
+	id, err := app.videoFilesBucket.Save(ctx, pipeReader)
 
 	if err != nil {
 		return err
 	}
 
-	err = app.videoSavedTopic.PublishSuccess(path, url)
+	err = app.videoSavedTopic.PublishSuccess(ctx, id, url)
 
 	if err != nil {
 		return err
