@@ -1,0 +1,50 @@
+name: Updates callback of telegram bot
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Environment
+        default: prod
+        required: true
+      service-name:
+        description: name of clludrun
+        default: bot
+        required: true
+
+jobs:
+  update-bot-callback:
+    runs-on: ubuntu-latest
+    environment: prod
+
+    env:
+      GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+
+    steps:
+      - uses: "actions/checkout@v3"
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - id: secrets-manager
+        uses: google-github-actions/get-secretmanager-secrets@v0
+        with:
+          secrets: |-
+            telegram-bot-token:${{ steps.auth.outputs.project_id }}/telegram_bot_token
+
+      - id: get-bot
+        name: Fetches bot url
+        run: |
+          echo "url=$(gcloud run services describe ${{ inputs.service-postfix }} --region=europe-central2 --format='value(status.url)')" >> $GITHUB_OUTPUT
+
+      - name: Set callback
+        run: |
+          curl -X "POST" "https://api.telegram.org/${{ steps.secrets-manager.outputs.telegram-bot-token }}/setWebhook" 
+            -d '{"url": "${{ steps.get-bot.outputs.url }}"}'  
+            -H 'Content-Type: application/json; charset=utf-8'
