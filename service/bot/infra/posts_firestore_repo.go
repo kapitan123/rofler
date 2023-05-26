@@ -73,6 +73,30 @@ func (s *FirestorePostsRepository) UpsertPost(ctx context.Context, p domain.Post
 	return err
 }
 
+func (s *FirestorePostsRepository) GetPostById(ctx context.Context, videoId string) (domain.Post, bool, error) {
+	var p PostModel
+	doc := s.postsCollection().Doc(videoId)
+	snap, err := doc.Get(ctx)
+
+	if err != nil {
+		return p.toDomainModel(), false, nil
+	}
+
+	if err := snap.DataTo(&p); err != nil {
+		return p.toDomainModel(), false, err
+	}
+
+	return p.toDomainModel(), true, nil
+}
+
+func (s *FirestorePostsRepository) CreatePost(ctx context.Context, p domain.Post) error {
+	doc := s.postsCollection().Doc(p.VideoId)
+
+	_, err := doc.Create(ctx, MapPostToModel(p))
+
+	return err
+}
+
 type (
 	PostModel struct {
 		VideoId   string          `firestore:"video_id"`
@@ -100,8 +124,8 @@ type (
 
 func (urm UserRefModel) toDomainModel() domain.UserRef {
 	return domain.UserRef{
-		urm.DisplayName,
-		urm.Id,
+		DisplayName: urm.DisplayName,
+		Id:          urm.Id,
 	}
 }
 
@@ -150,8 +174,8 @@ func MapPostToModel(p domain.Post) PostModel {
 
 func MapUserRefToModel(ur domain.UserRef) UserRefModel {
 	return UserRefModel{
-		ur.DisplayName,
-		ur.Id,
+		DisplayName: ur.DisplayName,
+		Id:          ur.Id,
 	}
 }
 

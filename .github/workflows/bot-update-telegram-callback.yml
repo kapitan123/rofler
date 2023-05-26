@@ -43,8 +43,8 @@ jobs:
         run: |
           echo "url=$(gcloud run services describe ${{ inputs.service-name }} --region=europe-central2 --format='value(status.url)')" >> $GITHUB_OUTPUT
 
-      - name: Set callback
-        run: |
-          curl -X "POST" "https://api.telegram.org/bot${{ steps.secrets-manager.outputs.telegram-bot-token }}/setWebhook" \
-            -d '{"url": "${{ steps.get-bot.outputs.url }}/telegram/callback"}' \
-            -H 'Content-Type: application/json; charset=utf-8'
+      - name: Set bot callback
+        uses: ./.github/actions/set-bot-callback
+        with:
+          bot-token: ${{ steps.secrets-manager.outputs.telegram-bot-token }}
+          callback-url: ${{ steps.get-bot.outputs.url }}

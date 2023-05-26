@@ -19,7 +19,7 @@ runs:
       id: webhook-curl
       shell: bash
       run: |
-        statuscode=$(curl -X "GET" -f -LI "https://api.telegram.org/bot${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/callback" -o /dev/null -w '%{http_code}\n' -s)
+        statuscode=$(curl -X "GET" -f -LI "https://api.telegram.org/bot${{ inputs.bot-token }}/setWebhook?url=${{ inputs.callback-url }}/telegram/callback" -o /dev/null -w '%{http_code}\n' -s)
         if [$statuscode != 200]; then
           echo "::error::Filename set-bo-callback/action.yml request was not sucessfull" && exit 1
         fi
