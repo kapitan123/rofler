@@ -18,10 +18,6 @@ func AsDescendingList(m map[string]int, format string) string {
 	return listMeassge
 }
 
-func AsUserMention(userId int64, username string) string {
-	return fmt.Sprintf("<a href=\"tg://user?id=%d\">%s</a>", userId, username)
-}
-
 func formatLine(format string, username string, score int) string {
 	return fmt.Sprintf(format, username, score) + "\n"
 }

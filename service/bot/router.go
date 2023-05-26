@@ -18,7 +18,6 @@ import (
 // temp solution with direct handler function
 func setupRouter(r *mux.Router, runner *command.Runner, pdr *choosePidor.ChoosePidor, msgr *messenger.Messenger) {
 	r.HandleFunc("/telegram/callback", messageHandler(runner)).Methods("POST")
-	r.HandleFunc("/chats/{chatid}/messages/{messageid}", deleteMessageHandler(msgr)).Methods("DELETE")
 	r.HandleFunc("/pubsub/subscriptions/video-converted", choosePidorHandler(pdr)).Methods("POST")
 }
 

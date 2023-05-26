@@ -1,19 +1,19 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: downloader
-  description: converts webms and urls to mp4 videos
+  title: bot
+  description: handles webhook messages and executes plugins based on message content
 servers:
   - url: https://{hostname}
     variables:
       hostname:
         default: localhost
 paths:          
-  /pubsub/subscriptions/video-url-published:
+  /pubsub/subscriptions/video-saved:
     post:
-      operationId: handleVideoUrlPublishedMessage
+      operationId: handleVideoSavedMessage
       requestBody:
-        description: handles messages from url published topic
+        description: handles messages from video saved topic
         required: true
         content:
           application/json:
@@ -21,7 +21,28 @@ paths:
               $ref: "#/components/schemas/PostPubSubMessage"
       responses:
         "200":
-          description: video was sucessfully downloaded
+          description: video was sucessfully published to telegram
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /telegram/callback:
+    post:
+      operationId: handleTelegramMessage
+      requestBody:
+        description: handles messages from telegram webhook
+        required: true
+        content:
+          application/json:
+           schema:
+            type: object
+            nullable: true
+      responses:
+        "200":
+          description: message was handled
         default:
           description: unexpected error
           content:
