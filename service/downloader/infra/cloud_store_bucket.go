@@ -47,8 +47,3 @@ func (b *CloudStorageBucket) Save(ctx context.Context, fromReader io.Reader) (st
 
 	return newFilePath, nil
 }
-
-func (b *CloudStorageBucket) Read(ctx context.Context, id uuid.UUID, r io.Reader) error {
-	// AK TODO implement
-	return nil
-}

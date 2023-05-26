@@ -49,6 +49,7 @@ func (h *ConvertLinkToVideo) Handle(ctx context.Context, m *tgbotapi.Message) er
 	url, chatId, senderId := m.Text, m.Chat.ID, m.From.ID
 	senderName := fmt.Sprintf("%s %s", m.From.FirstName, m.From.LastName)
 
+	// AK TODO url is actually a part of message MessageEntity liek usermention
 	meta, err := h.downloader.ExtractVideoMeta(url)
 
 	if err != nil {

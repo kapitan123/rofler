@@ -3,67 +3,74 @@ package app
 import (
 	"context"
 	"io"
-	//"github.com/kapitan123/telegrofler/service/downloader/infra"
+
+	"cloud.google.com/go/firestore"
+	"github.com/kapitan123/telegrofler/service/bot/infra"
+	"github.com/sirupsen/logrus"
 )
 
 type Application struct {
 	messenger              messenger
 	videoFilesBucket       fileBucket
 	videoUrlPublishedTopic videoUrlPublishedTopic
+	postsStorage           postsStorage
+}
+type postsStorage interface {
 }
 
 type messenger interface {
 }
 
 type videoUrlPublishedTopic interface {
-	PublishUrl(ctx context.Context, savedVideoAddr string, originalUrl string) error
+	PublishUrl(ctx context.Context, url string) error
 }
 
 type fileBucket interface {
 	Read(ctx context.Context, addr string, fromReader io.Reader) error
 }
 
-// func NewApplicationFromConfig(ctx context.Context, servicename string, projectId string, videoFileBucket string, videoSavedTopicId string) Application {
+func NewApplicationFromConfig(ctx context.Context, servicename string, projectId string, telegramBotToken string, videoUrlPostedTopicId string, videoFilesBucketUrl string) Application {
+	client, err := firestore.NewClient(ctx, projectId)
 
-// 	videoBucket := infra.NewCloudStoreBucketClient(ctx, projectId, videoFileBucket)
-// 	successTopic := infra.NewPubSubTopicClient(ctx, projectId, servicename, videoSavedTopicId)
-// 	youtubeDl := infra.NewDownloader()
+	if err != nil {
+		logrus.Panic("failed to create firestore client")
+	}
 
-// 	return NewApplication(successTopic, videoBucket, youtubeDl)
-// }
+	postsRepo := infra.NewFirestorePostsRepository(client)
 
-func NewApplication(messenger messenger, videoFilesBucket fileBucket, videoUrlPublishedTopic videoUrlPublishedTopic) Application {
+	botapi := infra.NewMessenger(telegramBotToken)
+
+	fileBucket := infra.NewCloudStoreBucketClient(ctx, projectId, videoFilesBucketUrl)
+	urlPostedTopic := infra.NewPubSubTopicClient(ctx, projectId, servicename, videoUrlPostedTopicId)
+
+	return NewApplication(botapi, postsRepo, fileBucket, urlPostedTopic)
+}
+
+func NewApplication(messenger messenger, postsStorage postsStorage, videoFilesBucket fileBucket, videoUrlPublishedTopic videoUrlPublishedTopic) Application {
 	return Application{
 		messenger:              messenger,
 		videoFilesBucket:       videoFilesBucket,
 		videoUrlPublishedTopic: videoUrlPublishedTopic,
+		postsStorage:           postsStorage,
 	}
 }
 
-func (app *Application) SaveVideoToStorage(ctx context.Context, url string) error {
-	pipeReader, pipeWriter := io.Pipe()
-
-	err := app.downloader.DownloadFromUrl(url, pipeWriter)
-
-	if err != nil {
-		return err
-	}
-
-	id, err := app.videoFilesBucket.Save(ctx, pipeReader)
-
-	if err != nil {
-		return err
-	}
-
-	err = app.videoSavedTopic.PublishSuccess(ctx, id, url)
-
-	if err != nil {
-		return err
-	}
-
-	return err
+func (app *Application) RequestVideoDownload(ctx context.Context, url string) error {
+	return nil
 }
 
-func (app *Application) GetVideo() {
+func (app *Application) GetTopRoflers() {
+	// AK TODO implement
+}
+
+func (app *Application) PublishVideo() {
+	// AK TODO implement
+}
+
+func (app *Application) RecordReactionToBotPublishedVideo() {
+	// AK TODO implement
+}
+
+func (app *Application) RecordReactionToPublishedVideo() {
 	// AK TODO implement
 }
