@@ -6,13 +6,7 @@ on:
       - main
     paths:
       - "service/downloader/**"
-      #AK TODO temp solution
-  workflow_dispatch:
-    inputs:
-      env:
-        description: Environment
-        default: prod
-        required: true
+      - "common/**"
 
 jobs:
   golang-lint:
