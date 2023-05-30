@@ -27,7 +27,7 @@ func NewPubSubTopicClient(ctx context.Context, projectId string, servicename str
 	}
 }
 
-func (t *PubSubTopic) PublishUrl(ctx context.Context, url url.URL) error {
+func (t *PubSubTopic) PublishUrl(ctx context.Context, url *url.URL) error {
 	message, _ := json.Marshal(VideoUrlPostedMessage{
 		Url: url,
 	})
@@ -52,5 +52,5 @@ func (t *PubSubTopic) PublishUrl(ctx context.Context, url url.URL) error {
 }
 
 type VideoUrlPostedMessage struct {
-	Url url.URL `json:"url"`
+	Url *url.URL `json:"url"`
 }

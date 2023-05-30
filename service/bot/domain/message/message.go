@@ -8,7 +8,7 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
-	media "github.com/kapitan123/telegrofler/service/bot/domain/media_type"
+	"github.com/kapitan123/telegrofler/service/bot/domain/media"
 	"github.com/samber/lo"
 )
 
@@ -23,17 +23,29 @@ var supportedMasks = []*regexp.Regexp{
 }
 
 type Message struct {
-	Id      int
-	message *tgbotapi.Message
-	rtm     *tgbotapi.Message
+	Id             int
+	message        *tgbotapi.Message
+	rtm            *tgbotapi.Message
+	ReplytoMessage ReplytoMessage
 }
 
 func New(message *tgbotapi.Message) Message {
-	return Message{
-		Id:      message.MessageID,
-		message: message,
-		rtm:     message.ReplyToMessage,
+	tgReplyTo := message.ReplyToMessage
+
+	if tgReplyTo == nil {
+		tgReplyTo = &tgbotapi.Message{}
 	}
+
+	return Message{
+		Id:             message.MessageID,
+		message:        message,
+		rtm:            tgReplyTo,
+		ReplytoMessage: ReplytoMessage{tgReplyTo},
+	}
+}
+
+func (m Message) IsCommand(commandName string) bool {
+	return m.message.IsCommand() && m.message.Command() == commandName
 }
 
 func (m Message) From() domain.UserRef {
@@ -44,12 +56,12 @@ func (m Message) ChatId() int64 {
 	return m.message.Chat.ID
 }
 
-func (m Message) HasMedia() bool {
-	return m.message.Video != nil || m.message.Photo != nil
+func (m Message) IsBotPost() bool {
+	return m.message.From.IsBot
 }
 
-func (m Message) IsReplyToMedia() bool {
-	return m.rtm.Video != nil || m.rtm.Photo != nil
+func (m Message) HasMedia() bool {
+	return m.message.Video != nil || m.message.Photo != nil
 }
 
 func (m Message) IsSelfReply() bool {
@@ -69,7 +81,7 @@ func (m Message) MediaType() media.Type {
 func (m Message) MediaId() string {
 	mediaId := ""
 	if m.rtm.Video != nil {
-		mediaId = m.rtm.Video.FileID
+		mediaId = m.rtm.Video.FileName
 	} else if len(m.rtm.Photo) > 0 {
 		mediaId = m.rtm.Photo[0].FileUniqueID
 	}
@@ -128,4 +140,28 @@ func (m Message) AsReaction() domain.Reaction {
 	}
 
 	return reaction
+}
+
+type ReplytoMessage struct {
+	rtm *tgbotapi.Message
+}
+
+func (m ReplytoMessage) HasMedia() bool {
+	return m.rtm.Video != nil || m.rtm.Photo != nil
+}
+
+func (m ReplytoMessage) IsPostedByBot() bool {
+	return m.rtm.From.IsBot && m.rtm.From.UserName == "TelegroflBot"
+}
+
+// Based on assumption that bot posts always contain exactly one mention
+func (m ReplytoMessage) GetUserRef() (domain.UserRef, error) {
+	if len(m.rtm.CaptionEntities) == 0 || m.rtm.CaptionEntities[0].User == nil {
+		return domain.UserRef{}, fmt.Errorf("message has no user reference")
+	}
+	user := m.rtm.CaptionEntities[0].User
+
+	userRef := domain.NewUserRef(user.ID, user.FirstName, user.LastName)
+
+	return userRef, nil
 }

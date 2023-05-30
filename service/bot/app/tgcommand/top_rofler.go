@@ -1,12 +1,11 @@
-package toprofler
+package tgcommand
 
 import (
 	"context"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
+	"github.com/kapitan123/telegrofler/service/bot/domain/format"
 	"github.com/kapitan123/telegrofler/service/bot/domain/message"
-	"github.com/kapitan123/telegrofler/service/bot/internal/messenger/format"
 )
 
 const commandName = "toprofler"
@@ -16,15 +15,7 @@ type TopRofler struct {
 	storage   postStorage
 }
 
-type messenger interface {
-	SendText(chatId int64, text string) (int, error)
-}
-
-type postStorage interface {
-	GetChatPosts(ctx context.Context, chatId int64) ([]domain.Post, error)
-}
-
-func New(messenger messenger, storage postStorage) *TopRofler {
+func NewTopRofler(messenger messenger, storage postStorage) *TopRofler {
 	return &TopRofler{
 		messenger: messenger,
 		storage:   storage,
@@ -66,6 +57,6 @@ func countScores(posts []domain.Post) map[string]int {
 	return names
 }
 
-func (h *TopRofler) ShouldRun(message *tgbotapi.Message) bool {
-	return message.IsCommand() && message.Command() == commandName
+func (h *TopRofler) ShouldRun(message message.Message) bool {
+	return message.IsCommand(commandName)
 }

@@ -4,7 +4,8 @@ import (
 	"net/url"
 	"time"
 
-	media "github.com/kapitan123/telegrofler/service/bot/domain/media_type"
+	"github.com/google/uuid"
+	"github.com/kapitan123/telegrofler/service/bot/domain/media"
 )
 
 type (
@@ -26,8 +27,9 @@ type (
 	}
 )
 
-func NewPost(poster UserRef, chatId int64) Post {
+func NewPost(mediaId string, poster UserRef, chatId int64) Post {
 	return Post{
+		Id:        mediaId,
 		Poster:    poster,
 		ChatId:    chatId,
 		Reactions: []Reaction{},
@@ -37,6 +39,7 @@ func NewPost(poster UserRef, chatId int64) Post {
 
 func NewPostFromExternalSource(externalSourceUrl *url.URL, poster UserRef, chatId int64) Post {
 	return Post{
+		Id:                uuid.NewString(),
 		ExternalSourceUrl: externalSourceUrl,
 		Poster:            poster,
 		ChatId:            chatId,

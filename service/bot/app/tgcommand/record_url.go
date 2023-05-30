@@ -1,4 +1,4 @@
-package convertLinkToVideo
+package tgcommand
 
 import (
 	"context"
@@ -9,33 +9,25 @@ import (
 	"github.com/pkg/errors"
 )
 
-type RequestUrlContent struct {
+type RecordUrl struct {
 	messenger    messenger
 	postsStorage postStorage
 	urlTopic     urlTopic
-}
-
-type messenger interface {
-	Delete(chatId int64, messageId int) error
-}
-
-type postStorage interface {
-	UpsertPost(ctx context.Context, p domain.Post) error
 }
 
 type urlTopic interface {
 	PublishUrl(ctx context.Context, url *url.URL) error
 }
 
-func New(messenger messenger, postsStorage postStorage, urlTopic urlTopic) *RequestUrlContent {
-	return &RequestUrlContent{
+func NewRecordUrl(messenger messenger, postsStorage postStorage, urlTopic urlTopic) *RecordUrl {
+	return &RecordUrl{
 		messenger:    messenger,
 		postsStorage: postsStorage,
 		urlTopic:     urlTopic,
 	}
 }
 
-func (h *RequestUrlContent) Handle(ctx context.Context, m message.Message) error {
+func (h *RecordUrl) Handle(ctx context.Context, m message.Message) error {
 	url, _, err := m.FindUrl()
 
 	if err != nil {
@@ -53,7 +45,7 @@ func (h *RequestUrlContent) Handle(ctx context.Context, m message.Message) error
 	err = h.urlTopic.PublishUrl(ctx, url)
 
 	if err != nil {
-		return errors.Wrap(err, "unable to publish found url to store")
+		return errors.Wrap(err, "unable to publish found url to pubsub")
 	}
 
 	err = h.messenger.Delete(m.ChatId(), m.Id)
@@ -65,6 +57,6 @@ func (h *RequestUrlContent) Handle(ctx context.Context, m message.Message) error
 	return nil
 }
 
-func (h *RequestUrlContent) ShouldRun(m message.Message) bool {
+func (h *RecordUrl) ShouldRun(m message.Message) bool {
 	return m.HasDownloadableUrl()
 }

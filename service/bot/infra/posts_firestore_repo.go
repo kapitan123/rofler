@@ -71,17 +71,17 @@ func (s *FirestorePostsRepository) UpsertPost(ctx context.Context, p domain.Post
 	return err
 }
 
-func (s *FirestorePostsRepository) GetPostById(ctx context.Context, url string) (domain.Post, bool, error) {
+func (s *FirestorePostsRepository) GetPostById(ctx context.Context, mediaId string) (domain.Post, bool, error) {
 	var p PostModel
-	doc := s.postsCollection().Doc(url)
+	doc := s.postsCollection().Doc(mediaId)
 	snap, err := doc.Get(ctx)
 
 	if err != nil {
-		return p.toDomainModel(), false, nil
+		return p.toDomainModel(), false, errors.Wrap(err, "unable to get post by id")
 	}
 
 	if err := snap.DataTo(&p); err != nil {
-		return p.toDomainModel(), false, err
+		return p.toDomainModel(), false, errors.Wrap(err, "unable to deserialize post")
 	}
 
 	return p.toDomainModel(), true, nil
@@ -96,7 +96,7 @@ func (s *FirestorePostsRepository) GetByExternalSourceUrl(ctx context.Context, u
 	postModels, err := extensions.GetAll[PostModel](ctx, iter)
 
 	if err != nil {
-		return p.toDomainModel(), false, err
+		return p.toDomainModel(), false, errors.Wrap(err, "unable to get post by external_source_url")
 	}
 
 	if len(postModels) == 0 {
@@ -109,7 +109,7 @@ func (s *FirestorePostsRepository) GetByExternalSourceUrl(ctx context.Context, u
 type (
 	PostModel struct {
 		Id                uuid.UUID
-		ExternalSourceUrl url.URL         `firestore:"external_source_url"`
+		ExternalSourceUrl *url.URL        `firestore:"external_source_url"`
 		Reactions         []ReactionModel `firestore:"reactions"`
 		PostedOn          time.Time       `firestore:"posted_on"`
 		ChatId            int64           `firestore:"chat_id"`

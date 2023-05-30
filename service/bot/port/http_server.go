@@ -52,7 +52,7 @@ func (h HttpServer) HandleTelegramMessage(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = h.app.HandleTelegramMessage(r.Context(), update)
+	err = h.app.HandleTelegramMessage(r.Context(), update.Message)
 
 	if err != nil {
 		httperr.RespondWithSlugError(err, w, r)
