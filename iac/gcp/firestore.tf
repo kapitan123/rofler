@@ -15,14 +15,14 @@ resource "google_firestore_index" "posts_by_date_and_chat" {
 }
 
 resource "google_firestore_field" "expire_at_field" {
-  project = var.project_id
+  project    = var.project_id
   collection = "media"
-  database = "(default)"
-  field = "expire_at"
+  database   = "(default)"
+  field      = "expire_at"
 
   index_config {
     indexes {
-        order = "ASCENDING"
+      order = "ASCENDING"
     }
   }
 

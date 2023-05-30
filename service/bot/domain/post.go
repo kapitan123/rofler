@@ -51,3 +51,21 @@ func NewPostFromExternalSource(externalSourceUrl *url.URL, poster UserRef, chatI
 func (p *Post) AddReaction(reaction Reaction) {
 	p.Reactions = append(p.Reactions, reaction)
 }
+
+// type postsCollection []Post
+
+// // AK TODO move counting ab list buildeng logic here
+// // groups posts by user
+// func (posts *postsCollection) GroupReactionsByUser() map[string]int {
+
+// 	roflerScores := map[UserRef]int{}
+// 	for _, p := range posts {
+// 		roflerScores[p.Poster] += len(p.Reactions)
+// 	}
+
+// 	names := map[string]int{}
+// 	for k, v := range roflerScores {
+// 		names[k.DisplayName] = v
+// 	}
+// 	return names
+// }
