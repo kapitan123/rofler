@@ -4,7 +4,7 @@ info:
   title: downloader
   description: converts webms and urls to mp4 videos
 servers:
-  - url: https://{hostname}
+  - url: https://{hostname}/api
     variables:
       hostname:
         default: localhost
