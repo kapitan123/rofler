@@ -26,7 +26,6 @@ type downloader interface {
 }
 
 func NewApplicationFromConfig(ctx context.Context, servicename string, projectId string, videoFileBucket string, videoSavedTopicId string) Application {
-
 	videoBucket := infra.NewCloudStoreBucketClient(ctx, projectId, videoFileBucket)
 	successTopic := infra.NewPubSubTopicClient(ctx, projectId, servicename, videoSavedTopicId)
 	youtubeDl := infra.NewDownloader()
