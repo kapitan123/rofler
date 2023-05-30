@@ -32,8 +32,6 @@ resource "google_pubsub_subscription" "downloader_to_video_url_published" {
     dead_letter_topic     = google_pubsub_topic.dead_letter_received.id
     max_delivery_attempts = 5
   }
-
-  ack_deadline_seconds = 20
 }
 
 resource "google_pubsub_subscription" "bot_to_saved_videos" {
