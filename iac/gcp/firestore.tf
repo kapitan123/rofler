@@ -13,18 +13,3 @@ resource "google_firestore_index" "posts_by_date_and_chat" {
     order      = "ASCENDING"
   }
 }
-
-resource "google_firestore_field" "expire_at_field" {
-  project    = var.project_id
-  collection = "media"
-  database   = "(default)"
-  field      = "expire_at"
-
-  index_config {
-    indexes {
-      order = "ASCENDING"
-    }
-  }
-
-  ttl_config {}
-}
