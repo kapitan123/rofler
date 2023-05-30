@@ -7,18 +7,20 @@ import (
 	"io"
 	"time"
 
-	contentLoader "github.com/kapitan123/telegrofler/service/bot/internal/content_loader"
+	"github.com/kapitan123/telegrofler/service/bot/domain"
+	url "github.com/kapitan123/telegrofler/service/bot/domain/media"
 	"github.com/kapitan123/telegrofler/service/bot/internal/messenger/format"
-	"github.com/kapitan123/telegrofler/service/bot/internal/storage"
+	"github.com/pkg/errors"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
 )
 
-type ConvertLinkToVideo struct {
-	messenger  messenger
-	storage    postStorage
-	downloader downloader
+type RequestUrlContent struct {
+	messenger    messenger
+	postsStorage postStorage
+	urlTopic     urlTopic
+	urlsStorage  urlsStorage
 }
 
 type messenger interface {
@@ -28,32 +30,46 @@ type messenger interface {
 }
 
 type postStorage interface {
-	UpsertPost(ctx context.Context, p storage.Post) error
+	UpsertPost(ctx context.Context, p domain.Post) error
 }
 
-type downloader interface {
-	DownloadContent(dUrl string, res io.Writer) error
-	ExtractVideoMeta(url string) (*contentLoader.VideoMeta, error)
-	CanExtractVideoMeta(url string) bool
+type urlsStorage interface {
+	CreateUrl(ctx context.Context, url string) error
 }
 
-func New(messenger messenger, storage postStorage, downloader downloader) *ConvertLinkToVideo {
-	return &ConvertLinkToVideo{
-		messenger:  messenger,
-		storage:    storage,
-		downloader: downloader,
+type urlTopic interface {
+	PublishUrl(ctx context.Context, url string) error
+}
+
+func New(messenger messenger, postsStorage postStorage, urlsStorage urlsStorage, urlTopic urlTopic) *RequestUrlContent {
+	return &RequestUrlContent{
+		messenger:    messenger,
+		postsStorage: postsStorage,
+		urlsStorage:  urlsStorage,
+		urlTopic:     urlTopic,
 	}
 }
 
-func (h *ConvertLinkToVideo) Handle(ctx context.Context, m *tgbotapi.Message) error {
+func (h *RequestUrlContent) Handle(ctx context.Context, m *tgbotapi.Message) error {
 	url, chatId, senderId := m.Text, m.Chat.ID, m.From.ID
 	senderName := fmt.Sprintf("%s %s", m.From.FirstName, m.From.LastName)
 
-	// AK TODO url is actually a part of message MessageEntity liek usermention
-	meta, err := h.downloader.ExtractVideoMeta(url)
+	err := h.urlsStorage.CreateUrl(ctx, url)
 
 	if err != nil {
-		return err
+		return errors.Wrap(err, "unable to save found url")
+	}
+
+	err = h.urlTopic.PublishUrl(ctx, url)
+
+	if err != nil {
+		return errors.Wrap(err, "unable to publish found url to store")
+	}
+
+	err = h.messenger.Delete(chatId, m.MessageID)
+
+	if err != nil {
+		return errors.Wrap(err, "unable to delete message from chat")
 	}
 
 	log.Info("Url was found in a callback message: ", url)
@@ -85,11 +101,11 @@ func (h *ConvertLinkToVideo) Handle(ctx context.Context, m *tgbotapi.Message) er
 		PostedOn:  time.Now(),
 	}
 
-	err = h.storage.UpsertPost(ctx, newPost)
+	err = h.postsStorage.UpsertPost(ctx, newPost)
 
 	return err
 }
 
-func (h *ConvertLinkToVideo) ShouldRun(m *tgbotapi.Message) bool {
-	return h.downloader.CanExtractVideoMeta(m.Text)
+func (h *RequestUrlContent) ShouldRun(m *tgbotapi.Message) bool {
+	return len(m.Entities) > 0 && url.IsConvertable(m.Text)
 }

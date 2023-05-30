@@ -6,11 +6,9 @@ import (
 )
 
 type Config struct {
-	TelegramToken      string `env:"TELEGRAM_BOT_TOKEN"`
-	VidoFilesBucketUrl string `env:"VIDEO_FILES_BUCKET_URL"`
-	DeletionQueueId    string `env:"MESSAGE_DELETION_QUEUE_ID"`
-	VideoSavedTopicId  string `env:"VIDEO_SAVED_TOPIC_ID"`
-	SelfUrl            string `env:"SELF_URL"`
+	TelegramToken            string `env:"TELEGRAM_BOT_TOKEN"`
+	VidoFilesBucketUrl       string `env:"VIDEO_FILES_BUCKET_URL"`
+	VideoUrlPublishedTopicId string `env:"VIDEO_URL_PUBLISHED_TOPIC"`
 
 	ProjectId   string `env:"PROJECT_ID"`
 	Port        int    `env:"PORT" envDefault:"8080"`
@@ -27,20 +25,12 @@ func GetEnvVars() Config {
 		log.Panic("VIDEO_FILES_BUCKET_URL is not set")
 	}
 
-	if cfg.TelegramToken == "" {
-		log.Panic("TELEGRAM_BOT_TOKEN is not set")
-	}
-
-	if cfg.SelfUrl == "" {
-		log.Panic("SELF_URL is not set")
-	}
-
-	if cfg.VideoSavedTopicId == "" {
+	if cfg.VideoUrlPublishedTopicId == "" {
 		log.Panic("VIDEO_SAVED_TOPIC_ID is not set")
 	}
 
-	if cfg.DeletionQueueId == "" {
-		log.Panic("MESSAGE_DELETION_QUEUE_ID is not set")
+	if cfg.TelegramToken == "" {
+		log.Panic("TELEGRAM_BOT_TOKEN is not set")
 	}
 
 	if cfg.ProjectId == "" {

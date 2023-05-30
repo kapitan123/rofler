@@ -8,8 +8,7 @@ import (
 )
 
 type CloudStorageBucket struct {
-	bucket            *storage.BucketHandle
-	writeSubdirectory string
+	bucket *storage.BucketHandle
 }
 
 func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFilesBucketUrl string) *CloudStorageBucket {
@@ -20,8 +19,7 @@ func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFiles
 	}
 
 	return &CloudStorageBucket{
-		bucket:            newStorageClient.Bucket(videoFilesBucketUrl),
-		writeSubdirectory: "/to-convert/",
+		bucket: newStorageClient.Bucket(videoFilesBucketUrl),
 	}
 }
 

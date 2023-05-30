@@ -4,8 +4,8 @@ import (
 	"context"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/kapitan123/telegrofler/service/bot/internal/messenger/format"
-	"github.com/kapitan123/telegrofler/service/bot/internal/storage"
 )
 
 const commandName = "toprofler"
@@ -20,7 +20,7 @@ type messenger interface {
 }
 
 type postStorage interface {
-	GetChatPosts(ctx context.Context, chatId int64) ([]storage.Post, error)
+	GetChatPosts(ctx context.Context, chatId int64) ([]domain.Post, error)
 }
 
 func New(messenger messenger, storage postStorage) *TopRofler {
@@ -51,8 +51,8 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 	return nil
 }
 
-func countScores(posts []storage.Post) map[string]int {
-	roflerScores := map[storage.UserRef]int{}
+func countScores(posts []domain.Post) map[string]int {
+	roflerScores := map[domain.UserRef]int{}
 	for _, p := range posts {
 		roflerScores[p.UserRef] += len(p.Reactions)
 	}

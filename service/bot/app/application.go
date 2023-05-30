@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"cloud.google.com/go/firestore"
@@ -10,13 +11,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// AK TODO looks like this one is a case for CQRS
+// top roflers - is a query
+// the rest are commands
 type Application struct {
 	messenger              messenger
 	videoFilesBucket       fileBucket
 	videoUrlPublishedTopic videoUrlPublishedTopic
 	postsStorage           postsStorage
+	urlsStorage            urlsStorage
 }
 type postsStorage interface {
+}
+
+type urlsStorage interface {
+	GetUrlByAddr(ctx context.Context, url string) (url.Url, bool, error)
 }
 
 type messenger interface {
@@ -60,6 +69,15 @@ func NewApplication(messenger messenger, postsStorage postsStorage, videoFilesBu
 func (app *Application) PublishVideo(ctx context.Context, originalUrl string, savedAddr string) error {
 	// AK TODO implement
 
+	mediaData, found, err := app.urlsStorage.GetUrlByAddr(ctx, originalUrl)
+
+	if err != nil {
+		return err
+	}
+
+	if !found {
+		return fmt.Errorf("video %s was not found for url %s", savedAddr, originalUrl)
+	}
 	// get in store - get chat id, get poster, publish video should have a ttl of one month
 
 	return nil

@@ -34,13 +34,8 @@ resource "google_cloud_run_service" "bot" {
         }
 
         env {
-          name  = "MESSAGE_DELETION_QUEUE_ID"
-          value = google_cloud_tasks_queue.tg_message_deletion.id
-        }
-
-        env {
-          name  = "VIDEO_SAVED_TOPIC_ID"
-          value = google_pubsub_topic.uploadable_video_saved.id
+          name  = "VIDEO_URL_PUBLISHED_TOPIC"
+          value = google_pubsub_topic.video_url_published.id
         }
 
         env {

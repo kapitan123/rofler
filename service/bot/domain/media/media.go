@@ -1,4 +1,4 @@
-package url
+package media
 
 import (
 	"regexp"
@@ -7,7 +7,7 @@ import (
 	"github.com/kapitan123/telegrofler/service/bot/domain"
 )
 
-type MediaUrl struct {
+type Media struct {
 	Url      string
 	PostedOn time.Time
 	ChatId   int64

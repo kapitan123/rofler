@@ -6,9 +6,10 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/service/bot/internal/storage"
+	"github.com/kapitan123/telegrofler/service/bot/domain"
 )
 
+// AK TODO rewrite this lil boi
 type RecordReaction struct {
 	messenger messenger
 	storage   postStorage
@@ -20,8 +21,8 @@ type (
 	}
 
 	postStorage interface {
-		GetPostById(ctx context.Context, videoId string) (storage.Post, bool, error)
-		UpsertPost(ctx context.Context, p storage.Post) error
+		GetPostById(ctx context.Context, videoId string) (domain.Post, bool, error)
+		UpsertPost(ctx context.Context, p domain.Post) error
 	}
 )
 
@@ -44,8 +45,8 @@ func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error 
 	from := m.ReplyToMessage.From
 
 	if !found {
-		reactions := make([]storage.Reaction, 0)
-		roflerRef := storage.UserRef{
+		reactions := make([]domain.Reaction, 0)
+		roflerRef := domain.UserRef{
 			Id:          from.ID,
 			DisplayName: fmt.Sprintf("%s %s", from.FirstName, from.LastName),
 		}
@@ -57,7 +58,7 @@ func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error 
 			postType = "misc"
 		}
 
-		exPost = storage.Post{
+		exPost = domain.Post{
 			VideoId:   mediaReply.VideoId,
 			Source:    postType,
 			UserRef:   roflerRef,
@@ -101,7 +102,7 @@ func (h *RecordReaction) ShouldRun(m *tgbotapi.Message) bool {
 type replyToMediaPost struct {
 	VideoId     string
 	ToMessageId int // RepllyToMessage.ID not the update.Message.ID
-	ReactorRef  storage.UserRef
+	ReactorRef  domain.UserRef
 	Text        string
 }
 
@@ -118,7 +119,7 @@ func extractUserMediaReaction(upd *tgbotapi.Message) replyToMediaPost {
 
 	vr := replyToMediaPost{
 		VideoId: mediaId,
-		ReactorRef: storage.UserRef{
+		ReactorRef: domain.UserRef{
 			Id:          rtm.From.ID,
 			DisplayName: fmt.Sprintf("%s %s", upd.From.FirstName, upd.From.LastName),
 		},
