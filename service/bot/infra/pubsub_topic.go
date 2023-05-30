@@ -14,7 +14,7 @@ type PubSubTopic struct {
 	origin string
 }
 
-func NewPubSubTopicClient(ctx context.Context, projectId string, servicename string, videoUrlPostedTopicId string) *PubSubTopic {
+func NewPubSubTopicClient(ctx context.Context, projectId string, servicename string, videoUrlPublishedTopicId string) *PubSubTopic {
 	newPubSubClient, err := pubsub.NewClient(ctx, projectId)
 
 	if err != nil {
@@ -22,14 +22,14 @@ func NewPubSubTopicClient(ctx context.Context, projectId string, servicename str
 	}
 
 	return &PubSubTopic{
-		topic:  newPubSubClient.Topic(videoUrlPostedTopicId),
+		topic:  newPubSubClient.Topic(videoUrlPublishedTopicId),
 		origin: servicename,
 	}
 }
 
 func (t *PubSubTopic) PublishUrl(ctx context.Context, url *url.URL) error {
 	message, _ := json.Marshal(VideoUrlPostedMessage{
-		Url: url,
+		Url: url.String(),
 	})
 	result := t.topic.Publish(ctx, &pubsub.Message{
 		Data: message,
@@ -52,5 +52,5 @@ func (t *PubSubTopic) PublishUrl(ctx context.Context, url *url.URL) error {
 }
 
 type VideoUrlPostedMessage struct {
-	Url *url.URL `json:"url"`
+	Url string `json:"url"`
 }

@@ -35,7 +35,7 @@ resource "google_cloud_run_service" "bot" {
 
         env {
           name  = "VIDEO_URL_PUBLISHED_TOPIC"
-          value = google_pubsub_topic.video_url_published.id
+          value = google_pubsub_topic.video_url_published.name
         }
 
         env {
@@ -95,8 +95,8 @@ resource "google_cloud_run_service" "downloader" {
         }
 
         env {
-          name  = "VIDEO_SAVED_TOPIC_ID"
-          value = google_pubsub_topic.uploadable_video_saved.id
+          name  = "VIDEO_SAVED_TOPIC"
+          value = google_pubsub_topic.uploadable_video_saved.name
         }
 
         env {

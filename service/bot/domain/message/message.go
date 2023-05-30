@@ -134,10 +134,9 @@ func (m Message) HasDownloadableUrl() bool {
 
 func (m Message) AsReaction() domain.Reaction {
 	reaction := domain.Reaction{
-		Reactor:          m.From(),
-		ReactToMessageId: m.rtm.MessageID,
-		Text:             m.message.Text,
-		PostedOn:         time.Now(),
+		Reactor:  m.From(),
+		Text:     m.message.Text,
+		PostedOn: time.Now(),
 	}
 
 	return reaction

@@ -6,9 +6,9 @@ import (
 )
 
 type Config struct {
-	TelegramToken            string `env:"TELEGRAM_BOT_TOKEN"`
-	VidoFilesBucketUrl       string `env:"VIDEO_FILES_BUCKET_URL"`
-	VideoUrlPublishedTopicId string `env:"VIDEO_URL_PUBLISHED_TOPIC"`
+	TelegramToken          string `env:"TELEGRAM_BOT_TOKEN"`
+	VidoFilesBucketUrl     string `env:"VIDEO_FILES_BUCKET_URL"`
+	VideoUrlPublishedTopic string `env:"VIDEO_URL_PUBLISHED_TOPIC"`
 
 	ProjectId   string `env:"PROJECT_ID"`
 	Port        int    `env:"PORT" envDefault:"8080"`
@@ -25,8 +25,8 @@ func GetEnvVars() Config {
 		log.Panic("VIDEO_FILES_BUCKET_URL is not set")
 	}
 
-	if cfg.VideoUrlPublishedTopicId == "" {
-		log.Panic("VIDEO_SAVED_TOPIC_ID is not set")
+	if cfg.VideoUrlPublishedTopic == "" {
+		log.Panic("VIDEO_URL_PUBLISHED_TOPIC is not set")
 	}
 
 	if cfg.TelegramToken == "" {

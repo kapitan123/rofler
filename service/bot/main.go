@@ -19,7 +19,7 @@ func main() {
 
 	logs.Init(cfg.DebguMode)
 
-	application := app.NewApplicationFromConfig(ctx, cfg.ServiceName, cfg.ProjectId, cfg.TelegramToken, cfg.VideoUrlPublishedTopicId, cfg.VidoFilesBucketUrl)
+	application := app.NewApplicationFromConfig(ctx, cfg.ServiceName, cfg.ProjectId, cfg.TelegramToken, cfg.VideoUrlPublishedTopic, cfg.VidoFilesBucketUrl)
 
 	server.RunHTTPServer(cfg.Port, func(router chi.Router) http.Handler {
 		return port.HandlerFromMux(port.NewHttpServer(application), router)

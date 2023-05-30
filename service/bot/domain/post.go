@@ -20,10 +20,9 @@ type (
 	}
 
 	Reaction struct {
-		ReactToMessageId int
-		Text             string
-		PostedOn         time.Time
-		Reactor          UserRef
+		Text     string
+		PostedOn time.Time
+		Reactor  UserRef
 	}
 )
 

@@ -109,7 +109,7 @@ func (s *FirestorePostsRepository) GetByExternalSourceUrl(ctx context.Context, u
 type (
 	PostModel struct {
 		Id                uuid.UUID
-		ExternalSourceUrl *url.URL        `firestore:"external_source_url"`
+		ExternalSourceUrl string          `firestore:"external_source_url"`
 		Reactions         []ReactionModel `firestore:"reactions"`
 		PostedOn          time.Time       `firestore:"posted_on"`
 		ChatId            int64           `firestore:"chat_id"`
@@ -138,10 +138,9 @@ func (urm UserRefModel) toDomainModel() domain.UserRef {
 
 func (rm ReactionModel) toDomainModel() domain.Reaction {
 	return domain.Reaction{
-		ReactToMessageId: rm.ReactToMessageId,
-		Text:             rm.Text,
-		PostedOn:         rm.PostedOn,
-		Reactor:          rm.Reactor.toDomainModel(),
+		Text:     rm.Text,
+		PostedOn: rm.PostedOn,
+		Reactor:  rm.Reactor.toDomainModel(),
 	}
 }
 
@@ -150,8 +149,9 @@ func (pm PostModel) toDomainModel() domain.Post {
 		return rm.toDomainModel()
 	})
 
+	url, _ := url.Parse(pm.ExternalSourceUrl)
 	return domain.Post{
-		ExternalSourceUrl: pm.ExternalSourceUrl,
+		ExternalSourceUrl: url,
 		Reactions:         reactions,
 		PostedOn:          pm.PostedOn,
 		ChatId:            pm.ChatId,
@@ -165,7 +165,7 @@ func MapPostToModel(p domain.Post) PostModel {
 	})
 
 	return PostModel{
-		ExternalSourceUrl: p.ExternalSourceUrl,
+		ExternalSourceUrl: p.ExternalSourceUrl.String(),
 		Reactions:         reactionModels,
 		PostedOn:          p.PostedOn,
 		ChatId:            p.ChatId,
@@ -182,9 +182,8 @@ func MapUserRefToModel(ur domain.UserRef) UserRefModel {
 
 func MapReactionToModel(r domain.Reaction) ReactionModel {
 	return ReactionModel{
-		ReactToMessageId: r.ReactToMessageId,
-		Text:             r.Text,
-		PostedOn:         r.PostedOn,
-		Reactor:          MapUserRefToModel(r.Reactor),
+		Text:     r.Text,
+		PostedOn: r.PostedOn,
+		Reactor:  MapUserRefToModel(r.Reactor),
 	}
 }
