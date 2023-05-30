@@ -15,7 +15,7 @@ resource "google_pubsub_subscription" "downloader_to_video_url_published" {
   topic = google_pubsub_topic.video_url_published.name
 
   push_config {
-    push_endpoint = "${local.bot_url}/pubsub/subscriptions/video-url-published"
+    push_endpoint = "${local.bot_url}/api/pubsub/subscriptions/video-url-published"
 
     attributes = {
       x-goog-version = "v1"
@@ -35,7 +35,7 @@ resource "google_pubsub_subscription" "bot_to_saved_videos" {
   topic = google_pubsub_topic.uploadable_video_saved.name
 
   push_config {
-    push_endpoint = "${local.downloader_url}/pubsub/subscriptions/video-saved"
+    push_endpoint = "${local.downloader_url}/api/pubsub/subscriptions/video-saved"
 
     attributes = {
       x-goog-version = "v1"
