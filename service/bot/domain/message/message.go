@@ -102,7 +102,8 @@ func (m Message) FindUrl() (*url.URL, bool, error) {
 		return nil, false, fmt.Errorf("message contains no urls")
 	}
 
-	url, err := urlEnt.ParseURL()
+	urlString := m.message.Text[urlEnt.Offset:urlEnt.Length]
+	url, err := url.Parse(urlString)
 
 	if err != nil {
 		return nil, false, fmt.Errorf("can't parse url")
