@@ -9,7 +9,7 @@ import (
 type Config struct {
 	VidoFilesBucketUrl string `env:"VIDEO_FILES_BUCKET_URL"`
 	Port               int    `env:"PORT" envDefault:"8080"`
-	VideoSavedTopicId  string `env:"VIDEO_SAVED_TOPIC"`
+	VideoSavedTopic    string `env:"VIDEO_SAVED_TOPIC"`
 	ProjectId          string `env:"PROJECT_ID"`
 	ServiceName        string `env:"SERVICE_NAME" envDefault:"downloader"`
 	DebguMode          bool   `env:"DEBUG_MODE"`
@@ -23,7 +23,7 @@ func GetEnvVars() Config {
 		log.Panic("VIDEO_FILES_BUCKET_URL is not set")
 	}
 
-	if cfg.VideoSavedTopicId == "" {
+	if cfg.VideoSavedTopic == "" {
 		log.Panic("VIDEO_CONVERTED_TOPIC is not set")
 	}
 
