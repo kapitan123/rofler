@@ -1,9 +1,17 @@
-package domain
+package url
 
-import "regexp"
+import (
+	"regexp"
+	"time"
 
-type DownloadableUrl struct {
-	url string
+	"github.com/kapitan123/telegrofler/service/bot/domain"
+)
+
+type MediaUrl struct {
+	Url      string
+	PostedOn time.Time
+	ChatId   int64
+	Poster   domain.UserRef
 }
 
 var mobileTiktokRegex = regexp.MustCompile(`https:\/\/[a-zA-Z]{2}\.tiktok\.com\/`)
@@ -16,12 +24,12 @@ var supportedMasks = []*regexp.Regexp{
 	instagramReelRegex,
 }
 
-func TryParseFromSupportedSources(url string) (DownloadableUrl, bool) {
+func IsConvertable(url string) bool {
 	for _, regex := range supportedMasks {
 		if regex.MatchString(url) {
-			return DownloadableUrl{url}, true
+			return true
 		}
 	}
 
-	return DownloadableUrl{}, false
+	return false
 }

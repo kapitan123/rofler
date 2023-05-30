@@ -52,7 +52,7 @@ func (h HttpServer) HandleTelegramMessage(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = h.app.HandleWebhookMessage()
+	err = h.app.HandleTelegramMessage(r.Context(), update)
 
 	if err != nil {
 		httperr.RespondWithSlugError(err, w, r)

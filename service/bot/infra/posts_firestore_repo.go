@@ -11,8 +11,6 @@ import (
 	"github.com/samber/lo"
 )
 
-const postsCollectionName = "posts"
-
 type FirestorePostsRepository struct {
 	client *firestore.Client
 	//postFactory     post.Factory

@@ -34,6 +34,7 @@ require (
 	cloud.google.com/go/storage v1.30.1
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-chi/render v1.0.2
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect

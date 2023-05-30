@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/kapitan123/telegrofler/common/logs"
 	"github.com/kapitan123/telegrofler/common/server"
 	"github.com/kapitan123/telegrofler/service/bot/app"

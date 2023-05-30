@@ -47,6 +47,7 @@ func NewApplicationFromConfig(ctx context.Context, servicename string, projectId
 	return NewApplication(botapi, postsRepo, fileBucket, urlPostedTopic)
 }
 
+// AK TODO i think I need to extract telegram commands, and inside handle pass it to the right one
 func NewApplication(messenger messenger, postsStorage postsStorage, videoFilesBucket fileBucket, videoUrlPublishedTopic videoUrlPublishedTopic) Application {
 	return Application{
 		messenger:              messenger,
@@ -56,19 +57,18 @@ func NewApplication(messenger messenger, postsStorage postsStorage, videoFilesBu
 	}
 }
 
-// func (app *Application) RequestVideoDownload(ctx context.Context, url string) error {
-// 	return nil
-// }
-
-//	func (app *Application) GetTopRoflers() {
-//		// AK TODO implement
-//	}
 func (app *Application) PublishVideo(ctx context.Context, originalUrl string, savedAddr string) error {
 	// AK TODO implement
+
+	// get in store - get chat id, get poster, publish video should have a ttl of one month
+
 	return nil
 }
 
-func (app *Application) GetCommand(ctx context.Context, message tgbotapi.Update) MessageHandler {
+func (app *Application) HandleTelegramMessage(ctx context.Context, message tgbotapi.Update) error {
+
+	// AK TODO get command
+	// execute command
 
 	// here is the domain logic
 	// AK TODO implement
