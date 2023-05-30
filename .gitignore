@@ -14,9 +14,6 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-# Go binaries
-bot/api/api
-
 # Vscode setup
 .vscode/
 .devcontainer/

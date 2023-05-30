@@ -15,13 +15,9 @@ func RunHTTPServer(port int, createHandler func(router chi.Router) http.Handler)
 	apiRouter := chi.NewRouter()
 	setMiddlewares(apiRouter)
 
-	rootRouter := chi.NewRouter()
-
-	rootRouter.Mount("/api", createHandler(apiRouter))
-
 	logrus.Infof("Starting HTTP server on :" + strconv.Itoa(port))
 
-	err := http.ListenAndServe(":"+strconv.Itoa(port), apiRouter)
+	err := http.ListenAndServe(":"+strconv.Itoa(port), createHandler(apiRouter))
 	if err != nil {
 		logrus.WithError(err).Panic("Unable to start HTTP server")
 	}
