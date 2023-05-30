@@ -53,7 +53,8 @@ func (h HttpServer) HandleTelegramMessage(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	logrus.Info()
+	LogBody(update)
+
 	err = h.app.HandleTelegramMessage(r.Context(), update.Message)
 
 	if err != nil {
