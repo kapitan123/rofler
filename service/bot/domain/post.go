@@ -1,36 +1,50 @@
 package domain
 
 import (
+	"net/url"
 	"time"
+
+	media "github.com/kapitan123/telegrofler/service/bot/domain/media_type"
 )
 
 type (
 	Post struct {
-		VideoId   string
-		Source    string
-		Url       string
-		Reactions []Reaction
-		PostedOn  time.Time
-		ChatId    int64
-		UserRef   UserRef
+		Id                string
+		ExternalSourceUrl *url.URL
+		Type              media.Type
+		Reactions         []Reaction
+		PostedOn          time.Time
+		ChatId            int64
+		Poster            UserRef
 	}
 
 	Reaction struct {
 		ReactToMessageId int
-		Sender           UserRef
 		Text             string
 		PostedOn         time.Time
-		ReactorUserRef   UserRef
+		Reactor          UserRef
 	}
 )
 
-func (p *Post) AddReaction(reactor UserRef, text string, messageid int) {
-	reaction := Reaction{
-		ReactorUserRef:   reactor,
-		Text:             text,
-		ReactToMessageId: messageid,
-		PostedOn:         time.Now(),
+func NewPost(poster UserRef, chatId int64) Post {
+	return Post{
+		Poster:    poster,
+		ChatId:    chatId,
+		Reactions: []Reaction{},
+		PostedOn:  time.Now(),
 	}
+}
 
+func NewPostFromExternalSource(externalSourceUrl *url.URL, poster UserRef, chatId int64) Post {
+	return Post{
+		ExternalSourceUrl: externalSourceUrl,
+		Poster:            poster,
+		ChatId:            chatId,
+		Reactions:         []Reaction{},
+		PostedOn:          time.Now(),
+	}
+}
+
+func (p *Post) AddReaction(reaction Reaction) {
 	p.Reactions = append(p.Reactions, reaction)
 }

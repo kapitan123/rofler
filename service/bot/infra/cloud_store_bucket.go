@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"cloud.google.com/go/storage"
+	"github.com/pkg/errors"
 )
 
 type CloudStorageBucket struct {
@@ -23,7 +24,12 @@ func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFiles
 	}
 }
 
-func (b *CloudStorageBucket) Read(ctx context.Context, addr string, r io.Reader) error {
-	// AK TODO implement
-	return nil
+func (b *CloudStorageBucket) Read(ctx context.Context, addr string) (io.Reader, error) {
+	reader, err := b.bucket.Object(addr).NewReader(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to read file")
+	}
+
+	return reader, nil
 }

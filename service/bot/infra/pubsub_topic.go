@@ -3,6 +3,7 @@ package infra
 import (
 	"context"
 	"encoding/json"
+	"net/url"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/sirupsen/logrus"
@@ -26,7 +27,7 @@ func NewPubSubTopicClient(ctx context.Context, projectId string, servicename str
 	}
 }
 
-func (t *PubSubTopic) PublishUrl(ctx context.Context, url string) error {
+func (t *PubSubTopic) PublishUrl(ctx context.Context, url url.URL) error {
 	message, _ := json.Marshal(VideoUrlPostedMessage{
 		Url: url,
 	})
@@ -51,5 +52,5 @@ func (t *PubSubTopic) PublishUrl(ctx context.Context, url string) error {
 }
 
 type VideoUrlPostedMessage struct {
-	Url string `json:"url"`
+	Url url.URL `json:"url"`
 }

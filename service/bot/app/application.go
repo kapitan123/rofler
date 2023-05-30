@@ -19,13 +19,8 @@ type Application struct {
 	videoFilesBucket       fileBucket
 	videoUrlPublishedTopic videoUrlPublishedTopic
 	postsStorage           postsStorage
-	urlsStorage            urlsStorage
 }
 type postsStorage interface {
-}
-
-type urlsStorage interface {
-	GetUrlByAddr(ctx context.Context, url string) (url.Url, bool, error)
 }
 
 type messenger interface {

@@ -2,11 +2,9 @@ package recordReaction
 
 import (
 	"context"
-	"fmt"
-	"time"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
+	"github.com/kapitan123/telegrofler/service/bot/domain/message"
 )
 
 // AK TODO rewrite this lil boi
@@ -33,99 +31,23 @@ func New(messenger messenger, storage postStorage) *RecordReaction {
 	}
 }
 
-func (h *RecordReaction) Handle(ctx context.Context, m *tgbotapi.Message) error {
-	mediaReply := extractUserMediaReaction(m)
-
-	exPost, found, err := h.storage.GetPostById(ctx, mediaReply.VideoId)
+func (h *RecordReaction) Handle(ctx context.Context, m message.Message) error {
+	post, found, err := h.storage.GetPostById(ctx, m.MediaId())
 
 	if err != nil {
 		return err
 	}
 
-	from := m.ReplyToMessage.From
-
 	if !found {
-		reactions := make([]domain.Reaction, 0)
-		roflerRef := domain.UserRef{
-			Id:          from.ID,
-			DisplayName: fmt.Sprintf("%s %s", from.FirstName, from.LastName),
-		}
-
-		// misc is video can be migrated to video type in the future
-		postType := "pic"
-
-		if m.ReplyToMessage.Video != nil {
-			postType = "misc"
-		}
-
-		exPost = domain.Post{
-			VideoId:   mediaReply.VideoId,
-			Source:    postType,
-			UserRef:   roflerRef,
-			Url:       "",
-			Reactions: reactions,
-			PostedOn:  time.Now(),
-			ChatId:    m.Chat.ID,
-		}
+		post = domain.NewPost(m.ReplyToMessage.From(), m.ReplyToMessage.ChatId())
 	}
 
-	exPost.AddReaction(mediaReply.ReactorRef, mediaReply.Text, mediaReply.ToMessageId)
-	h.storage.UpsertPost(ctx, exPost)
+	post.AddReaction(m.AsReaction())
+	h.storage.UpsertPost(ctx, post)
 
 	return nil
 }
 
-func (h *RecordReaction) ShouldRun(m *tgbotapi.Message) bool {
-	rtm := m.ReplyToMessage
-
-	if rtm == nil {
-		return false
-	}
-
-	if rtm.From.IsBot {
-		return false
-	}
-
-	if m.From.ID == rtm.From.ID {
-		return false
-	}
-
-	hasMedia := rtm.Video != nil || len(rtm.Photo) > 0
-
-	if rtm == nil || !hasMedia || m.From.UserName == "" {
-		return false
-	}
-
-	return true
-}
-
-type replyToMediaPost struct {
-	VideoId     string
-	ToMessageId int // RepllyToMessage.ID not the update.Message.ID
-	ReactorRef  domain.UserRef
-	Text        string
-}
-
-func extractUserMediaReaction(upd *tgbotapi.Message) replyToMediaPost {
-	rtm := upd.ReplyToMessage
-
-	// VideoId field also stores image id's should be converted with migration into another field
-	mediaId := ""
-	if rtm.Video != nil {
-		mediaId = rtm.Video.FileID
-	} else {
-		mediaId = rtm.Photo[0].FileUniqueID
-	}
-
-	vr := replyToMediaPost{
-		VideoId: mediaId,
-		ReactorRef: domain.UserRef{
-			Id:          rtm.From.ID,
-			DisplayName: fmt.Sprintf("%s %s", upd.From.FirstName, upd.From.LastName),
-		},
-		ToMessageId: rtm.MessageID,
-		Text:        upd.Text,
-	}
-
-	return vr
+func (h *RecordReaction) ShouldRun(m message.Message) bool {
+	return m.IsReplyToMedia() && !m.IsSelfReply() && !m.IsBotPost()
 }

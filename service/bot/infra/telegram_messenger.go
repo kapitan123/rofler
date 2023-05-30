@@ -5,6 +5,7 @@ import (
 	"io"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -100,14 +101,14 @@ func (b TelegramMessenger) Delete(chatId int64, messageId int) error {
 	return nil
 }
 
-func (b TelegramMessenger) SendVideo(chatId int64, videoId string, caption string, payload io.Reader) (int, error) {
+func (b TelegramMessenger) SendVideo(chatId int64, caption string, payload io.Reader) (int, error) {
 	vidbytes, err := io.ReadAll(payload)
 
 	if err != nil {
 		return 0, err
 	}
 
-	fb := tgbotapi.FileBytes{Name: videoId, Bytes: vidbytes}
+	fb := tgbotapi.FileBytes{Name: uuid.NewString(), Bytes: vidbytes}
 
 	v := tgbotapi.NewVideo(chatId, fb)
 

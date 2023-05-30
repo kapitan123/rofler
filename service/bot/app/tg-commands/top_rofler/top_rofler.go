@@ -5,6 +5,7 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
+	"github.com/kapitan123/telegrofler/service/bot/domain/message"
 	"github.com/kapitan123/telegrofler/service/bot/internal/messenger/format"
 )
 
@@ -30,8 +31,8 @@ func New(messenger messenger, storage postStorage) *TopRofler {
 	}
 }
 
-func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error {
-	posts, err := h.storage.GetChatPosts(ctx, message.Chat.ID)
+func (h *TopRofler) Handle(ctx context.Context, message message.Message) error {
+	posts, err := h.storage.GetChatPosts(ctx, message.ChatId())
 	if err != nil {
 		return err
 	}
@@ -40,11 +41,12 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 		return nil
 	}
 
+	// AK TODO also should be gone to domain
 	roflerScores := countScores(posts)
 
 	listMeassge := format.AsDescendingList(roflerScores, "🤡 <b>%s</b>: %d")
 
-	_, err = h.messenger.SendText(message.Chat.ID, listMeassge)
+	_, err = h.messenger.SendText(message.ChatId(), listMeassge)
 	if err != nil {
 		return err
 	}
@@ -54,7 +56,7 @@ func (h *TopRofler) Handle(ctx context.Context, message *tgbotapi.Message) error
 func countScores(posts []domain.Post) map[string]int {
 	roflerScores := map[domain.UserRef]int{}
 	for _, p := range posts {
-		roflerScores[p.UserRef] += len(p.Reactions)
+		roflerScores[p.Poster] += len(p.Reactions)
 	}
 
 	names := map[string]int{}
