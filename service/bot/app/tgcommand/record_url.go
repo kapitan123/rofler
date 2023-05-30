@@ -2,8 +2,10 @@ package tgcommand
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
+	"github.com/kapitan123/telegrofler/common/logs"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/kapitan123/telegrofler/service/bot/domain/message"
 	"github.com/pkg/errors"
@@ -27,7 +29,11 @@ func NewRecordUrl(messenger messenger, postsStorage postStorage, urlTopic urlTop
 	}
 }
 
-func (h *RecordUrl) Handle(ctx context.Context, m message.Message) error {
+func (h *RecordUrl) Handle(ctx context.Context, m message.Message) (err error) {
+	defer func() {
+		logs.LogExecutionResult(fmt.Sprintf("%T", h), m, err)
+	}()
+
 	url, _, err := m.FindUrl()
 
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 )
 
 var mobileTiktokRegex = regexp.MustCompile(`https:\/\/[a-zA-Z]{2}\.tiktok\.com\/`)
-var youtubeShortsRegex = regexp.MustCompile(`https:\/\/youtube.com\/shorts\/.*`)
+var youtubeShortsRegex = regexp.MustCompile(`https:\/\/youtube\.com\/shorts\/.*`)
 var instagramReelRegex = regexp.MustCompile(`https:\/\/www.instagram.com\/reel\/.*`)
 
 var supportedMasks = []*regexp.Regexp{

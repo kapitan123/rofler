@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kapitan123/telegrofler/common/logs"
 	"github.com/kapitan123/telegrofler/service/bot/domain/message"
 )
 
@@ -17,7 +18,11 @@ func NewRecordReaction(storage postStorage) *RecordReaction {
 	}
 }
 
-func (h *RecordReaction) Handle(ctx context.Context, m message.Message) error {
+func (h *RecordReaction) Handle(ctx context.Context, m message.Message) (err error) {
+	defer func() {
+		logs.LogExecutionResult("RecordReaction ", m, err)
+	}()
+
 	existingPost, found, err := h.storage.GetPostById(ctx, m.MediaId())
 
 	if err != nil {

@@ -48,7 +48,7 @@ func (l *StructuredLoggerEntry) Write(status, bytes int, header http.Header, ela
 		"resp_elapsed": elapsed.Round(time.Millisecond / 100).String(),
 	})
 
-	l.Logger.Info("Request completed	")
+	l.Logger.Info("Request completed")
 }
 
 func (l *StructuredLoggerEntry) Panic(v interface{}, stack []byte) {
