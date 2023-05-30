@@ -27,6 +27,8 @@ func (h HttpServer) HandleVideoUrlPublishedMessage(w http.ResponseWriter, r *htt
 		return
 	}
 
+	LogBody(postMessage)
+
 	var videoMessage VideoUrlPublishedMessage
 	err := json.Unmarshal(postMessage.Data, &videoMessage)
 	if err != nil {
