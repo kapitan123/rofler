@@ -5,16 +5,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	gcloudAppCredsEnv          = "GOOGLE_APPLICATION_CREDENTIALS" // Default cloudrun env -should be set to run local container
-	selfUrl                    = "SELF_URL"
-	region                     = "REGION"
-	saEmail                    = "SA_EMAIL"
-	serviceName                = "K_SERVICE" // Default cloudrun env
-	videoWasPublishedTopicName = "VIDEO_PUBLISHED_TOPIC"
-	deletionQueueId            = "MESSAGE_DELETION_QUEUE_ID"
-)
-
 type Config struct {
 	TelegramToken      string `env:"TELEGRAM_BOT_TOKEN"`
 	VidoFilesBucketUrl string `env:"VIDEO_FILES_BUCKET_URL"`
@@ -27,10 +17,6 @@ type Config struct {
 	ServiceName string `env:"SERVICE_NAME" envDefault:"bot"`
 
 	DebguMode bool `env:"DEBUG_MODE"`
-}
-
-func init() {
-
 }
 
 func GetEnvVars() Config {

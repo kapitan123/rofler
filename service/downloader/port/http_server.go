@@ -22,7 +22,7 @@ func NewHttpServer(app app.Application) HttpServer {
 func (h HttpServer) HandleVideoUrlPublishedMessage(w http.ResponseWriter, r *http.Request) {
 	postMessage := PostPubSubMessage{}
 	if err := render.Decode(r, &postMessage); err != nil {
-		httperr.BadRequest("invalid formt of pubsub message", err, w, r)
+		httperr.BadRequest("invalid format of pubsub message", err, w, r)
 		return
 	}
 

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"cloud.google.com/go/firestore"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/service/bot/infra"
 	"github.com/sirupsen/logrus"
 )
@@ -55,22 +56,23 @@ func NewApplication(messenger messenger, postsStorage postsStorage, videoFilesBu
 	}
 }
 
-func (app *Application) RequestVideoDownload(ctx context.Context, url string) error {
+// func (app *Application) RequestVideoDownload(ctx context.Context, url string) error {
+// 	return nil
+// }
+
+//	func (app *Application) GetTopRoflers() {
+//		// AK TODO implement
+//	}
+func (app *Application) PublishVideo(ctx context.Context, originalUrl string, savedAddr string) error {
+	// AK TODO implement
 	return nil
 }
 
-func (app *Application) GetTopRoflers() {
+func (app *Application) GetCommand(ctx context.Context, message tgbotapi.Update) MessageHandler {
+
+	// here is the domain logic
 	// AK TODO implement
+	return nil
 }
 
-func (app *Application) PublishVideo() {
-	// AK TODO implement
-}
-
-func (app *Application) RecordReactionToBotPublishedVideo() {
-	// AK TODO implement
-}
-
-func (app *Application) RecordReactionToPublishedVideo() {
-	// AK TODO implement
-}
+type MessageHandler func(int)

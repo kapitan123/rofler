@@ -28,7 +28,6 @@ func RunHTTPServer(port int, createHandler func(router chi.Router) http.Handler)
 }
 func setMiddlewares(router *chi.Mux) {
 	router.Use(middleware.RequestID)
-	router.Use(middleware.RealIP)
 	router.Use(logs.NewStructuredLogger(logrus.StandardLogger()))
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.Timeout(60 * time.Second))

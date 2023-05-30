@@ -7,6 +7,7 @@ type UserRef struct {
 	Id          int64
 }
 
+// AK TODO this crap probably, belongs to messanger
 func (ur UserRef) AsUserMention() string {
 	return fmt.Sprintf("<a href=\"tg://user?id=%d\">%s</a>", ur.Id, ur.DisplayName)
 }

@@ -57,6 +57,7 @@ func (h *RecordBotPostReaction) ShouldRun(m *tgbotapi.Message) bool {
 	return containsVideoRepostReaction(m)
 }
 
+// AK TODO this is part of the domain
 type replyToMediaPost struct {
 	VideoId     string
 	ToMessageId int // RepllyToMessage.ID not the update.Message.ID
