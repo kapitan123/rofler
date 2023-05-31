@@ -2,6 +2,7 @@
 package port
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 
@@ -30,7 +31,14 @@ func (h HttpServer) HandleVideoUrlPublishedMessage(w http.ResponseWriter, r *htt
 	LogBody(postMessage)
 
 	var videoMessage VideoUrlPublishedMessage
-	err := json.Unmarshal(postMessage.Data, &videoMessage)
+
+	decodedDataBytes, err := base64.StdEncoding.DecodeString(postMessage.Data)
+	if err != nil {
+		httperr.BadRequest("invalid encoding of pubsub data", err, w, r)
+		return
+	}
+
+	err = json.Unmarshal(decodedDataBytes, &videoMessage)
 	if err != nil {
 		httperr.BadRequest("invalid pubsub.Data payload", err, w, r)
 		return
@@ -52,7 +60,7 @@ type VideoUrlPublishedMessage struct {
 
 // AK TODO temp logging
 func LogBody(upd PostPubSubMessage) {
-	log := logrus.WithField("body", string(upd.Data)).WithField("messageid", upd.MessageId)
+	log := logrus.WithField("data:", string(upd.Data)).WithField("messageid", upd.MessageId)
 
 	log.Info("pubsub message recieved")
 }

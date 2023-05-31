@@ -33,13 +33,12 @@ components:
   schemas:
     PostPubSubMessage:
       type: object
-      required: [id, data, publishTime]
+      required: [message_id, data, publish_time]
       properties:
         message_id:
           type: string
         data:
           type: string
-          format: byte
         publish_time:
           type: string
           format: date-time

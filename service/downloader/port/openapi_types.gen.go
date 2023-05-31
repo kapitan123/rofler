@@ -15,9 +15,9 @@ type Error struct {
 
 // PostPubSubMessage defines model for PostPubSubMessage.
 type PostPubSubMessage struct {
-	Data        []byte     `json:"data"`
-	MessageId   *string    `json:"message_id,omitempty"`
-	PublishTime *time.Time `json:"publish_time,omitempty"`
+	Data        string    `json:"data"`
+	MessageId   string    `json:"message_id"`
+	PublishTime time.Time `json:"publish_time"`
 }
 
 // HandleVideoUrlPublishedMessageJSONRequestBody defines body for HandleVideoUrlPublishedMessage for application/json ContentType.
