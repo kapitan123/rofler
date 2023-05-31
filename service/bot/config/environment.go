@@ -19,7 +19,11 @@ type Config struct {
 
 func GetEnvVars() Config {
 	cfg := Config{}
-	env.Parse(&cfg)
+	err := env.Parse(&cfg)
+
+	if err != nil {
+		log.Panic("could not parse env variables")
+	}
 
 	if cfg.VidoFilesBucketUrl == "" {
 		log.Panic("VIDEO_FILES_BUCKET_URL is not set")

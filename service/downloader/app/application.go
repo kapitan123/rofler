@@ -23,7 +23,7 @@ type fileBucket interface {
 }
 
 type downloader interface {
-	DownloadFromUrl(url string, w io.Writer) error
+	DownloadFromUrl(ctx context.Context, url string, w io.Writer) error
 }
 
 func NewApplicationFromConfig(ctx context.Context, servicename string, projectId string, videoFileBucket string, videoSavedTopicId string) Application {
@@ -45,9 +45,9 @@ func NewApplication(videoSavedTopic successTopic, videoBucket fileBucket, downlo
 func (app *Application) SaveVideoToStorage(ctx context.Context, url string) error {
 	pipeReader, pipeWriter := io.Pipe()
 
-	err := app.downloader.DownloadFromUrl(url, pipeWriter)
+	err := app.downloader.DownloadFromUrl(ctx, url, pipeWriter)
 
-	logrus.Infof("video piped to %s", url)
+	logrus.Infof("video piped from %s", url)
 
 	if err != nil {
 		logrus.Error(err)

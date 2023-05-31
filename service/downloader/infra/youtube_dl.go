@@ -1,44 +1,37 @@
 package infra
 
 import (
+	"context"
 	"io"
-	"os"
-	"os/exec"
 
 	"github.com/sirupsen/logrus"
+	"github.com/wader/goutubedl"
 )
 
 type Downloader struct {
 }
 
 func NewDownloader() *Downloader {
+	goutubedl.Path = "yt-dlp"
 	return &Downloader{}
 }
 
-func (d *Downloader) DownloadFromUrl(url string, w io.Writer) error {
-	// youtube-dl -o - "https://www.youtube.com/watch?v=BaW_jenozKcj"
-	cmd := exec.Command("youtube-dl", "-o -", url)
-
-	stdout, err := cmd.StdoutPipe()
-
+func (d *Downloader) DownloadFromUrl(ctx context.Context, url string, w io.Writer) error {
+	result, err := goutubedl.New(context.Background(), url, goutubedl.Options{})
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
-	// AK TODO check error handling and also chekc do I even need to spawn it in a separate goroutine.
-	// Download may be so slow in the past exactly because container is deprovisioned after serving the request!
-	go func() {
-		_, err := io.Copy(io.MultiWriter(w, os.Stdout), stdout)
-		if err != nil {
-			logrus.Error("Error copying output:", err)
-		}
-	}()
-
-	err = cmd.Run()
-
+	downloadResult, err := result.Download(context.Background(), "best")
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
+
+	defer downloadResult.Close()
+
+	io.Copy(w, downloadResult)
 
 	return nil
 }

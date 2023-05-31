@@ -60,7 +60,7 @@ type VideoUrlPublishedMessage struct {
 
 // AK TODO temp logging
 func LogBody(upd PubSubMessage) {
-	log := logrus.WithField("data:", string(upd.Message.Data)).WithField("messageid", upd.Message.MessageId)
+	log := logrus.WithField("data:", upd.Message.Data).WithField("messageid", upd.Message.MessageId)
 
-	log.Info("pubsub message recieved")
+	log.Info("pubsub message received")
 }

@@ -41,6 +41,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/samber/lo v1.38.1
+	github.com/wader/goutubedl v0.0.0-20230503164948-cef23e8d43d4
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect

@@ -7,17 +7,22 @@ import (
 
 // AK TODO check if I can make each string a value object type
 type Config struct {
-	VidoFilesBucketUrl string `env:"VIDEO_FILES_BUCKET_URL"`
+	VidoFilesBucketUrl string `env:"VIDEO_FILES_BUCKET_URL" envDefault:"8080"` // AK TODO test
 	Port               int    `env:"PORT" envDefault:"8080"`
-	VideoSavedTopic    string `env:"VIDEO_SAVED_TOPIC"`
-	ProjectId          string `env:"PROJECT_ID"`
+	VideoSavedTopic    string `env:"VIDEO_SAVED_TOPIC" envDefault:"8080"` // AK TODO test
+	ProjectId          string `env:"PROJECT_ID" envDefault:"8080"`
 	ServiceName        string `env:"SERVICE_NAME" envDefault:"downloader"`
 	DebguMode          bool   `env:"DEBUG_MODE"`
 }
 
 func GetEnvVars() Config {
 	cfg := Config{}
-	env.Parse(&cfg)
+
+	err := env.Parse(&cfg)
+
+	if err != nil {
+		log.Panic("could not parse env variables")
+	}
 
 	if cfg.VidoFilesBucketUrl == "" {
 		log.Panic("VIDEO_FILES_BUCKET_URL is not set")
