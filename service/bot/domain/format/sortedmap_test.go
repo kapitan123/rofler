@@ -1,4 +1,4 @@
-package sortedmap
+package format
 
 import (
 	"testing"

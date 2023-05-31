@@ -2,15 +2,13 @@ package format
 
 import (
 	"fmt"
-
-	"github.com/kapitan123/telegrofler/service/bot/domain/sortedmap"
 )
 
 // AK TODO this is not really apparent that format is a formattable string using two arguments
 func AsDescendingList(m map[string]int, format string) string {
 	listMeassge := ""
 
-	sm := sortedmap.Sort(m)
+	sm := Sort(m)
 
 	for _, pair := range sm {
 		listMeassge += formatLine(format, pair.Key, pair.Value)
