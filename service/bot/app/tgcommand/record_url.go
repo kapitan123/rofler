@@ -54,7 +54,7 @@ func (h *RecordUrl) Handle(ctx context.Context, m message.Message) (err error) {
 		return errors.Wrap(err, "unable to publish found url to pubsub")
 	}
 
-	// it's really painful to test
+	// it's really painful to perform integration tests as telegram has no backoff
 	_ = h.messenger.Delete(m.ChatId(), m.Id)
 
 	return nil

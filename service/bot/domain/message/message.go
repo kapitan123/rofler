@@ -72,7 +72,6 @@ func (m Message) IsSelfReply() bool {
 	return m.message.From.ID == m.rtm.From.ID
 }
 
-// AK TODO is not used
 func (m Message) MediaType() media.Type {
 	if m.rtm.Video != nil {
 		return media.Video
@@ -94,8 +93,7 @@ func (m Message) MediaId() string {
 	return mediaId
 }
 
-// As we delete the message we check if message contains only url
-func (m Message) IsUrlMessage() bool {
+func (m Message) ContainsOnlyUrlString() bool {
 	if len(m.message.Entities) != 1 {
 		return false
 	}
@@ -116,7 +114,7 @@ func (m Message) IsUrlMessage() bool {
 }
 
 func (m Message) GetEmbeddedUrl() (*url.URL, error) {
-	if !m.IsUrlMessage() {
+	if !m.ContainsOnlyUrlString() {
 		return nil, errors.Errorf("message is not a url only message")
 	}
 
@@ -124,13 +122,12 @@ func (m Message) GetEmbeddedUrl() (*url.URL, error) {
 }
 
 func (m Message) HasDownloadableUrl() bool {
-	found := m.IsUrlMessage()
+	found := m.ContainsOnlyUrlString()
 
 	if !found {
 		return false
 	}
 
-	// url message contains only a url
 	url := m.message.Text
 	for _, regex := range supportedMasks {
 		if regex.MatchString(url) {
@@ -163,7 +160,7 @@ func (m ReplytoMessage) IsPostedByBot() bool {
 	return m.rtm.From.IsBot && m.rtm.From.UserName == "TelegroflBot"
 }
 
-// Based on assumption that bot posts always contain exactly one mention
+// Based on the fact that bot posts always contain exactly one mention
 func (m ReplytoMessage) GetUserRef() (domain.UserRef, error) {
 	if len(m.rtm.CaptionEntities) == 0 || m.rtm.CaptionEntities[0].User == nil {
 		return domain.UserRef{}, errors.Errorf("message has no user reference")

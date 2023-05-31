@@ -49,7 +49,7 @@ func (app *Application) SaveVideoToStorage(ctx context.Context, url string) erro
 		defer pw.Close()
 		err := app.downloader.DownloadFromUrl(ctx, url, pw)
 
-		// AK TODO propagate error
+		// AK TODO propagate the error
 		if err != nil {
 			logrus.Error(err)
 			//return err

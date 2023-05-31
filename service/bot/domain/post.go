@@ -51,6 +51,7 @@ func (p *Post) AddReaction(reaction Reaction) {
 	p.Reactions = append(p.Reactions, reaction)
 }
 
+// AK TODO should group scores
 // type postsCollection []Post
 
 // // AK TODO move counting ab list buildeng logic here

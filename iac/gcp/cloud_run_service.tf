@@ -57,7 +57,6 @@ resource "google_cloud_run_service" "bot" {
   depends_on = [google_project_service.cloud_run_googleapis_com]
 }
 
-// downloader service
 resource "google_cloud_run_service" "downloader" {
   name     = var.downloader_name
   location = var.region
