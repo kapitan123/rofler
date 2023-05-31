@@ -2,7 +2,6 @@ package tgcommand
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/kapitan123/telegrofler/common/logs"
 	"github.com/kapitan123/telegrofler/service/bot/domain/message"
@@ -23,20 +22,20 @@ func (h *RecordReaction) Handle(ctx context.Context, m message.Message) (err err
 		logs.LogExecutionResult("RecordReaction ", m, err)
 	}()
 
-	existingPost, found, err := h.storage.GetPostById(ctx, m.MediaId())
+	// existingPost, found, err := h.storage.GetPostById(ctx, m.MediaId())
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	// should never happen
-	if !found {
-		return fmt.Errorf("original post was not saved, reaction will not be recorded")
-	}
+	// // should never happen
+	// if !found {
+	// 	return fmt.Errorf("original post was not saved, reaction will not be recorded")
+	// }
 
-	existingPost.AddReaction(m.AsReaction())
+	// existingPost.AddReaction(m.AsReaction())
 
-	h.storage.UpsertPost(ctx, existingPost)
+	// h.storage.UpsertPost(ctx, existingPost)
 
 	return nil
 }
