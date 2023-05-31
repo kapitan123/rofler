@@ -18,7 +18,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PostPubSubMessage"
+              $ref: "#/components/schemas/PubSubMessage"
       responses:
         "200":
           description: video was sucessfully published to telegram
@@ -52,19 +52,21 @@ paths:
 
 components:
   schemas:
-    PostPubSubMessage:
+    PubSubMessage:
       type: object
-      required: [id, data, publishTime]
+      required: [message]
       properties:
-        id:
-          type: string
-          format: uuid
-        data:
-          type: string
-          format: byte
-        publishTime:
-          type: string
-          format: date-time
+        message:
+          type: object
+          required: [message_id, data, publish_time]
+          properties:
+            message_id:
+              type: string
+            data:
+              type: string
+            publish_time:
+              type: string
+              format: date-time
 
     Error:
       type: object

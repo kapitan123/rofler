@@ -5,8 +5,6 @@ package port
 
 import (
 	"time"
-
-	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 )
 
 // Error defines model for Error.
@@ -15,18 +13,20 @@ type Error struct {
 	Slug    string `json:"slug"`
 }
 
-// PostPubSubMessage defines model for PostPubSubMessage.
-type PostPubSubMessage struct {
-	Data        []byte             `json:"data"`
-	Id          openapi_types.UUID `json:"id"`
-	PublishTime time.Time          `json:"publishTime"`
+// PubSubMessage defines model for PubSubMessage.
+type PubSubMessage struct {
+	Message struct {
+		Data        string    `json:"data"`
+		MessageId   string    `json:"message_id"`
+		PublishTime time.Time `json:"publish_time"`
+	} `json:"message"`
 }
 
 // HandleTelegramMessageJSONBody defines parameters for HandleTelegramMessage.
 type HandleTelegramMessageJSONBody = map[string]interface{}
 
 // HandleVideoSavedMessageJSONRequestBody defines body for HandleVideoSavedMessage for application/json ContentType.
-type HandleVideoSavedMessageJSONRequestBody = PostPubSubMessage
+type HandleVideoSavedMessageJSONRequestBody = PubSubMessage
 
 // HandleTelegramMessageJSONRequestBody defines body for HandleTelegramMessage for application/json ContentType.
 type HandleTelegramMessageJSONRequestBody = HandleTelegramMessageJSONBody

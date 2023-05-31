@@ -2,6 +2,7 @@
 package port
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 
@@ -22,14 +23,20 @@ func NewHttpServer(app app.Application) HttpServer {
 }
 
 func (h HttpServer) HandleVideoSavedMessage(w http.ResponseWriter, r *http.Request) {
-	postMessage := PostPubSubMessage{}
+	postMessage := PubSubMessage{}
 	if err := render.Decode(r, &postMessage); err != nil {
 		httperr.BadRequest("invalid format of pubsub message", err, w, r)
 		return
 	}
 
 	var savedVideoMessage VideoSavedMessage
-	err := json.Unmarshal(postMessage.Data, &savedVideoMessage)
+	decodedDataBytes, err := base64.StdEncoding.DecodeString(postMessage.Message.Data)
+	if err != nil {
+		httperr.BadRequest("invalid encoding of pubsub data", err, w, r)
+		return
+	}
+
+	err = json.Unmarshal(decodedDataBytes, &savedVideoMessage)
 	if err != nil {
 		httperr.BadRequest("invalid pubsub.Data payload", err, w, r)
 		return
