@@ -13,12 +13,14 @@ type Error struct {
 	Slug    string `json:"slug"`
 }
 
-// PostPubSubMessage defines model for PostPubSubMessage.
-type PostPubSubMessage struct {
-	Data        string    `json:"data"`
-	MessageId   string    `json:"message_id"`
-	PublishTime time.Time `json:"publish_time"`
+// PubSubMessage defines model for PubSubMessage.
+type PubSubMessage struct {
+	Message struct {
+		Data        string    `json:"data"`
+		MessageId   string    `json:"message_id"`
+		PublishTime time.Time `json:"publish_time"`
+	} `json:"message"`
 }
 
 // HandleVideoUrlPublishedMessageJSONRequestBody defines body for HandleVideoUrlPublishedMessage for application/json ContentType.
-type HandleVideoUrlPublishedMessageJSONRequestBody = PostPubSubMessage
+type HandleVideoUrlPublishedMessageJSONRequestBody = PubSubMessage
