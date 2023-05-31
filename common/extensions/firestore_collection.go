@@ -13,15 +13,15 @@ type firebaseDocIdSetter[TT any] interface {
 }
 
 func GetAll[T any, PT firebaseDocIdSetter[T]](ctx context.Context, iter *firestore.DocumentIterator) ([]T, error) {
-	snapsots, err := iter.GetAll()
+	snapshots, err := iter.GetAll()
 
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get firestor snapshots")
+		return nil, errors.Wrap(err, "unable to get firestore snapshots")
 	}
 
 	var documents []T
 
-	for _, snap := range snapsots {
+	for _, snap := range snapshots {
 		var d T
 		err := snap.DataTo(&d)
 
