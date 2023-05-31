@@ -82,6 +82,7 @@ func (s *FirestorePostsRepository) GetPostById(ctx context.Context, mediaId stri
 		return p.toDomainModel(), false, errors.Wrap(err, "unable to deserialize post")
 	}
 
+	p.Id = mediaId
 	return p.toDomainModel(), true, nil
 }
 
