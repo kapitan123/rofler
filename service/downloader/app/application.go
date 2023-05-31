@@ -45,18 +45,18 @@ func NewApplication(videoSavedTopic successTopic, videoBucket fileBucket, downlo
 func (app *Application) SaveVideoToStorage(ctx context.Context, url string) error {
 	pr, pw := io.Pipe()
 
+	errs := make(chan error, 1)
+
 	go func() {
 		defer pw.Close()
-		err := app.downloader.DownloadFromUrl(ctx, url, pw)
-
-		// AK TODO propagate the error
-		if err != nil {
-			logrus.Error(err)
-			//return err
-		}
+		errs <- app.downloader.DownloadFromUrl(ctx, url, pw)
 	}()
 
 	id, err := app.videoFilesBucket.Save(ctx, pr)
+
+	if err := <-errs; err != nil {
+		return err
+	}
 
 	logrus.Infof("video saved to bucket %s", id)
 
