@@ -88,7 +88,7 @@ func (s *FirestorePostsRepository) GetPostById(ctx context.Context, mediaId stri
 
 func (s *FirestorePostsRepository) GetByExternalSourceUrl(ctx context.Context, url string) (domain.Post, bool, error) {
 	var p PostModel
-	query := s.postsCollection().Where("external_source_url", "=", url).Limit(1)
+	query := s.postsCollection().Where("external_source_url", "==", url).Limit(1)
 
 	iter := query.Documents(ctx)
 
