@@ -46,7 +46,7 @@ func (t *PubSubTopic) PublishSuccess(ctx context.Context, savedVideoAddr string,
 		return err
 	}
 
-	logrus.Info("success message for video save was published message id = %s", id)
+	logrus.Infof("success message for video save was published message id = %s", id)
 
 	return nil
 }
