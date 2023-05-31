@@ -2,12 +2,12 @@ package infra
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,16 +36,23 @@ func (b *CloudStorageBucket) Save(ctx context.Context, fromReader io.Reader) (st
 	newFilePath := b.subdirectory + uuid.New().String() + ".mp4"
 	writer := b.bucket.Object(newFilePath).NewWriter(ctx)
 
-	defer writer.Close()
-
-	go func() {
-		// AK TODO add exception handling
-		_, err := io.Copy(writer, fromReader)
-		logrus.Error(err)
+	defer func() {
+		writer.Close()
+		logrus.Infof("finish upload %s", newFilePath)
 	}()
+	// 	// AK TODO add exception handling
+	logrus.Infof("start upload %s", newFilePath)
 
+	_, err := io.Copy(writer, fromReader)
+	if err != nil {
+		logrus.Error(err)
+	}
+
+	if _, err := io.Copy(writer, fromReader); err != nil {
+		return "", fmt.Errorf("io.Copy: %v", err)
+	}
 	if err := writer.Close(); err != nil {
-		return "", errors.Wrap(err, "unable to upload data to storage")
+		return "", fmt.Errorf("Writer.Close: %v", err)
 	}
 
 	return newFilePath, nil

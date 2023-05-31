@@ -43,23 +43,24 @@ func NewApplication(videoSavedTopic successTopic, videoBucket fileBucket, downlo
 }
 
 func (app *Application) SaveVideoToStorage(ctx context.Context, url string) error {
-	pipeReader, pipeWriter := io.Pipe()
+	pr, pw := io.Pipe()
 
-	err := app.downloader.DownloadFromUrl(ctx, url, pipeWriter)
+	go func() {
+		defer pw.Close()
+		err := app.downloader.DownloadFromUrl(ctx, url, pw)
 
-	logrus.Infof("video piped from %s", url)
+		// AK TODO propagate error
+		if err != nil {
+			logrus.Error(err)
+			//return err
+		}
+	}()
 
-	if err != nil {
-		logrus.Error(err)
-		return err
-	}
-
-	id, err := app.videoFilesBucket.Save(ctx, pipeReader)
+	id, err := app.videoFilesBucket.Save(ctx, pr)
 
 	logrus.Infof("video saved to bucket %s", id)
 
 	if err != nil {
-		logrus.Error(err)
 		return err
 	}
 
