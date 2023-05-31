@@ -1,5 +1,3 @@
-// AK TODO remame resource to bot
-// Callback processing service
 resource "google_cloud_run_service" "bot" {
   name     = var.bot_name
   location = var.region

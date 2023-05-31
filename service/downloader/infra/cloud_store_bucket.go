@@ -40,7 +40,7 @@ func (b *CloudStorageBucket) Save(ctx context.Context, fromReader io.Reader) (st
 		writer.Close()
 		logrus.Infof("finish upload %s", newFilePath)
 	}()
-	// 	// AK TODO add exception handling
+
 	logrus.Infof("start upload %s", newFilePath)
 
 	_, err := io.Copy(writer, fromReader)

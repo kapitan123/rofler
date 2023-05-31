@@ -22,7 +22,7 @@ func (h *RecordMedia) Handle(ctx context.Context, m message.Message) (err error)
 		logs.LogExecutionResult("RecordMedia ", m, err)
 	}()
 
-	// AK TODO torned off until tests are complete
+	// AK TODO turned off until tests are complete
 	// newPost := domain.NewPost(m.MediaId(), m.From(), m.ChatId())
 	// err = h.storage.UpsertPost(ctx, newPost)
 
