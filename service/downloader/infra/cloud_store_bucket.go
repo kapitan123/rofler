@@ -8,6 +8,7 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type CloudStorageBucket struct {
@@ -37,9 +38,11 @@ func (b *CloudStorageBucket) Save(ctx context.Context, fromReader io.Reader) (st
 
 	defer writer.Close()
 
-	if _, err := io.Copy(writer, fromReader); err != nil {
-		return "", errors.Wrap(err, "unable to copy data to bucket object writer")
-	}
+	go func() {
+		// AK TODO add exception handling
+		_, err := io.Copy(writer, fromReader)
+		logrus.Error(err)
+	}()
 
 	if err := writer.Close(); err != nil {
 		return "", errors.Wrap(err, "unable to upload data to storage")

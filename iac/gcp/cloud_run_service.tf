@@ -39,8 +39,8 @@ resource "google_cloud_run_service" "bot" {
         }
 
         env {
-          name  = "VIDEO_FILES_BUCKET_URL"
-          value = google_storage_bucket.videos.url
+          name  = "VIDEO_FILES_BUCKET"
+          value = google_storage_bucket.videos.name
         }
 
         env {
@@ -90,8 +90,8 @@ resource "google_cloud_run_service" "downloader" {
         }
 
         env {
-          name  = "VIDEO_FILES_BUCKET_URL"
-          value = google_storage_bucket.videos.url
+          name  = "VIDEO_FILES_BUCKET"
+          value = google_storage_bucket.videos.name
         }
 
         env {

@@ -11,8 +11,8 @@ import (
 type Downloader struct {
 }
 
-func NewDownloader() *Downloader {
-	goutubedl.Path = "yt-dlp"
+func NewDownloader(path string) *Downloader {
+	goutubedl.Path = path
 	return &Downloader{}
 }
 
@@ -35,7 +35,10 @@ func (d *Downloader) DownloadFromUrl(ctx context.Context, url string, w io.Write
 
 	logrus.Infof("start copy %s", url)
 
-	_, err = io.Copy(w, downloadResult)
+	go func() {
+		// AK TODO add exception handling
+		_, err = io.Copy(w, downloadResult)
+	}()
 
 	if err != nil {
 		logrus.Error(err)

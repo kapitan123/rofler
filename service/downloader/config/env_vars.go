@@ -6,12 +6,15 @@ import (
 )
 
 type Config struct {
-	VidoFilesBucketUrl string `env:"VIDEO_FILES_BUCKET_URL"`
-	Port               int    `env:"PORT" envDefault:"8080"`
-	VideoSavedTopic    string `env:"VIDEO_SAVED_TOPIC"`
-	ProjectId          string `env:"PROJECT_ID"`
-	ServiceName        string `env:"SERVICE_NAME" envDefault:"downloader"`
-	DebguMode          bool   `env:"DEBUG_MODE"`
+	VidoFilesBucket string `env:"VIDEO_FILES_BUCKET"`
+	YoutubeDlPath   string `env:"YOUTUBE_DL_PATH" envDefault:"yt-dlp"`
+	VideoSavedTopic string `env:"VIDEO_SAVED_TOPIC"`
+
+	ProjectId string `env:"PROJECT_ID"`
+
+	Port        int    `env:"PORT" envDefault:"8080"`
+	ServiceName string `env:"SERVICE_NAME" envDefault:"downloader"`
+	DebguMode   bool   `env:"DEBUG_MODE"`
 }
 
 func GetEnvVars() Config {
@@ -23,7 +26,7 @@ func GetEnvVars() Config {
 		log.Panic("could not parse env variables")
 	}
 
-	if cfg.VidoFilesBucketUrl == "" {
+	if cfg.VidoFilesBucket == "" {
 		log.Panic("VIDEO_FILES_BUCKET_URL is not set")
 	}
 

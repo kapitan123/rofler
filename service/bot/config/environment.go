@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	TelegramToken          string `env:"TELEGRAM_BOT_TOKEN"`
-	VidoFilesBucketUrl     string `env:"VIDEO_FILES_BUCKET_URL"`
+	VidoFilesBucket        string `env:"VIDEO_FILES_BUCKET"`
 	VideoUrlPublishedTopic string `env:"VIDEO_URL_PUBLISHED_TOPIC"`
 
 	ProjectId   string `env:"PROJECT_ID"`
@@ -25,7 +25,7 @@ func GetEnvVars() Config {
 		log.Panic("could not parse env variables")
 	}
 
-	if cfg.VidoFilesBucketUrl == "" {
+	if cfg.VidoFilesBucket == "" {
 		log.Panic("VIDEO_FILES_BUCKET_URL is not set")
 	}
 
