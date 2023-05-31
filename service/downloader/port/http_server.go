@@ -32,7 +32,7 @@ func (h HttpServer) HandleVideoUrlPublishedMessage(w http.ResponseWriter, r *htt
 
 	var videoMessage VideoUrlPublishedMessage
 
-	decodedDataBytes, err := base64.StdEncoding.DecodeString(postMessage.Data)
+	decodedDataBytes, err := base64.StdEncoding.DecodeString(postMessage.Message.Data)
 	if err != nil {
 		httperr.BadRequest("invalid encoding of pubsub data", err, w, r)
 		return
