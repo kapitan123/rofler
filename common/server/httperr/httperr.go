@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/kapitan123/telegrofler/common/errors"
 	"github.com/kapitan123/telegrofler/common/logs"
+	"github.com/sirupsen/logrus"
 )
 
 func InternalError(slug string, err error, w http.ResponseWriter, r *http.Request) {
@@ -36,6 +37,7 @@ func httpRespondWithError(err error, slug string, w http.ResponseWriter, r *http
 	resp := ErrorResponse{slug, status}
 
 	if err := render.Render(w, r, resp); err != nil {
+		logrus.Error(err)
 		panic(err)
 	}
 }
