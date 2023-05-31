@@ -55,6 +55,7 @@ func (app *Application) SaveVideoToStorage(ctx context.Context, url string) erro
 	id, err := app.videoFilesBucket.Save(ctx, pr)
 
 	if err := <-errs; err != nil {
+		close(errs)
 		return err
 	}
 
