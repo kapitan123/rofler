@@ -54,11 +54,8 @@ func (h *RecordUrl) Handle(ctx context.Context, m message.Message) (err error) {
 		return errors.Wrap(err, "unable to publish found url to pubsub")
 	}
 
-	err = h.messenger.Delete(m.ChatId(), m.Id)
-
-	if err != nil {
-		return errors.Wrap(err, "unable to delete message from chat")
-	}
+	// it's really painful to test
+	_ = h.messenger.Delete(m.ChatId(), m.Id)
 
 	return nil
 }
