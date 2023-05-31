@@ -5,7 +5,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// AK TODO check if I can make each string a value object type
 type Config struct {
 	VidoFilesBucketUrl string `env:"VIDEO_FILES_BUCKET_URL"`
 	Port               int    `env:"PORT" envDefault:"8080"`

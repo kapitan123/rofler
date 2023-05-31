@@ -23,6 +23,8 @@ func (d *Downloader) DownloadFromUrl(ctx context.Context, url string, w io.Write
 		return err
 	}
 
+	logrus.Infof("start download from %s", url)
+
 	downloadResult, err := result.Download(context.Background(), "best")
 	if err != nil {
 		logrus.Error(err)
@@ -31,6 +33,7 @@ func (d *Downloader) DownloadFromUrl(ctx context.Context, url string, w io.Write
 
 	defer downloadResult.Close()
 
+	logrus.Infof("start copy", url)
 	io.Copy(w, downloadResult)
 
 	return nil
