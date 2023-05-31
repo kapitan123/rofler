@@ -35,13 +35,12 @@ components:
       type: object
       required: [id, data, publishTime]
       properties:
-        id:
+        message_id:
           type: string
-          format: uuid
         data:
           type: string
           format: byte
-        publishTime:
+        publish_time:
           type: string
           format: date-time
 
