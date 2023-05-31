@@ -89,9 +89,10 @@ func (m Message) MediaId() string {
 	return mediaId
 }
 
-func (m Message) FindUrl() (*url.URL, bool, error) {
-	if len(m.message.Entities) < 1 {
-		return nil, false, fmt.Errorf("message contains no urls")
+// As we delete the message we check if message contains only url
+func (m Message) IsUrlMessage() bool {
+	if len(m.message.Entities) != 1 {
+		return false
 	}
 
 	urlEnt, found := lo.Find(m.message.Entities, func(ent tgbotapi.MessageEntity) bool {
@@ -99,32 +100,35 @@ func (m Message) FindUrl() (*url.URL, bool, error) {
 	})
 
 	if !found {
-		return nil, false, fmt.Errorf("message contains no urls")
+		return false
 	}
 
-	urlString := m.message.Text[urlEnt.Offset:urlEnt.Length]
-	url, err := url.Parse(urlString)
-
-	if err != nil {
-		return nil, false, fmt.Errorf("can't parse url")
+	if urlEnt.Length != len(m.message.Text) {
+		return false
 	}
 
-	return url, true, nil
+	return true
+}
+
+func (m Message) GetEmbeddedUrl() (*url.URL, error) {
+	if !m.IsUrlMessage() {
+		return nil, fmt.Errorf("message is not a url only message")
+	}
+
+	return url.Parse(m.message.Text)
 }
 
 func (m Message) HasDownloadableUrl() bool {
-	url, found, err := m.FindUrl()
-
-	if err != nil {
-		return false
-	}
+	found := m.IsUrlMessage()
 
 	if !found {
 		return false
 	}
 
+	// url message contains only a url
+	url := m.message.Text
 	for _, regex := range supportedMasks {
-		if regex.MatchString(url.String()) {
+		if regex.MatchString(url) {
 			return true
 		}
 	}

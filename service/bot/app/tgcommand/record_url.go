@@ -34,7 +34,7 @@ func (h *RecordUrl) Handle(ctx context.Context, m message.Message) (err error) {
 		logs.LogExecutionResult(fmt.Sprintf("%T", h), m, err)
 	}()
 
-	url, _, err := m.FindUrl()
+	url, err := m.GetEmbeddedUrl()
 
 	if err != nil {
 		return err
