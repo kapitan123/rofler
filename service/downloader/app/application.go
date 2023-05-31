@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/kapitan123/telegrofler/service/downloader/infra"
+	"github.com/sirupsen/logrus"
 )
 
 type Application struct {
@@ -46,19 +47,26 @@ func (app *Application) SaveVideoToStorage(ctx context.Context, url string) erro
 
 	err := app.downloader.DownloadFromUrl(url, pipeWriter)
 
+	logrus.Infof("video piped to %s", url)
+
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
 	id, err := app.videoFilesBucket.Save(ctx, pipeReader)
 
+	logrus.Infof("video saved to bucket %s", id)
+
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
 	err = app.videoSavedTopic.PublishSuccess(ctx, id, url)
 
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 

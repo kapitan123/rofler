@@ -1,10 +1,11 @@
 package infra
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Downloader struct {
@@ -29,7 +30,7 @@ func (d *Downloader) DownloadFromUrl(url string, w io.Writer) error {
 	go func() {
 		_, err := io.Copy(io.MultiWriter(w, os.Stdout), stdout)
 		if err != nil {
-			fmt.Println("Error copying output:", err)
+			logrus.Error("Error copying output:", err)
 		}
 	}()
 
