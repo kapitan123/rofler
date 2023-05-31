@@ -30,6 +30,10 @@ type Message struct {
 }
 
 func New(message *tgbotapi.Message) Message {
+	if message == nil {
+		message = &tgbotapi.Message{}
+	}
+
 	tgReplyTo := message.ReplyToMessage
 
 	if tgReplyTo == nil {
