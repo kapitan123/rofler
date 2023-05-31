@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"cloud.google.com/go/storage"
@@ -28,7 +29,7 @@ func (b *CloudStorageBucket) Read(ctx context.Context, addr string) (io.Reader, 
 	reader, err := b.bucket.Object(addr).NewReader(ctx)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to read file")
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to read file %s", addr))
 	}
 
 	return reader, nil
