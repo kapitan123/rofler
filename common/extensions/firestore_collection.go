@@ -7,7 +7,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-func GetAll[T any](ctx context.Context, iter *firestore.DocumentIterator) ([]T, error) {
+type firebaseDocIdSetter[TT any] interface {
+	SetId(id string)
+	*TT
+}
+
+func GetAll[T any, PT firebaseDocIdSetter[T]](ctx context.Context, iter *firestore.DocumentIterator) ([]T, error) {
 	snapsots, err := iter.GetAll()
 
 	if err != nil {
@@ -23,6 +28,8 @@ func GetAll[T any](ctx context.Context, iter *firestore.DocumentIterator) ([]T, 
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to deserialize snapshot")
 		}
+		pointerToD := PT(&d)
+		pointerToD.SetId(snap.Ref.ID)
 		documents = append(documents, d)
 	}
 	return documents, nil

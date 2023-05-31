@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/google/uuid"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
 )
 
@@ -52,7 +51,7 @@ func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string,
 		return err
 	}
 
-	_, err = h.messenger.SendVideo(uuid.NewString(), post.ChatId, post.Poster.AsUserMention(), reader)
+	_, err = h.messenger.SendVideo(post.Id, post.ChatId, post.Poster.AsUserMention(), reader)
 
 	if err != nil {
 		return err

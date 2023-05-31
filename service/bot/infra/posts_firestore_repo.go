@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"github.com/google/uuid"
 	"github.com/kapitan123/telegrofler/common/extensions"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/pkg/errors"
@@ -108,7 +107,7 @@ func (s *FirestorePostsRepository) GetByExternalSourceUrl(ctx context.Context, u
 
 type (
 	PostModel struct {
-		Id                uuid.UUID
+		Id                string          `firestore:"-"`
 		ExternalSourceUrl string          `firestore:"external_source_url"`
 		Reactions         []ReactionModel `firestore:"reactions"`
 		PostedOn          time.Time       `firestore:"posted_on"`
@@ -128,6 +127,10 @@ type (
 		Id          int64  `firestore:"user_id"`
 	}
 )
+
+func (pm *PostModel) SetId(id string) {
+	pm.Id = id
+}
 
 func (urm UserRefModel) toDomainModel() domain.UserRef {
 	return domain.UserRef{
@@ -151,6 +154,7 @@ func (pm PostModel) toDomainModel() domain.Post {
 
 	url, _ := url.Parse(pm.ExternalSourceUrl)
 	return domain.Post{
+		Id:                pm.Id,
 		ExternalSourceUrl: url,
 		Reactions:         reactions,
 		PostedOn:          pm.PostedOn,
@@ -165,6 +169,7 @@ func MapPostToModel(p domain.Post) PostModel {
 	})
 
 	return PostModel{
+		Id:                p.Id,
 		ExternalSourceUrl: p.ExternalSourceUrl.String(),
 		Reactions:         reactionModels,
 		PostedOn:          p.PostedOn,
