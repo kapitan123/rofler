@@ -5,12 +5,15 @@ import (
 	"time"
 
 	"github.com/kapitan123/telegrofler/service/bot/domain"
+	"github.com/kapitan123/telegrofler/service/bot/domain/media"
 	"github.com/samber/lo"
+	"github.com/sirupsen/logrus"
 )
 
 type (
 	PostModel struct {
 		Id                string          `firestore:"-"`
+		Type              string          `firestore:"rtype"`
 		ExternalSourceUrl string          `firestore:"external_source_url"`
 		Reactions         []ReactionModel `firestore:"reactions"`
 		PostedOn          time.Time       `firestore:"posted_on"`
@@ -56,8 +59,16 @@ func (pm PostModel) toDomainModel() domain.Post {
 	})
 
 	url, _ := url.Parse(pm.ExternalSourceUrl)
+
+	mediaType, err := media.NewTypeFromString(pm.Type)
+
+	if err != nil {
+		logrus.Warn(err)
+	}
+
 	return domain.Post{
 		Id:                pm.Id,
+		Type:              mediaType,
 		ExternalSourceUrl: url,
 		Reactions:         reactions,
 		PostedOn:          pm.PostedOn,
@@ -73,6 +84,7 @@ func MapPostToModel(p domain.Post) PostModel {
 
 	return PostModel{
 		Id:                p.Id,
+		Type:              p.Type.String(),
 		ExternalSourceUrl: p.ExternalSourceUrl.String(),
 		Reactions:         reactionModels,
 		PostedOn:          p.PostedOn,

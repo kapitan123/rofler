@@ -2,10 +2,10 @@ package pubsubcommand
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	"github.com/kapitan123/telegrofler/service/bot/domain"
+	"github.com/pkg/errors"
 )
 
 type PublishDownloadedVideo struct {
@@ -42,7 +42,7 @@ func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string,
 	}
 
 	if !found {
-		return fmt.Errorf("video %s was not found for url %s", savedAddr, originalUrl)
+		return errors.Errorf("video %s was not found for url %s", savedAddr, originalUrl)
 	}
 
 	reader, err := h.filesBucket.Read(ctx, savedAddr)

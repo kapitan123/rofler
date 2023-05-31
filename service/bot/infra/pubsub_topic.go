@@ -46,7 +46,7 @@ func (t *PubSubTopic) PublishUrl(ctx context.Context, url *url.URL) error {
 		return err
 	}
 
-	logrus.Info("videoUrlPostedMessage was published, message id = %s", id)
+	logrus.Infof("videoUrlPostedMessage was published, message id = %s", id)
 
 	return nil
 }

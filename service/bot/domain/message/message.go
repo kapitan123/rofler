@@ -1,7 +1,6 @@
 package message
 
 import (
-	"fmt"
 	"net/url"
 	"regexp"
 	"time"
@@ -9,6 +8,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/kapitan123/telegrofler/service/bot/domain/media"
+	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
 
@@ -72,6 +72,7 @@ func (m Message) IsSelfReply() bool {
 	return m.message.From.ID == m.rtm.From.ID
 }
 
+// AK TODO is not used
 func (m Message) MediaType() media.Type {
 	if m.rtm.Video != nil {
 		return media.Video
@@ -116,7 +117,7 @@ func (m Message) IsUrlMessage() bool {
 
 func (m Message) GetEmbeddedUrl() (*url.URL, error) {
 	if !m.IsUrlMessage() {
-		return nil, fmt.Errorf("message is not a url only message")
+		return nil, errors.Errorf("message is not a url only message")
 	}
 
 	return url.Parse(m.message.Text)
@@ -165,7 +166,7 @@ func (m ReplytoMessage) IsPostedByBot() bool {
 // Based on assumption that bot posts always contain exactly one mention
 func (m ReplytoMessage) GetUserRef() (domain.UserRef, error) {
 	if len(m.rtm.CaptionEntities) == 0 || m.rtm.CaptionEntities[0].User == nil {
-		return domain.UserRef{}, fmt.Errorf("message has no user reference")
+		return domain.UserRef{}, errors.Errorf("message has no user reference")
 	}
 	user := m.rtm.CaptionEntities[0].User
 

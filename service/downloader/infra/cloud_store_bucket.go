@@ -2,12 +2,12 @@ package infra
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -49,10 +49,10 @@ func (b *CloudStorageBucket) Save(ctx context.Context, fromReader io.Reader) (st
 	}
 
 	if _, err := io.Copy(writer, fromReader); err != nil {
-		return "", fmt.Errorf("io.Copy: %v", err)
+		return "", errors.Errorf("io.Copy: %v", err)
 	}
 	if err := writer.Close(); err != nil {
-		return "", fmt.Errorf("Writer.Close: %v", err)
+		return "", errors.Errorf("Writer.Close: %v", err)
 	}
 
 	return newFilePath, nil
