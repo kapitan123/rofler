@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/kapitan123/telegrofler/common/logs"
-	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/kapitan123/telegrofler/service/bot/domain/message"
 )
 
@@ -23,12 +22,13 @@ func (h *RecordMedia) Handle(ctx context.Context, m message.Message) (err error)
 		logs.LogExecutionResult("RecordMedia ", m, err)
 	}()
 
-	newPost := domain.NewPost(m.MediaId(), m.From(), m.ChatId())
-	err = h.storage.UpsertPost(ctx, newPost)
+	// AK TODO torned off until tests are complete
+	// newPost := domain.NewPost(m.MediaId(), m.From(), m.ChatId())
+	// err = h.storage.UpsertPost(ctx, newPost)
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
