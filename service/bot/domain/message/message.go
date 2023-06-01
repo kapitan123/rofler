@@ -7,7 +7,6 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
-	"github.com/kapitan123/telegrofler/service/bot/domain/media"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
@@ -72,14 +71,14 @@ func (m Message) IsSelfReply() bool {
 	return m.message.From.ID == m.rtm.From.ID
 }
 
-func (m Message) MediaType() media.Type {
+func (m Message) MediaType() domain.MediaType {
 	if m.rtm.Video != nil {
-		return media.Video
+		return domain.Video
 	} else if len(m.rtm.Photo) > 0 {
-		return media.Image
+		return domain.Image
 	}
 
-	return media.Type{}
+	return domain.MediaType{}
 }
 
 func (m Message) MediaId() string {

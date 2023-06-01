@@ -5,14 +5,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/kapitan123/telegrofler/service/bot/domain/media"
 )
 
 type (
 	Post struct {
 		Id                string
 		ExternalSourceUrl *url.URL
-		Type              media.Type
+		Type              MediaType
 		Reactions         []Reaction
 		PostedOn          time.Time
 		ChatId            int64

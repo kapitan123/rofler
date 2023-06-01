@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/kapitan123/telegrofler/service/bot/domain"
-	"github.com/kapitan123/telegrofler/service/bot/domain/media"
 	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"
 )
@@ -60,7 +59,7 @@ func (pm PostModel) toDomainModel() domain.Post {
 
 	url, _ := url.Parse(pm.ExternalSourceUrl)
 
-	mediaType, err := media.NewTypeFromString(pm.Type)
+	mediaType, err := domain.NewMediaTypeFromString(pm.Type)
 
 	if err != nil {
 		logrus.Warn(err)

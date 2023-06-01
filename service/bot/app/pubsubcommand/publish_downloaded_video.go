@@ -45,6 +45,8 @@ func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string,
 		return errors.Errorf("video %s was not found for url %s", savedAddr, originalUrl)
 	}
 
+	// AK TODO read in a separate routine
+	// close the reader
 	reader, err := h.filesBucket.Read(ctx, savedAddr)
 
 	if err != nil {

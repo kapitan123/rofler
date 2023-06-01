@@ -68,7 +68,7 @@ func (app *Application) HandleTelegramMessage(ctx context.Context, msg *tgbotapi
 			err := ch.Handle(ctx, wrappedMessage)
 
 			if err != nil {
-				return errors.Wrap(err, "telegram command failed")
+				return errors.Wrap(err, "telegram command failed") // AK TODO add command name
 			}
 		}
 	}
