@@ -15,7 +15,7 @@ type PublishDownloadedVideo struct {
 }
 
 type messenger interface {
-	SendVideo(videoId string, chatId int64, caption string, payload io.Reader) (int, error)
+	SendVideo(videoId string, chatId domain.ChatId, caption string, payload io.Reader) (int, error)
 }
 
 type postStorage interface {

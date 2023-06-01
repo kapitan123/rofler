@@ -43,7 +43,8 @@ func NewApplication(videoSavedTopic successTopic, videoBucket fileBucket, downlo
 }
 
 func (app *Application) SaveVideoToStorage(ctx context.Context, url string) error {
-	pr, pw := io.Pipe()
+	pr, pw := io.Pipe() // AK TODO I can actually change signature to return reader from Download Url
+	// this way I
 
 	errs := make(chan error, 1)
 
@@ -52,6 +53,7 @@ func (app *Application) SaveVideoToStorage(ctx context.Context, url string) erro
 		errs <- app.downloader.DownloadFromUrl(ctx, url, pw)
 	}()
 
+	// AK TODO need to peek first byte
 	id, err := app.videoFilesBucket.Save(ctx, pr)
 
 	if err := <-errs; err != nil {

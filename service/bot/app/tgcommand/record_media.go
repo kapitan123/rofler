@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/kapitan123/telegrofler/common/logs"
-	"github.com/kapitan123/telegrofler/service/bot/domain/message"
+	"github.com/kapitan123/telegrofler/service/bot/domain"
 )
 
 type RecordMedia struct {
@@ -17,7 +17,7 @@ func NewRecordMediaPost(storage postStorage) *RecordMedia {
 	}
 }
 
-func (h *RecordMedia) Handle(ctx context.Context, m message.Message) (err error) {
+func (h *RecordMedia) Handle(ctx context.Context, m domain.Message) (err error) {
 	defer func() {
 		logs.LogExecutionResult("RecordMedia ", m, err)
 	}()
@@ -33,6 +33,6 @@ func (h *RecordMedia) Handle(ctx context.Context, m message.Message) (err error)
 	return nil
 }
 
-func (h *RecordMedia) ShouldRun(m message.Message) bool {
+func (h *RecordMedia) ShouldRun(m domain.Message) bool {
 	return m.HasMedia() && !m.IsBotPost()
 }

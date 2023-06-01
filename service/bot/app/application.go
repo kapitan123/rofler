@@ -7,7 +7,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kapitan123/telegrofler/service/bot/app/pubsubcommand"
 	"github.com/kapitan123/telegrofler/service/bot/app/tgcommand"
-	"github.com/kapitan123/telegrofler/service/bot/domain/message"
+	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/kapitan123/telegrofler/service/bot/infra"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -19,8 +19,8 @@ type Application struct {
 }
 
 type tgcommandhandler interface {
-	Handle(ctx context.Context, message message.Message) error
-	ShouldRun(m message.Message) bool
+	Handle(ctx context.Context, message domain.Message) error
+	ShouldRun(m domain.Message) bool
 }
 
 func NewApplicationFromConfig(ctx context.Context, servicename string, projectId string, telegramBotToken string, videoUrlPostedTopicId string, videoFilesBucketUrl string) Application {
@@ -62,7 +62,7 @@ func (app *Application) PublishVideo(ctx context.Context, originalUrl string, sa
 }
 
 func (app *Application) HandleTelegramMessage(ctx context.Context, msg *tgbotapi.Message) error {
-	wrappedMessage := message.New(msg)
+	wrappedMessage := domain.NewMessage(msg)
 	for _, ch := range app.TelegramCommands {
 		if ch.ShouldRun(wrappedMessage) {
 			err := ch.Handle(ctx, wrappedMessage)

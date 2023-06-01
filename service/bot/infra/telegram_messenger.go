@@ -5,6 +5,7 @@ import (
 	"io"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,7 +24,7 @@ func NewMessenger(token string) *TelegramMessenger {
 	}
 }
 
-func (m TelegramMessenger) SendText(chatID int64, text string) (int, error) {
+func (m TelegramMessenger) SendText(chatID domain.ChatId, text string) (int, error) {
 	msg := tgbotapi.NewMessage(chatID, text)
 
 	msg.ParseMode = tgbotapi.ModeHTML
@@ -37,7 +38,7 @@ func (m TelegramMessenger) SendText(chatID int64, text string) (int, error) {
 	return res.MessageID, err
 }
 
-func (m TelegramMessenger) ReplyWithText(chatId int64, replyToMessageId int, caption string) (int, error) {
+func (m TelegramMessenger) ReplyWithText(chatId domain.ChatId, replyToMessageId int, caption string) (int, error) {
 	msg := tgbotapi.NewMessage(chatId, caption)
 	msg.ReplyToMessageID = replyToMessageId
 	msg.ParseMode = tgbotapi.ModeHTML
@@ -51,9 +52,9 @@ func (m TelegramMessenger) ReplyWithText(chatId int64, replyToMessageId int, cap
 	return res.MessageID, err
 }
 
-func (b TelegramMessenger) Delete(chatId int64, messageId int) error {
+func (b TelegramMessenger) Delete(chatId domain.ChatId, messageId int) error {
 	dmc := tgbotapi.DeleteMessageConfig{
-		ChatID:    chatId,
+		ChatID:    int64(chatId),
 		MessageID: messageId,
 	}
 
@@ -65,7 +66,7 @@ func (b TelegramMessenger) Delete(chatId int64, messageId int) error {
 	return nil
 }
 
-func (b TelegramMessenger) SendVideo(videoId string, chatId int64, caption string, payload io.Reader) (int, error) {
+func (b TelegramMessenger) SendVideo(videoId string, chatId domain.ChatId, caption string, payload io.Reader) (int, error) {
 	vidbytes, err := io.ReadAll(payload)
 
 	if err != nil {
@@ -74,7 +75,7 @@ func (b TelegramMessenger) SendVideo(videoId string, chatId int64, caption strin
 
 	fb := tgbotapi.FileBytes{Name: videoId, Bytes: vidbytes}
 
-	v := tgbotapi.NewVideo(chatId, fb)
+	v := tgbotapi.NewVideo(int64(chatId), fb)
 
 	v.Caption = caption
 	v.ParseMode = tgbotapi.ModeHTML

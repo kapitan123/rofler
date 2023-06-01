@@ -1,5 +1,4 @@
-// AK TODO move to domain package
-package message
+package domain
 
 import (
 	"net/url"
@@ -7,7 +6,6 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
@@ -22,6 +20,8 @@ var supportedMasks = []*regexp.Regexp{
 	instagramReelRegex,
 }
 
+type ChatId int64
+type MessageId int
 type Message struct {
 	Id             int
 	message        *tgbotapi.Message
@@ -29,7 +29,7 @@ type Message struct {
 	ReplytoMessage ReplytoMessage
 }
 
-func New(message *tgbotapi.Message) Message {
+func NewMessage(message *tgbotapi.Message) Message {
 	if message == nil {
 		message = &tgbotapi.Message{}
 	}
@@ -52,12 +52,16 @@ func (m Message) IsCommand(commandName string) bool {
 	return m.message.IsCommand() && m.message.Command() == commandName
 }
 
-func (m Message) From() domain.UserRef {
-	return domain.NewUserRef(m.message.From.ID, m.message.From.FirstName, m.message.From.LastName)
+func (m Message) From() UserRef {
+	return NewUserRef(m.message.From.ID, m.message.From.FirstName, m.message.From.LastName)
 }
 
-func (m Message) ChatId() int64 {
-	return m.message.Chat.ID
+func (m Message) MessageId() MessageId {
+	return MessageId(m.message.MessageID)
+}
+
+func (m Message) ChatId() ChatId {
+	return ChatId(m.message.Chat.ID)
 }
 
 func (m Message) IsBotPost() bool {
@@ -72,14 +76,14 @@ func (m Message) IsSelfReply() bool {
 	return m.message.From.ID == m.rtm.From.ID
 }
 
-func (m Message) MediaType() domain.MediaType {
+func (m Message) MediaType() MediaType {
 	if m.rtm.Video != nil {
-		return domain.Video
+		return Video
 	} else if len(m.rtm.Photo) > 0 {
-		return domain.Image
+		return Image
 	}
 
-	return domain.MediaType{}
+	return MediaType{}
 }
 
 func (m Message) MediaId() string {
@@ -138,8 +142,8 @@ func (m Message) HasDownloadableUrl() bool {
 	return false
 }
 
-func (m Message) AsReaction() domain.Reaction {
-	reaction := domain.Reaction{
+func (m Message) AsReaction() Reaction {
+	reaction := Reaction{
 		Reactor:  m.From(),
 		Text:     m.message.Text,
 		PostedOn: time.Now(),
@@ -161,13 +165,13 @@ func (m ReplytoMessage) IsPostedByBot() bool {
 }
 
 // Based on the fact that bot posts always contain exactly one mention
-func (m ReplytoMessage) GetUserRef() (domain.UserRef, error) {
+func (m ReplytoMessage) GetUserRef() (UserRef, error) {
 	if len(m.rtm.CaptionEntities) == 0 || m.rtm.CaptionEntities[0].User == nil {
-		return domain.UserRef{}, errors.Errorf("message has no user reference")
+		return UserRef{}, errors.Errorf("message has no user reference")
 	}
 	user := m.rtm.CaptionEntities[0].User
 
-	userRef := domain.NewUserRef(user.ID, user.FirstName, user.LastName)
+	userRef := NewUserRef(user.ID, user.FirstName, user.LastName)
 
 	return userRef, nil
 }

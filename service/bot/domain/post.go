@@ -11,10 +11,11 @@ type (
 	Post struct {
 		Id                string
 		ExternalSourceUrl *url.URL
+		OriginalMessageId MessageId
 		Type              MediaType
 		Reactions         []Reaction
 		PostedOn          time.Time
-		ChatId            int64
+		ChatId            ChatId
 		Poster            UserRef
 	}
 
@@ -25,7 +26,7 @@ type (
 	}
 )
 
-func NewPost(mediaId string, poster UserRef, chatId int64) Post {
+func NewPost(mediaId string, poster UserRef, chatId ChatId) Post {
 	return Post{
 		Id:        mediaId,
 		Poster:    poster,
@@ -35,9 +36,10 @@ func NewPost(mediaId string, poster UserRef, chatId int64) Post {
 	}
 }
 
-func NewPostFromExternalSource(externalSourceUrl *url.URL, poster UserRef, chatId int64) Post {
+func NewPostFromExternalSource(externalSourceUrl *url.URL, poster UserRef, chatId ChatId, messageId MessageId) Post {
 	return Post{
 		Id:                uuid.NewString(),
+		OriginalMessageId: messageId,
 		ExternalSourceUrl: externalSourceUrl,
 		Poster:            poster,
 		ChatId:            chatId,

@@ -12,8 +12,9 @@ import (
 type (
 	PostModel struct {
 		Id                string          `firestore:"-"`
-		Type              string          `firestore:"rtype"`
-		ExternalSourceUrl string          `firestore:"external_source_url"`
+		Type              string          `firestore:"type"`
+		OriginalMessageId int             `firestore:"original_message_id,omitempty"`
+		ExternalSourceUrl string          `firestore:"external_source_url,omitempty"`
 		Reactions         []ReactionModel `firestore:"reactions"`
 		PostedOn          time.Time       `firestore:"posted_on"`
 		ChatId            int64           `firestore:"chat_id"`
@@ -71,7 +72,7 @@ func (pm PostModel) toDomainModel() domain.Post {
 		ExternalSourceUrl: url,
 		Reactions:         reactions,
 		PostedOn:          pm.PostedOn,
-		ChatId:            pm.ChatId,
+		ChatId:            domain.ChatId(pm.ChatId),
 		Poster:            pm.Poster.toDomainModel(),
 	}
 }
@@ -85,9 +86,10 @@ func MapPostToModel(p domain.Post) PostModel {
 		Id:                p.Id,
 		Type:              p.Type.String(),
 		ExternalSourceUrl: p.ExternalSourceUrl.String(),
+		OriginalMessageId: int(p.OriginalMessageId),
 		Reactions:         reactionModels,
 		PostedOn:          p.PostedOn,
-		ChatId:            p.ChatId,
+		ChatId:            int64(p.ChatId),
 		Poster:            MapUserRefToModel(p.Poster),
 	}
 }

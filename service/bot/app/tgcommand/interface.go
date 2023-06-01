@@ -8,14 +8,14 @@ import (
 )
 
 type messenger interface {
-	Delete(chatId int64, messageId int) error
-	SendText(chatId int64, text string) (int, error)
+	Delete(chatId domain.ChatId, messageId int) error
+	SendText(chatId domain.ChatId, text string) (int, error)
 }
 
 type postStorage interface {
 	GetPostById(ctx context.Context, videoId string) (domain.Post, bool, error)
 	UpsertPost(ctx context.Context, p domain.Post) error
-	GetChatPosts(ctx context.Context, chatId int64) ([]domain.Post, error)
+	GetChatPosts(ctx context.Context, chatId domain.ChatId) ([]domain.Post, error)
 }
 
 type filesBucket interface {

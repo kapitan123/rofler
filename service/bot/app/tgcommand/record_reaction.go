@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/kapitan123/telegrofler/common/logs"
-	"github.com/kapitan123/telegrofler/service/bot/domain/message"
+	"github.com/kapitan123/telegrofler/service/bot/domain"
 )
 
 type RecordReaction struct {
@@ -17,7 +17,7 @@ func NewRecordReaction(storage postStorage) *RecordReaction {
 	}
 }
 
-func (h *RecordReaction) Handle(ctx context.Context, m message.Message) (err error) {
+func (h *RecordReaction) Handle(ctx context.Context, m domain.Message) (err error) {
 	defer func() {
 		logs.LogExecutionResult("RecordReaction ", m, err)
 	}()
@@ -40,6 +40,6 @@ func (h *RecordReaction) Handle(ctx context.Context, m message.Message) (err err
 	return nil
 }
 
-func (h *RecordReaction) ShouldRun(m message.Message) bool {
+func (h *RecordReaction) ShouldRun(m domain.Message) bool {
 	return m.ReplytoMessage.HasMedia()
 }

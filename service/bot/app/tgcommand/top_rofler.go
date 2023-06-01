@@ -5,7 +5,6 @@ import (
 
 	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/kapitan123/telegrofler/service/bot/domain/format"
-	"github.com/kapitan123/telegrofler/service/bot/domain/message"
 )
 
 const commandName = "toprofler"
@@ -22,7 +21,7 @@ func NewTopRofler(messenger messenger, storage postStorage) *TopRofler {
 	}
 }
 
-func (h *TopRofler) Handle(ctx context.Context, message message.Message) error {
+func (h *TopRofler) Handle(ctx context.Context, message domain.Message) error {
 	posts, err := h.storage.GetChatPosts(ctx, message.ChatId())
 	if err != nil {
 		return err
@@ -57,6 +56,6 @@ func countScores(posts []domain.Post) map[string]int {
 	return names
 }
 
-func (h *TopRofler) ShouldRun(message message.Message) bool {
+func (h *TopRofler) ShouldRun(message domain.Message) bool {
 	return message.IsCommand(commandName)
 }

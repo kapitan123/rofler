@@ -27,7 +27,7 @@ func (r FirestorePostsRepository) postsCollection() *firestore.CollectionRef {
 	return r.client.Collection("posts")
 }
 
-func (s FirestorePostsRepository) GetChatPosts(ctx context.Context, chatid int64) ([]domain.Post, error) {
+func (s FirestorePostsRepository) GetChatPosts(ctx context.Context, chatid domain.ChatId) ([]domain.Post, error) {
 	query := s.postsCollection().Where("chat_id", "==", chatid)
 	iter := query.Documents(ctx)
 

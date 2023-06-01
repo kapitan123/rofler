@@ -7,7 +7,6 @@ import (
 
 	"github.com/kapitan123/telegrofler/common/logs"
 	"github.com/kapitan123/telegrofler/service/bot/domain"
-	"github.com/kapitan123/telegrofler/service/bot/domain/message"
 	"github.com/pkg/errors"
 )
 
@@ -29,7 +28,7 @@ func NewRecordUrl(messenger messenger, postsStorage postStorage, urlTopic urlTop
 	}
 }
 
-func (h *RecordUrl) Handle(ctx context.Context, m message.Message) (err error) {
+func (h *RecordUrl) Handle(ctx context.Context, m domain.Message) (err error) {
 	defer func() {
 		logs.LogExecutionResult(fmt.Sprintf("%T", h), m, err)
 	}()
@@ -40,7 +39,7 @@ func (h *RecordUrl) Handle(ctx context.Context, m message.Message) (err error) {
 		return err
 	}
 
-	post := domain.NewPostFromExternalSource(url, m.From(), m.ChatId())
+	post := domain.NewPostFromExternalSource(url, m.From(), m.ChatId(), m.MessageId())
 
 	err = h.postsStorage.UpsertPost(ctx, post)
 
@@ -60,6 +59,6 @@ func (h *RecordUrl) Handle(ctx context.Context, m message.Message) (err error) {
 	return nil
 }
 
-func (h *RecordUrl) ShouldRun(m message.Message) bool {
+func (h *RecordUrl) ShouldRun(m domain.Message) bool {
 	return m.HasDownloadableUrl()
 }
