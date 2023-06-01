@@ -27,7 +27,7 @@ func NewPubSubTopicClient(ctx context.Context, projectId string, servicename str
 }
 
 func (t *PubSubTopic) PublishSuccess(ctx context.Context, savedVideoAddr string, originalUrl string) error {
-	message, _ := json.Marshal(VideoSavedMessage{
+	message, _ := json.Marshal(videoSavedMessage{
 		SavedVideoAddr: savedVideoAddr,
 		OriginalUrl:    originalUrl,
 	})
@@ -51,7 +51,7 @@ func (t *PubSubTopic) PublishSuccess(ctx context.Context, savedVideoAddr string,
 	return nil
 }
 
-type VideoSavedMessage struct {
+type videoSavedMessage struct {
 	SavedVideoAddr string `json:"saved_video_addr"`
 	OriginalUrl    string `json:"original_url"`
 }

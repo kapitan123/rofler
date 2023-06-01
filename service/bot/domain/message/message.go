@@ -1,3 +1,4 @@
+// AK TODO move to domain package
 package message
 
 import (
