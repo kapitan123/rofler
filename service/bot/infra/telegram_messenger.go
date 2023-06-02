@@ -38,20 +38,6 @@ func (m TelegramMessenger) SendText(chatID domain.ChatId, text string) (int, err
 	return res.MessageID, err
 }
 
-func (m TelegramMessenger) ReplyWithText(chatId domain.ChatId, replyToMessageId int, caption string) (int, error) {
-	msg := tgbotapi.NewMessage(int64(chatId), caption)
-	msg.ReplyToMessageID = replyToMessageId
-	msg.ParseMode = tgbotapi.ModeHTML
-
-	res, err := m.api.Send(msg)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return res.MessageID, err
-}
-
 func (b TelegramMessenger) Delete(chatId domain.ChatId, messageId int) error {
 	dmc := tgbotapi.DeleteMessageConfig{
 		ChatID:    int64(chatId),
