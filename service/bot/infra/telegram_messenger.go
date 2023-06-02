@@ -25,7 +25,7 @@ func NewMessenger(token string) *TelegramMessenger {
 }
 
 func (m TelegramMessenger) SendText(chatID domain.ChatId, text string) (int, error) {
-	msg := tgbotapi.NewMessage(chatID, text)
+	msg := tgbotapi.NewMessage(int64(chatID), text)
 
 	msg.ParseMode = tgbotapi.ModeHTML
 
@@ -39,7 +39,7 @@ func (m TelegramMessenger) SendText(chatID domain.ChatId, text string) (int, err
 }
 
 func (m TelegramMessenger) ReplyWithText(chatId domain.ChatId, replyToMessageId int, caption string) (int, error) {
-	msg := tgbotapi.NewMessage(chatId, caption)
+	msg := tgbotapi.NewMessage(int64(chatId), caption)
 	msg.ReplyToMessageID = replyToMessageId
 	msg.ParseMode = tgbotapi.ModeHTML
 
