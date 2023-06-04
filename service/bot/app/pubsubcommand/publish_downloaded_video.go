@@ -16,6 +16,7 @@ type PublishDownloadedVideo struct {
 
 type messenger interface {
 	SendVideo(videoId string, chatId domain.ChatId, caption string, payload io.Reader) (int, error)
+	Delete(chatId domain.ChatId, messageId domain.MessageId) error
 }
 
 type postStorage interface {
@@ -23,7 +24,7 @@ type postStorage interface {
 }
 
 type filesBucket interface {
-	Read(ctx context.Context, addr string) (io.Reader, error)
+	Read(ctx context.Context, addr string, writer io.Writer) error
 }
 
 func NewPublishDownloadedVideo(messenger messenger, postsStorage postStorage, filesBucket filesBucket) *PublishDownloadedVideo {
@@ -45,19 +46,24 @@ func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string,
 		return errors.Errorf("video %s was not found for url %s", savedAddr, originalUrl)
 	}
 
-	// AK TODO read in a separate routine
-	// close the reader
-	reader, err := h.filesBucket.Read(ctx, savedAddr)
+	pr, pw := io.Pipe()
 
-	if err != nil {
+	errs := make(chan error, 1)
+
+	go func() {
+		defer pw.Close()
+		errs <- h.filesBucket.Read(ctx, savedAddr, pw)
+	}()
+
+	_, err = h.messenger.SendVideo(post.Id, post.ChatId, post.Poster.AsUserMention(), pr)
+
+	if err := <-errs; err != nil {
+		close(errs)
 		return err
 	}
 
-	_, err = h.messenger.SendVideo(post.Id, post.ChatId, post.Poster.AsUserMention(), reader)
-
-	if err != nil {
-		return err
-	}
+	// it's really painful to perform integration tests as telegram has no backoff
+	_ = h.messenger.Delete(post.ChatId, post.OriginalMessageId)
 
 	return err
 }

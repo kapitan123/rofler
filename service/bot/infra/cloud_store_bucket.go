@@ -25,12 +25,18 @@ func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFiles
 	}
 }
 
-func (b *CloudStorageBucket) Read(ctx context.Context, addr string) (io.Reader, error) {
+func (b *CloudStorageBucket) Read(ctx context.Context, addr string, writer io.Writer) error {
 	reader, err := b.bucket.Object(addr).NewReader(ctx)
 
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("unable to read file %s", addr))
+		return errors.Wrap(err, fmt.Sprintf("unable to read file %s", addr))
 	}
 
-	return reader, nil
+	_, err = io.Copy(writer, reader)
+
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("unable to copy file content %s", addr))
+	}
+
+	return nil
 }

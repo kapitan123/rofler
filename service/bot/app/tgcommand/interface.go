@@ -8,7 +8,6 @@ import (
 )
 
 type messenger interface {
-	Delete(chatId domain.ChatId, messageId int) error
 	SendText(chatId domain.ChatId, text string) (int, error)
 }
 

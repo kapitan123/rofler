@@ -38,10 +38,10 @@ func (m TelegramMessenger) SendText(chatID domain.ChatId, text string) (int, err
 	return res.MessageID, err
 }
 
-func (b TelegramMessenger) Delete(chatId domain.ChatId, messageId int) error {
+func (b TelegramMessenger) Delete(chatId domain.ChatId, messageId domain.MessageId) error {
 	dmc := tgbotapi.DeleteMessageConfig{
 		ChatID:    int64(chatId),
-		MessageID: messageId,
+		MessageID: int(messageId),
 	}
 
 	_, err := b.api.Request(dmc)

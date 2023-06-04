@@ -1,10 +1,13 @@
 package app
 
 import (
+	"bufio"
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/kapitan123/telegrofler/service/downloader/infra"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -43,8 +46,7 @@ func NewApplication(videoSavedTopic successTopic, videoBucket fileBucket, downlo
 }
 
 func (app *Application) SaveVideoToStorage(ctx context.Context, url string) error {
-	pr, pw := io.Pipe() // AK TODO I can actually change signature to return reader from Download Url
-	// this way I
+	pr, pw := io.Pipe()
 
 	errs := make(chan error, 1)
 
@@ -53,8 +55,15 @@ func (app *Application) SaveVideoToStorage(ctx context.Context, url string) erro
 		errs <- app.downloader.DownloadFromUrl(ctx, url, pw)
 	}()
 
-	// AK TODO need to peek first byte
-	id, err := app.videoFilesBucket.Save(ctx, pr)
+	bufReader := bufio.NewReader(pr)
+
+	_, err := bufReader.Peek(1)
+
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Can't download file from url %s", url))
+	}
+
+	id, err := app.videoFilesBucket.Save(ctx, bufReader)
 
 	if err := <-errs; err != nil {
 		close(errs)
