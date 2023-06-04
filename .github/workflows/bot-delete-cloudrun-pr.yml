@@ -20,11 +20,5 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      - id: secrets-manager
-        uses: google-github-actions/get-secretmanager-secrets@v0
-        with:
-          secrets: |-
-            app-name:${{ steps.auth.outputs.project_id }}/app_name
-
       - name: Delete service
-        run: gcloud run services delete ${{ steps.secrets-manager.outputs.app-name }}-${{github.event.number}} --region europe-central2 --quiet
+        run: gcloud run services delete bot-${{github.event.number}} --region europe-central2 --quiet
