@@ -45,6 +45,12 @@ jobs:
         uses: "google-github-actions/auth@v0"
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
+      
+      - id: secrets-manager
+        uses: google-github-actions/get-secretmanager-secrets@v0
+        with:
+          secrets: |-
+            downloader-cookies:${{ steps.auth.outputs.project_id }}/downloader_cookies
 
       - id: service-meta
         name: Calculate service deployment settings
@@ -76,6 +82,7 @@ jobs:
           region: europe-central2
           env_vars: |
             PROJECT_ID=${{ steps.auth.outputs.project_id}}
+            DOWNLOADER_COOKIES=${{ steps.auth.outputs.downloader_cookies}}
           flags: --allow-unauthenticated
 
       - name: Output deployed url

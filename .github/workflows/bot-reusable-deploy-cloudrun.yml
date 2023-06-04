@@ -86,7 +86,6 @@ jobs:
           env_vars: |
             TELEGRAM_BOT_TOKEN=${{ steps.service-meta.outputs.bot-token }}  
             PROJECT_ID=${{ steps.auth.outputs.project_id}}
-            DELETION_QUEUE_NAME=tg-message-deletion
           flags: --allow-unauthenticated
 
       - name: Output deployed url

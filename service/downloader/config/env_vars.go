@@ -6,9 +6,10 @@ import (
 )
 
 type Config struct {
-	VidoFilesBucket string `env:"VIDEO_FILES_BUCKET"`
-	YoutubeDlPath   string `env:"YOUTUBE_DL_PATH" envDefault:"yt-dlp"`
-	VideoSavedTopic string `env:"VIDEO_SAVED_TOPIC"`
+	VidoFilesBucket   string `env:"VIDEO_FILES_BUCKET"`
+	YoutubeDlPath     string `env:"YOUTUBE_DL_PATH" envDefault:"yt-dlp"`
+	VideoSavedTopic   string `env:"VIDEO_SAVED_TOPIC"`
+	DownloaderCookies string `env:"DOWNLOADER_COOKIES"`
 
 	ProjectId string `env:"PROJECT_ID"`
 
