@@ -28,7 +28,7 @@ resource "google_cloud_run_service" "bot" {
 
         env {
           name  = "TELEGRAM_BOT_TOKEN"
-          value = google_secret_manager_secret.bot_token
+          value = var.bot_token
         }
 
         env {
@@ -103,7 +103,7 @@ resource "google_cloud_run_service" "downloader" {
 
         env {
           name  = "DOWNLOADER_COOKIES"
-          value = google_secret_manager_secret.downloader_cookies
+          value = var.downloader_cookies
         }
       }
     }

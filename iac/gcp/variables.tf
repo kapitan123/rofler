@@ -26,3 +26,13 @@ variable "downloader_name" {
   type    = string
   default = "downloader"
 }
+
+variable "bot_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "downloader_cookies" {
+  type      = string
+  sensitive = true
+}

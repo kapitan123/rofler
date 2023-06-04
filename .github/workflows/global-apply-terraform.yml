@@ -36,9 +36,18 @@ jobs:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
           create_credentials_file: true
 
+      - id: secrets-manager
+        uses: google-github-actions/get-secretmanager-secrets@v0
+        with:
+          secrets: |-
+            telegram-bot-token:${{ steps.auth.outputs.project_id }}/telegram_bot_token
+            downloader-cookies:${{ steps.auth.outputs.project_id }}/downloader_cookies
+
       - name: Populate TF cli args
         run: |
           echo "TF_VAR_project_id=${{ steps.auth.outputs.project_id }}" >> $GITHUB_ENV
+          echo "TF_VAR_bot_token=${{ steps.secrets-manager.outputs.telegram-bot-token }}" >> $GITHUB_ENV
+          echo "TF_VAR_downloader_cookies=${{ steps.secrets-manager.outputs.downloader-cookies }}" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
