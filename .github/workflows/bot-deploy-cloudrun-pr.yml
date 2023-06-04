@@ -23,6 +23,7 @@ jobs:
           working-directory: service/bot/
 
   deploy-to-cloudrun:
+    needs: golang-lint
     name: Deploys new version of telegrofler bot to a PR copy
     uses: ./.github/workflows/bot-reusable-deploy-cloudrun.yml
     with:
