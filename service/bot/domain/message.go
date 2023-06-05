@@ -3,6 +3,7 @@ package domain
 import (
 	"net/url"
 	"regexp"
+	"strconv"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -22,6 +23,11 @@ var supportedMasks = []*regexp.Regexp{
 
 type ChatId int64
 type MessageId int
+
+func (m MessageId) String() string {
+	return strconv.Itoa(int(m))
+}
+
 type Message struct {
 	Id             int
 	message        *tgbotapi.Message

@@ -72,7 +72,7 @@ func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string,
 	err = h.messenger.Delete(post.ChatId, post.OriginalMessageId)
 
 	if err != nil {
-		logrus.Error("can't delete message after publishing video", err)
+		logrus.Error("can't delete message after publishing video messageId: "+post.OriginalMessageId.String(), err)
 	}
 
 	return nil
