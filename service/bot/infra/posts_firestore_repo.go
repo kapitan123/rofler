@@ -86,6 +86,8 @@ func (s *FirestorePostsRepository) GetPostById(ctx context.Context, mediaId stri
 	return p.toDomainModel(), true, nil
 }
 
+// AK TODO this won't work if different chats posted the same link
+// This will also fail if message was posted twice
 func (s *FirestorePostsRepository) GetByExternalSourceUrl(ctx context.Context, url string) (domain.Post, bool, error) {
 	var p PostModel
 	query := s.postsCollection().Where("external_source_url", "==", url).Limit(1)
