@@ -38,6 +38,7 @@ func NewPublishDownloadedVideo(messenger messenger, postsStorage postStorage, fi
 }
 
 func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string, savedAddr string) error {
+	return nil
 	post, found, err := h.postsStorage.GetByExternalSourceUrl(ctx, originalUrl)
 
 	if err != nil {
