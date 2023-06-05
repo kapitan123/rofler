@@ -4,11 +4,6 @@ resource "google_cloud_run_service" "bot" {
   project  = var.project_id
 
   autogenerate_revision_name = true
-  lifecycle {
-    ignore_changes = [
-      template[0].spec[5],
-    ]
-  }
 
   template {
     spec {
@@ -63,12 +58,6 @@ resource "google_cloud_run_service" "downloader" {
   project  = var.project_id
 
   autogenerate_revision_name = true
-
-  lifecycle {
-    ignore_changes = [
-      template[0].spec[5],
-    ]
-  }
 
   template {
     spec {

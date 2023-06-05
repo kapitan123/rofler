@@ -19,7 +19,7 @@ func NewRecordMediaPost(storage postStorage) *RecordMedia {
 
 func (h *RecordMedia) Handle(ctx context.Context, m domain.Message) (err error) {
 	defer func() {
-		logs.LogExecutionResult("RecordMedia ", m, err)
+		logs.LogExecutionResult("RecordMedia", m, err)
 	}()
 
 	// AK TODO turned off until tests are complete

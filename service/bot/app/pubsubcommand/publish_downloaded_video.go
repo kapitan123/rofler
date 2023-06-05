@@ -6,6 +6,7 @@ import (
 
 	"github.com/kapitan123/telegrofler/service/bot/domain"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type PublishDownloadedVideo struct {
@@ -58,13 +59,21 @@ func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string,
 
 	_, err = h.messenger.SendVideo(post.ChatId, post.Id, post.Poster.AsUserMention(), pr)
 
+	if err != nil {
+		logrus.Error("can't post video to telegram channel", err)
+	}
+
 	if err := <-errs; err != nil {
 		close(errs)
 		return err
 	}
 
 	// it's really painful to perform integration tests as telegram has no backoff
-	_ = h.messenger.Delete(post.ChatId, post.OriginalMessageId)
+	err = h.messenger.Delete(post.ChatId, post.OriginalMessageId)
+
+	if err != nil {
+		logrus.Error("can't delete message after publishing video", err)
+	}
 
 	return err
 }

@@ -26,9 +26,10 @@ type (
 	}
 )
 
-func NewPost(mediaId string, poster UserRef, chatId ChatId) Post {
+func NewPost(mediaId string, poster UserRef, chatId ChatId, mediaType MediaType) Post {
 	return Post{
 		Id:        mediaId,
+		Type:      mediaType,
 		Poster:    poster,
 		ChatId:    chatId,
 		Reactions: []Reaction{},
@@ -39,6 +40,7 @@ func NewPost(mediaId string, poster UserRef, chatId ChatId) Post {
 func NewPostFromExternalSource(externalSourceUrl *url.URL, poster UserRef, chatId ChatId, messageId MessageId) Post {
 	return Post{
 		Id:                uuid.NewString(),
+		Type:              Video,
 		OriginalMessageId: messageId,
 		ExternalSourceUrl: externalSourceUrl,
 		Poster:            poster,

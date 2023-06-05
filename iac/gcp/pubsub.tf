@@ -55,3 +55,23 @@ resource "google_pubsub_subscription" "bot_to_saved_videos" {
 
   ack_deadline_seconds = 60
 }
+
+resource "google_pubsub_subscription" "bot_to_dead_letter" {
+  name  = "bot_to_dead_letter"
+  topic = google_pubsub_topic.uploadable_video_saved.name
+
+  push_config {
+    push_endpoint = "${local.bot_url}/pubsub/subscriptions/video-save-failure"
+
+    attributes = {
+      x-goog-version = "v1"
+    }
+  }
+
+  dead_letter_policy {
+    dead_letter_topic     = google_pubsub_topic.dead_letter_received.id
+    max_delivery_attempts = 5
+  }
+
+  ack_deadline_seconds = 60
+}
