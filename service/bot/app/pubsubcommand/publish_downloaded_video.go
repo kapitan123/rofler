@@ -15,7 +15,8 @@ type PublishDownloadedVideo struct {
 }
 
 type messenger interface {
-	SendVideo(videoId string, chatId domain.ChatId, caption string, payload io.Reader) (int, error)
+	SendVideo(chatId domain.ChatId, videoId string, caption string, payload io.Reader) (int, error)
+	ReplyWithText(chatId domain.ChatId, replyToMessageId domain.MessageId, text string) (int, error)
 	Delete(chatId domain.ChatId, messageId domain.MessageId) error
 }
 
@@ -55,7 +56,7 @@ func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string,
 		errs <- h.filesBucket.Read(ctx, savedAddr, pw)
 	}()
 
-	_, err = h.messenger.SendVideo(post.Id, post.ChatId, post.Poster.AsUserMention(), pr)
+	_, err = h.messenger.SendVideo(post.ChatId, post.Id, post.Poster.AsUserMention(), pr)
 
 	if err := <-errs; err != nil {
 		close(errs)

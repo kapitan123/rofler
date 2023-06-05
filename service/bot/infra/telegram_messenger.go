@@ -38,6 +38,10 @@ func (m TelegramMessenger) SendText(chatID domain.ChatId, text string) (int, err
 	return res.MessageID, err
 }
 
+func (m TelegramMessenger) ReplyWithText(chatId domain.ChatId, replyToMessageId domain.MessageId, text string) (int, error) {
+	return 0, nil
+}
+
 func (b TelegramMessenger) Delete(chatId domain.ChatId, messageId domain.MessageId) error {
 	dmc := tgbotapi.DeleteMessageConfig{
 		ChatID:    int64(chatId),
@@ -52,7 +56,7 @@ func (b TelegramMessenger) Delete(chatId domain.ChatId, messageId domain.Message
 	return nil
 }
 
-func (b TelegramMessenger) SendVideo(videoId string, chatId domain.ChatId, caption string, payload io.Reader) (int, error) {
+func (b TelegramMessenger) SendVideo(chatId domain.ChatId, videoId string, caption string, payload io.Reader) (int, error) {
 	vidbytes, err := io.ReadAll(payload)
 
 	if err != nil {
