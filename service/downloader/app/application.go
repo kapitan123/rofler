@@ -60,7 +60,7 @@ func (app *Application) SaveVideoToStorage(ctx context.Context, url string) erro
 	_, err := bufReader.Peek(1)
 
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Can't download file from url %s", url))
+		return errors.Wrap(err, fmt.Sprintf("can't download file from url %s", url))
 	}
 
 	id, err := app.videoFilesBucket.Save(ctx, bufReader)
@@ -70,17 +70,17 @@ func (app *Application) SaveVideoToStorage(ctx context.Context, url string) erro
 		return err
 	}
 
-	logrus.Infof("video saved to bucket %s", id)
-
 	if err != nil {
-		return err
+		return errors.Wrap(err, fmt.Sprintf("can't save stream content of %s to bucket %s", url, id))
 	}
+
+	logrus.Infof("video saved to bucket %s", id)
 
 	err = app.videoSavedTopic.PublishSuccess(ctx, id, url)
 
 	if err != nil {
 		logrus.Error(err)
-		return err
+		return errors.Wrap(err, fmt.Sprintf("can't publish success for saved file %s", id))
 	}
 
 	return err
