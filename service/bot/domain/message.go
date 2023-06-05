@@ -22,6 +22,11 @@ var supportedMasks = []*regexp.Regexp{
 }
 
 type ChatId int64
+
+func (m ChatId) String() string {
+	return strconv.FormatInt(int64(m), 10)
+}
+
 type MessageId int
 
 func (m MessageId) String() string {

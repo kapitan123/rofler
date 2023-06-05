@@ -2,6 +2,7 @@ package pubsubcommand
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/kapitan123/telegrofler/service/bot/domain"
@@ -72,7 +73,8 @@ func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string,
 	err = h.messenger.Delete(post.ChatId, post.OriginalMessageId)
 
 	if err != nil {
-		logrus.Error("can't delete message after publishing video messageId: "+post.OriginalMessageId.String(), err)
+		err = errors.Wrap(err, fmt.Sprintf("can't delete message %s from chat %s after publishing video", post.OriginalMessageId, post.ChatId))
+		logrus.Error(err)
 	}
 
 	return nil
