@@ -75,5 +75,5 @@ func (h *PublishDownloadedVideo) Handle(ctx context.Context, originalUrl string,
 		logrus.Error("can't delete message after publishing video", err)
 	}
 
-	return err
+	return nil
 }
