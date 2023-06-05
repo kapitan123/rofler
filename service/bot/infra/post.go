@@ -69,6 +69,7 @@ func (pm PostModel) toDomainModel() domain.Post {
 	return domain.Post{
 		Id:                pm.Id,
 		Type:              mediaType,
+		OriginalMessageId: domain.MessageId(pm.OriginalMessageId),
 		ExternalSourceUrl: url,
 		Reactions:         reactions,
 		PostedOn:          pm.PostedOn,
