@@ -13,6 +13,9 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
+	// (POST /pubsub/subscriptions/video-save-failed)
+	HandleVideoSaveFailedMessage(w http.ResponseWriter, r *http.Request)
+
 	// (POST /pubsub/subscriptions/video-saved)
 	HandleVideoSavedMessage(w http.ResponseWriter, r *http.Request)
 
@@ -28,6 +31,21 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// HandleVideoSaveFailedMessage operation middleware
+func (siw *ServerInterfaceWrapper) HandleVideoSaveFailedMessage(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.HandleVideoSaveFailedMessage(w, r)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
 
 // HandleVideoSavedMessage operation middleware
 func (siw *ServerInterfaceWrapper) HandleVideoSavedMessage(w http.ResponseWriter, r *http.Request) {
@@ -172,6 +190,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/pubsub/subscriptions/video-save-failed", wrapper.HandleVideoSaveFailedMessage)
+	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/pubsub/subscriptions/video-saved", wrapper.HandleVideoSavedMessage)
 	})

@@ -71,6 +71,12 @@ func (h HttpServer) HandleTelegramMessage(w http.ResponseWriter, r *http.Request
 	render.Status(r, 200)
 }
 
+func (h HttpServer) HandleVideoSaveFailedMessage(w http.ResponseWriter, r *http.Request) {
+	// AK TODO not implemented
+
+	render.Status(r, 200)
+}
+
 type VideoSavedMessage struct {
 	SavedVideoAddr string `json:"saved_video_addr"`
 	OriginalUrl    string `json:"original_url"`

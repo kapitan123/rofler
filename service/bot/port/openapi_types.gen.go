@@ -25,6 +25,9 @@ type PubSubMessage struct {
 // HandleTelegramMessageJSONBody defines parameters for HandleTelegramMessage.
 type HandleTelegramMessageJSONBody = map[string]interface{}
 
+// HandleVideoSaveFailedMessageJSONRequestBody defines body for HandleVideoSaveFailedMessage for application/json ContentType.
+type HandleVideoSaveFailedMessageJSONRequestBody = PubSubMessage
+
 // HandleVideoSavedMessageJSONRequestBody defines body for HandleVideoSavedMessage for application/json ContentType.
 type HandleVideoSavedMessageJSONRequestBody = PubSubMessage
 
