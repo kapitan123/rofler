@@ -25,13 +25,13 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 # ===================================================================================
 # === Stage 2: Create a lightweight container =======================================
 # ===================================================================================
-FROM scratch 
+FROM scratch
 
 # Add certs
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Add binary
-COPY --from=builder /build/server /server 
+COPY --from=builder /build/server /server
 
 EXPOSE 9001
 
