@@ -19,7 +19,7 @@ func main() {
 	logs.Init(cfg.DebguMode)
 
 	application := app.NewApplicationFromConfig(ctx, cfg.ServiceName, cfg.ProjectId,
-		cfg.VidoFilesBucket, cfg.VideoSavedTopic, cfg.YoutubeDlPath)
+		cfg.VidoFilesBucket, cfg.VideoSavedTopic, cfg.YoutubeDlPath, cfg.DownloaderCookies)
 
 	server.RunHTTPServer(cfg.Port, func(router chi.Router) http.Handler {
 		return port.HandlerFromMux(port.NewHttpServer(application), router)

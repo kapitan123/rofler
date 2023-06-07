@@ -29,10 +29,10 @@ type downloader interface {
 	DownloadFromUrl(ctx context.Context, url string, out io.Writer) error
 }
 
-func NewApplicationFromConfig(ctx context.Context, servicename string, projectId string, videoFileBucket string, videoSavedTopicId string, ytPath string) Application {
+func NewApplicationFromConfig(ctx context.Context, servicename string, projectId string, videoFileBucket string, videoSavedTopicId string, ytPath string, base64cookies string) Application {
 	videoBucket := infra.NewCloudStoreBucketClient(ctx, projectId, videoFileBucket)
 	successTopic := infra.NewPubSubTopicClient(ctx, projectId, servicename, videoSavedTopicId)
-	youtubeDl := infra.NewDownloader(ytPath)
+	youtubeDl := infra.NewDownloader(ytPath, base64cookies)
 
 	return NewApplication(successTopic, videoBucket, youtubeDl)
 }
