@@ -26,7 +26,7 @@ func GetEnvVars() Config {
 	}
 
 	if cfg.VidoFilesBucket == "" {
-		log.Panic("VIDEO_FILES_BUCKET_URL is not set")
+		log.Panic("VIDEO_FILES_BUCKET is not set")
 	}
 
 	if cfg.VideoUrlPublishedTopic == "" {
