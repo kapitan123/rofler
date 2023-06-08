@@ -1,4 +1,5 @@
 // Package goutubedl provides a wrapper for youtube-dl.
+// AK TODO rewrite to simplify
 package goutubedl
 
 import (
