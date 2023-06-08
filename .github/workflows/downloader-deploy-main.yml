@@ -82,8 +82,8 @@ jobs:
           image: ${{ steps.service-meta.outputs.image }}
           region: europe-central2
           env_vars: |
-            PROJECT_ID=${{ steps.auth.outputs.project_id}}
-            DOWNLOADER_COOKIES=${{ steps.secrets-manager.outputs.downloader-cookies}}
+            PROJECT_ID=${{ steps.auth.outputs.project_id }}
+            DOWNLOADER_COOKIES=${{ steps.secrets-manager.outputs.downloader-cookies }}
           flags: --allow-unauthenticated
 
       - name: Output deployed url

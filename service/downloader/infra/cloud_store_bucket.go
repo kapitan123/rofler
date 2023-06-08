@@ -25,7 +25,7 @@ func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFiles
 
 	return &CloudStorageBucket{
 		bucket:       newStorageClient.Bucket(videoFilesBucketUrl),
-		subdirectory: "/saved/",
+		subdirectory: "saved/",
 	}
 }
 

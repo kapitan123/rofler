@@ -8,30 +8,38 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/kapitan123/telegrofler/service/downloader/goutubedl"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/wader/goutubedl"
+	//"github.com/wader/goutubedl"
 )
 
 var cookiesName = "cookies.txt"
 
 type Downloader struct {
+	cookiesPath string
 }
 
 func NewDownloader(path string, base64cookies string) *Downloader {
 	cookiesPath, err := createCookieFileFromBase64(base64cookies)
 
 	if err != nil {
-		logrus.Panic(err)
+		logrus.Panic(errors.Wrap(err, "can't create cookies file"))
 	}
 
-	goutubedl.Path = fmt.Sprintf("%s --cookies %s", path, cookiesPath)
+	goutubedl.Path = path
 
-	return &Downloader{}
+	_, err = goutubedl.Version(context.Background())
+
+	if err != nil {
+		logrus.Panic(errors.Wrap(err, "can't get yt-dlp version"))
+	}
+
+	return &Downloader{cookiesPath}
 }
 
 func (d *Downloader) DownloadFromUrl(ctx context.Context, url string, w io.Writer) error {
-	result, err := goutubedl.New(context.Background(), url, goutubedl.Options{})
+	result, err := goutubedl.New(context.Background(), url, goutubedl.Options{CookiesPath: d.cookiesPath})
 	if err != nil {
 		logrus.Error(err)
 		return err
