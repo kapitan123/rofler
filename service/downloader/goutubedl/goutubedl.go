@@ -308,6 +308,8 @@ func infoFromURL(ctx context.Context, rawURL string, options Options) (info Info
 	cmd.Stdin = bytes.NewBufferString(rawURL + "\n")
 
 	options.DebugLog.Print("cmd", " ", cmd.Args)
+	// AK TODO temp standard logger
+	logrus.Warn("A command to be executed: ", "cmd", " ", cmd.Args)
 	cmdErr := cmd.Run()
 
 	stderrLineScanner := bufio.NewScanner(stderrBuf)
@@ -483,7 +485,7 @@ func (result Result) Download(ctx context.Context, filter string) (*DownloadResu
 	cmd.Stderr = stderrWriter
 
 	debugLog.Print("cmd", " ", cmd.Args)
-	// AK TODO temp standard logger
+	// AK TODO temp standard logger for debug
 	logrus.Warn("A command to be executed: ", "cmd", " ", cmd.Args)
 
 	if err := cmd.Start(); err != nil {
