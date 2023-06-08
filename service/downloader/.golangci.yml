@@ -42,3 +42,5 @@ issues:
     - path: fixtures.go
       linters:
         - gosec
+    - path: goutubedl/
+      disable-all: true
