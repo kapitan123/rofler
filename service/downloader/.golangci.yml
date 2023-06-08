@@ -42,8 +42,6 @@ issues:
     - path: fixtures.go
       linters:
         - gosec
-    - path: goutubedl/
-      disable-all: true
 run:
   timeout: 5m
   skip-dirs:
