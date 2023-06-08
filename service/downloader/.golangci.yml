@@ -44,3 +44,7 @@ issues:
         - gosec
     - path: goutubedl/
       disable-all: true
+run:
+  timeout: 5m
+  skip-dirs:
+    - goutubedl
