@@ -17,6 +17,8 @@ import (
 	"path"
 	"strconv"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Path to youtube-dl binary. Default look for "youtube-dl" in PATH.
@@ -463,6 +465,12 @@ func (result Result) Download(ctx context.Context, filter string) (*DownloadResu
 		cmd.Args = append(cmd.Args, "-f", filter)
 	}
 
+	if result.Options.CookiesPath != "" {
+		cmd.Args = append(cmd.Args,
+			"--cookies", result.Options.CookiesPath,
+		)
+	}
+
 	cmd.Dir = tempPath
 	var w io.WriteCloser
 	dr.reader, w = io.Pipe()
@@ -475,6 +483,9 @@ func (result Result) Download(ctx context.Context, filter string) (*DownloadResu
 	cmd.Stderr = stderrWriter
 
 	debugLog.Print("cmd", " ", cmd.Args)
+	// AK TODO temp standard logger
+	logrus.Warn("A command to be executed: ", "cmd", " ", cmd.Args)
+
 	if err := cmd.Start(); err != nil {
 		os.RemoveAll(tempPath)
 		return nil, err
