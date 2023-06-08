@@ -38,7 +38,12 @@ func NewDownloader(path string, base64cookies string) *Downloader {
 }
 
 func (d *Downloader) DownloadFromUrl(ctx context.Context, url string, w io.Writer) error {
-	result, err := goutubedl.New(context.Background(), url, goutubedl.Options{CookiesPath: d.cookiesPath})
+	result, err := goutubedl.New(context.Background(), url,
+		goutubedl.Options{
+			CookiesPath: d.cookiesPath,
+			DebugLog:    logrus.StandardLogger(),
+		})
+
 	if err != nil {
 		logrus.Error(err)
 		return err
