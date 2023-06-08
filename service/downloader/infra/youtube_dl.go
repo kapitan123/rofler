@@ -11,7 +11,6 @@ import (
 	"github.com/kapitan123/telegrofler/service/downloader/goutubedl"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	//"github.com/wader/goutubedl"
 )
 
 var cookiesName = "cookies.txt"
@@ -45,7 +44,7 @@ func (d *Downloader) DownloadFromUrl(ctx context.Context, url string, w io.Write
 		return err
 	}
 
-	logrus.Infof("start download from %s", url)
+	logrus.Infof("start download from %s. info: %+v", url, result.Info)
 
 	downloadResult, err := result.Download(context.Background(), "best")
 

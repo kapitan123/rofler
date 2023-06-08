@@ -2,7 +2,6 @@ package domain
 
 import (
 	"net/url"
-	"regexp"
 	"strconv"
 	"time"
 
@@ -10,16 +9,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
-
-var mobileTiktokRegex = regexp.MustCompile(`https:\/\/[a-zA-Z]{2}\.tiktok\.com\/`)
-var youtubeShortsRegex = regexp.MustCompile(`https:\/\/youtube\.com\/shorts\/.*`)
-var instagramReelRegex = regexp.MustCompile(`https:\/\/www.instagram.com\/reel\/.*`)
-
-var supportedMasks = []*regexp.Regexp{
-	mobileTiktokRegex,
-	youtubeShortsRegex,
-	instagramReelRegex,
-}
 
 type ChatId int64
 
@@ -108,7 +97,7 @@ func (m Message) MediaId() string {
 	return mediaId
 }
 
-func (m Message) ContainsOnlyUrlString() bool {
+func (m Message) containsOnlyUrlString() bool {
 	if len(m.message.Entities) != 1 {
 		return false
 	}
@@ -129,28 +118,19 @@ func (m Message) ContainsOnlyUrlString() bool {
 }
 
 func (m Message) GetEmbeddedUrl() (*url.URL, error) {
-	if !m.ContainsOnlyUrlString() {
+	if !m.containsOnlyUrlString() {
 		return nil, errors.Errorf("message is not a url only message")
 	}
 
-	return url.Parse(m.message.Text)
+	return getSupportedUrl(m.message.Text)
 }
 
 func (m Message) HasDownloadableUrl() bool {
-	found := m.ContainsOnlyUrlString()
-
-	if !found {
+	if !m.containsOnlyUrlString() {
 		return false
 	}
 
-	url := m.message.Text
-	for _, regex := range supportedMasks {
-		if regex.MatchString(url) {
-			return true
-		}
-	}
-
-	return false
+	return canBeDownloaded(m.message.Text)
 }
 
 func (m Message) AsReaction() Reaction {
