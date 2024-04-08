@@ -3,7 +3,7 @@
 # ===================================================================================
 # === Stage 1:Builder container =====================================================
 # ===================================================================================
-FROM golang:1.19-alpine AS builder
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /build
 
@@ -24,7 +24,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 # ===================================================================================
 # === Stage 2: Create a run container =======================================
 # ===================================================================================
-FROM golang:1.19-alpine
+FROM golang:1.22-alpine
 
 RUN apk add --no-cache python3 py3-pip && apk add --no-cache ffmpeg curl && \
     curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && \

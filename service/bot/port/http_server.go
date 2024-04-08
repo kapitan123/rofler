@@ -88,5 +88,5 @@ func LogBody(upd tgbotapi.Update) {
 
 	log := logrus.WithField("body", string(jsonBytes))
 
-	log.Info("Tg callback recived")
+	log.Info("Tg callback received")
 }

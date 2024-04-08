@@ -1,11 +1,10 @@
 module github.com/kapitan123/telegrofler
 
-go 1.19
+go 1.22.2
 
 require (
 	cloud.google.com/go/firestore v1.9.0
 	cloud.google.com/go/pubsub v1.30.1
-	github.com/deepmap/oapi-codegen v1.12.4
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/google/uuid v1.3.0
 	github.com/sirupsen/logrus v1.9.0
@@ -41,7 +40,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/samber/lo v1.38.1
-	github.com/wader/goutubedl v0.0.0-20230503164948-cef23e8d43d4
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
