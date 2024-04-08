@@ -5,8 +5,9 @@ on:
     branches:
       - main
     paths:
-      - "service/downloader/**"
-      - "common/**"
+      - service/downloader/**
+      - common/**
+      - worfklows/**
 
 jobs:
   golang-lint:

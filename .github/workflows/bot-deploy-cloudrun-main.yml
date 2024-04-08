@@ -5,8 +5,9 @@ on:
     branches:
       - main
     paths:
-      - "service/bot/**"
-      - "common/**"
+      - service/bot/**
+      - common/**
+      - worfklows/**
 
 jobs:
   deploy-to-cloudrun:
