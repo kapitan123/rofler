@@ -5,7 +5,8 @@ on:
     types: [opened, edited, synchronize]
     paths:
       - service/bot/**
-      - "common/**"
+      - common/**
+      - worfklows/**
 
 jobs:
   golang-lint:
