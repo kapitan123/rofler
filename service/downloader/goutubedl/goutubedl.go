@@ -10,7 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+
 	"net/http"
 	"os"
 	"os/exec"
@@ -292,12 +292,12 @@ func infoFromURL(ctx context.Context, rawURL string, options Options) (info Info
 		)
 	}
 
-	tempPath, _ := ioutil.TempDir("", "ydls")
+	tempPath, _ := os.MkdirTemp("", "ydls")
 	defer os.RemoveAll(tempPath)
 
 	stdoutBuf := &bytes.Buffer{}
 	stderrBuf := &bytes.Buffer{}
-	stderrWriter := ioutil.Discard
+	stderrWriter := io.Discard
 	if options.StderrFn != nil {
 		stderrWriter = options.StderrFn(cmd)
 	}
@@ -373,7 +373,7 @@ func infoFromURL(ctx context.Context, rawURL string, options Options) (info Info
 	if options.DownloadThumbnail && info.Thumbnail != "" {
 		resp, respErr := get(info.Thumbnail)
 		if respErr == nil {
-			buf, _ := ioutil.ReadAll(resp.Body)
+			buf, _ := io.ReadAll(resp.Body)
 			resp.Body.Close()
 			info.ThumbnailBytes = buf
 		}
@@ -390,7 +390,7 @@ func infoFromURL(ctx context.Context, rawURL string, options Options) (info Info
 			for i, subtitle := range subtitles {
 				resp, respErr := get(subtitle.URL)
 				if respErr == nil {
-					buf, _ := ioutil.ReadAll(resp.Body)
+					buf, _ := io.ReadAll(resp.Body)
 					resp.Body.Close()
 					subtitles[i].Bytes = buf
 				}
@@ -436,12 +436,12 @@ func (result Result) Download(ctx context.Context, filter string) (*DownloadResu
 		return nil, fmt.Errorf("can't download a playlist")
 	}
 
-	tempPath, tempErr := ioutil.TempDir("", "ydls")
+	tempPath, tempErr := os.MkdirTemp("", "ydls")
 	if tempErr != nil {
 		return nil, tempErr
 	}
 	jsonTempPath := path.Join(tempPath, "info.json")
-	if err := ioutil.WriteFile(jsonTempPath, result.RawJSON, 0600); err != nil {
+	if err := os.WriteFile(jsonTempPath, result.RawJSON, 0600); err != nil {
 		os.RemoveAll(tempPath)
 		return nil, err
 	}
@@ -477,7 +477,7 @@ func (result Result) Download(ctx context.Context, filter string) (*DownloadResu
 	var w io.WriteCloser
 	dr.reader, w = io.Pipe()
 
-	stderrWriter := ioutil.Discard
+	stderrWriter := io.Discard
 	if result.Options.StderrFn != nil {
 		stderrWriter = result.Options.StderrFn(cmd)
 	}
@@ -494,7 +494,7 @@ func (result Result) Download(ctx context.Context, filter string) (*DownloadResu
 	}
 
 	go func() {
-		cmd.Wait()
+		_ = cmd.Wait()
 		w.Close()
 		os.RemoveAll(tempPath)
 		close(dr.waitCh)
