@@ -25,7 +25,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 # === Stage 2: Create a run container =======================================
 # ===================================================================================
 FROM golang:1.22-alpine
-    # restore unpinned latest
+    # restore unpinned latest if nightly build is merged in
     # curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && \
 RUN apk add --no-cache python3 py3-pip && apk add --no-cache ffmpeg curl && \
     curl -L https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/download/2024.04.07.232657/yt-dlp -o /usr/local/bin/yt-dlp && \
