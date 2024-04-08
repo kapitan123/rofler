@@ -86,6 +86,8 @@ jobs:
           env_vars: |
             TELEGRAM_BOT_TOKEN=${{ steps.service-meta.outputs.bot-token }}  
             PROJECT_ID=${{ steps.auth.outputs.project_id}}
+            VIDEO_URL_PUBLISHED_TOPIC=video_url_published
+            VIDEO_FILES_BUCKET=304373b586ff10b7-videos
           flags: --allow-unauthenticated
 
       - name: Output deployed url
