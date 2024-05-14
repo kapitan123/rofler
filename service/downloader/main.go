@@ -12,6 +12,7 @@ import (
 	"github.com/kapitan123/telegrofler/service/downloader/port"
 )
 
+// main
 func main() {
 	ctx := context.Background()
 	cfg := config.GetEnvVars()
