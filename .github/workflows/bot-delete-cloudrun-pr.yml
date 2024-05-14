@@ -3,7 +3,6 @@ name: Bot delete PR
 on:
   pull_request:
     types: [closed]
-  delete:
 
 jobs:
   delete-cloud-run:
