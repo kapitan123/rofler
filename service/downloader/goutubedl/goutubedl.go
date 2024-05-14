@@ -261,6 +261,7 @@ func infoFromURL(ctx context.Context, rawURL string, options Options) (info Info
 		// provide URL via stdin for security, youtube-dl has some run command args
 		"--batch-file", "-",
 		"-J",
+		"-f 0", // AK TODO added -f 0 as a temp workaround for tiktoks
 	)
 	if options.Type == TypePlaylist {
 		cmd.Args = append(cmd.Args, "--yes-playlist")
@@ -459,7 +460,7 @@ func (result Result) Download(ctx context.Context, filter string) (*DownloadResu
 		"--newline",
 		"--restrict-filenames",
 		"--load-info", jsonTempPath,
-		"-o", "-f 0", "-", // AK TODO added -f 0 as a temp workaround for tiktoks
+		"-o", "-",
 	)
 	// don't need to specify if direct as there is only one
 	// also seems to be issues when using filter with generic extractor
