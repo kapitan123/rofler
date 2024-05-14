@@ -459,7 +459,7 @@ func (result Result) Download(ctx context.Context, filter string) (*DownloadResu
 		"--newline",
 		"--restrict-filenames",
 		"--load-info", jsonTempPath,
-		"-o", "-",
+		"-o", "-f 0", "-", // AK TODO added -f 0 as a temp workaround for tiktoks
 	)
 	// don't need to specify if direct as there is only one
 	// also seems to be issues when using filter with generic extractor
