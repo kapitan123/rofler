@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/kapitan123/telegrofler/service/downloader/infra"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -30,9 +29,9 @@ type downloader interface {
 }
 
 func NewApplicationFromConfig(ctx context.Context, servicename string, projectId string, videoFileBucket string, videoSavedTopicId string, ytPath string, base64cookies string) Application {
-	videoBucket := infra.NewCloudStoreBucketClient(ctx, projectId, videoFileBucket)
-	successTopic := infra.NewPubSubTopicClient(ctx, projectId, servicename, videoSavedTopicId)
-	youtubeDl := infra.NewDownloader(ytPath, base64cookies)
+	videoBucket := NewCloudStoreBucketClient(ctx, projectId, videoFileBucket)
+	successTopic := NewPubSubTopicClient(ctx, projectId, servicename, videoSavedTopicId)
+	youtubeDl := NewDownloader(ytPath, base64cookies)
 
 	return NewApplication(successTopic, videoBucket, youtubeDl)
 }

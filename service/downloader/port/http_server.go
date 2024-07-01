@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/render"
 	"github.com/kapitan123/telegrofler/common/server/httperr"
-	"github.com/kapitan123/telegrofler/service/downloader/app"
+	"github.com/kapitan123/telegrofler/service/bot/app"
 	"github.com/sirupsen/logrus"
 )
 
@@ -57,7 +57,7 @@ type VideoUrlPublishedMessage struct {
 	Url string `json:"url"`
 }
 
-// AK TODO temp logging
+// AK TODO temp logging - convert to a middleware
 func LogBody(upd PubSubMessage) {
 	log := logrus.WithField("data:", upd.Message.Data).WithField("messageid", upd.Message.MessageId)
 

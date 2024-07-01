@@ -12,6 +12,7 @@ type firebaseDocIdSetter[TT any] interface {
 	*TT
 }
 
+// AK TODO check if I really need it
 func GetAll[T any, PT firebaseDocIdSetter[T]](ctx context.Context, iter *firestore.DocumentIterator) ([]T, error) {
 	snapshots, err := iter.GetAll()
 

@@ -1,5 +1,6 @@
 package errors
 
+// AK TODO change slog error
 type ErrorType struct {
 	t string
 }

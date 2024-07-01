@@ -1,4 +1,4 @@
-package config
+package app
 
 import (
 	"github.com/caarlos0/env"

@@ -2,6 +2,7 @@ package downloader
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"time"
 
@@ -20,7 +21,7 @@ func NewCloudStoreBucketClient(ctx context.Context, projectId string, videoFiles
 	newStorageClient, err := storage.NewClient(ctx)
 
 	if err != nil {
-		panic(err)
+		panic(err) // AK TODO remove panic
 	}
 
 	return &CloudStorageBucket{
@@ -33,16 +34,17 @@ func (b *CloudStorageBucket) Save(ctx context.Context, fromReader io.Reader) (st
 	ctx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
-	newFilePath := b.subdirectory + uuid.New().String() + ".mp4"
+	newFilePath := fmt.Sprintf("%s%s.mp4", b.subdirectory, uuid.New())
 	writer := b.bucket.Object(newFilePath).NewWriter(ctx)
 
 	defer func() {
 		writer.Close()
-		logrus.Infof("finish upload %s", newFilePath)
+		logrus.Infof("finished upload %s", newFilePath)
 	}()
 
 	logrus.Infof("start upload %s", newFilePath)
 
+	// AK TODO check
 	_, err := io.Copy(writer, fromReader)
 	if err != nil {
 		logrus.Error(err)

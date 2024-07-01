@@ -17,6 +17,7 @@ func BadRequest(slug string, err error, w http.ResponseWriter, r *http.Request) 
 	httpRespondWithError(err, slug, w, r, "Bad request", http.StatusBadRequest)
 }
 
+// AK TODO remove this. It is an absolute crap
 func RespondWithSlugError(err error, w http.ResponseWriter, r *http.Request) {
 	slugError, ok := err.(errors.SlugError)
 	if !ok {
