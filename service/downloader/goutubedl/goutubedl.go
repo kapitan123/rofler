@@ -254,14 +254,13 @@ func infoFromURL(ctx context.Context, rawURL string, options Options) (info Info
 		Path,
 		// see comment below about ignoring errors for playlists
 		"--ignore-errors",
-		"--no-call-home",
 		"--no-cache-dir",
 		"--skip-download",
 		"--restrict-filenames",
+		"-f 0",
 		// provide URL via stdin for security, youtube-dl has some run command args
-		"--batch-file", "-",
+		//"--batch-file", "-",
 		"-J",
-		"-f 0", // AK TODO added -f 0 as a temp workaround for tiktoks
 	)
 	if options.Type == TypePlaylist {
 		cmd.Args = append(cmd.Args, "--yes-playlist")

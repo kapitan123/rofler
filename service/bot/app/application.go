@@ -38,10 +38,7 @@ func NewApplicationFromConfig(ctx context.Context, servicename string, projectId
 	urlPostedTopic := infra.NewPubSubTopicClient(ctx, projectId, servicename, videoUrlPostedTopicId)
 
 	commands := []tgcommandhandler{
-		tgcommand.NewRecordMediaPost(postsRepo),
-		tgcommand.NewRecordReaction(postsRepo),
 		tgcommand.NewRecordUrl(botapi, postsRepo, urlPostedTopic),
-		tgcommand.NewTopRofler(botapi, postsRepo),
 	}
 
 	publishVideo := pubsubcommand.NewPublishDownloadedVideo(botapi, postsRepo, fileBucket)

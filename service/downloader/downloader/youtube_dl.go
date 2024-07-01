@@ -1,4 +1,4 @@
-package infra
+package downloader
 
 import (
 	"context"
@@ -81,13 +81,13 @@ func createCookieFileFromBase64(base64cookies string) (string, error) {
 
 	file, err := os.Create(cookiesName)
 	if err != nil {
-		return "", errors.Wrap(err, "error creating file")
+		return "", errors.Wrap(err, "error creating local copy of the cookie file")
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(content)
 	if err != nil {
-		return "", errors.Wrap(err, "error writing to file")
+		return "", errors.Wrap(err, "error writing to a local copy of the cookie file")
 	}
 
 	logrus.Info("cookie file created and content written successfully")
@@ -98,7 +98,7 @@ func createCookieFileFromBase64(base64cookies string) (string, error) {
 func getAbsoluteCookiePath() (string, error) {
 	wd, err := os.Getwd()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "couldnt open the current directory")
 	}
 
 	cookiesPath := filepath.Join(wd, cookiesName)

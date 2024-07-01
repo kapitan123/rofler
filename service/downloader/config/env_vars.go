@@ -11,8 +11,7 @@ type Config struct {
 	VideoSavedTopic   string `env:"VIDEO_SAVED_TOPIC"`
 	DownloaderCookies string `env:"DOWNLOADER_COOKIES"`
 
-	ProjectId string `env:"PROJECT_ID"`
-	// port
+	ProjectId   string `env:"PROJECT_ID"`
 	Port        int    `env:"PORT" envDefault:"8080"`
 	ServiceName string `env:"SERVICE_NAME" envDefault:"downloader"`
 	DebguMode   bool   `env:"DEBUG_MODE"`
