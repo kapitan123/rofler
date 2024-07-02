@@ -14,19 +14,20 @@ import (
 )
 
 var cookiesName = "cookies.txt"
+var ytPath = "yt-dlp"
 
 type Downloader struct {
 	cookiesPath string
 }
 
-func NewDownloader(path string, base64cookies string) *Downloader {
+func NewDownloader(base64cookies string) *Downloader {
 	cookiesPath, err := createCookieFileFromBase64(base64cookies)
 
 	if err != nil {
 		logrus.Panic(errors.Wrap(err, "can't create cookies file"))
 	}
 
-	goutubedl.Path = path
+	goutubedl.Path = ytPath
 
 	_, err = goutubedl.Version(context.Background())
 

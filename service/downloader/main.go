@@ -2,25 +2,34 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/kapitan123/telegrofler/common/logs"
-	"github.com/kapitan123/telegrofler/common/server"
+	"github.com/kapitan123/telegrofler/service/downloader/app"
 	"github.com/kapitan123/telegrofler/service/downloader/downloader"
-	"github.com/kapitan123/telegrofler/service/downloader/port"
 )
 
 func main() {
 	ctx := context.Background()
 	cfg := app.GetEnvVars()
 
-	logs.Init(cfg.DebguMode)
+	// AK TODO add errors
+	videoBucket := downloader.NewCloudStoreBucketClient(ctx, cfg.ProjectId, cfg.VideoFilesBucket)
+	successTopic := downloader.NewPubSubTopicClient(ctx, cfg.ProjectId, cfg.ServiceName, cfg.VideoSavedTopicId)
+	youtubeDl := downloader.NewDownloader(cfg.DownloaderCookies)
 
-	application := downloader.NewApplicationFromConfig(ctx, cfg.ServiceName, cfg.ProjectId,
-		cfg.VidoFilesBucket, cfg.VideoSavedTopic, cfg.YoutubeDlPath, cfg.DownloaderCookies)
+	handler := app.NewServer(videoBucket,
+		youtubeDl,
+		successTopic,
+	)
 
-	server.RunHTTPServer(cfg.Port, func(router chi.Router) http.Handler {
-		return port.HandlerFromMux(port.NewHttpServer(application), router)
-	})
+	http := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.Port),
+		Handler: handler,
+	}
+
+	go func() {
+		log.
+	}
 }
